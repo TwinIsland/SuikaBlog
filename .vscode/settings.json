@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "nobuild.h": "c",
+        "sqlite3.h": "c",
+        "crud.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "memory.h": "c",
+        "blog_init.h": "c",
+        "string.h": "c",
+        "fs_helper.h": "c",
+        "termios.h": "c"
+    }
+}
