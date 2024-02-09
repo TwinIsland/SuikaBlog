@@ -1,0 +1,131 @@
+.article-body {
+    margin-top: 9px;
+    margin-bottom: 9px;
+    font-family: 'Noto Sans SC', sans-serif;
+}
+
+.article-body img {
+    /* Makes the image responsive */
+    max-width: 100%;
+    height: auto;
+    /* Gives a little spacing around the image */
+    margin: 15px 0;
+    /* Adds a subtle shadow around the image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Optional: Rounded corners for the image */
+    border-radius: 5px;
+}
+
+/* Ensures the content clears/flows correctly around floated elements */
+.article-body::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.article-body {
+    font-family: 'Noto Sans SC', sans-serif;
+    line-height: 1.7;
+    color:  var(--bs-secondary-color);    
+    font-size: 18px;
+}
+
+.article-body h1, 
+.article-body h2, 
+.article-body h3, 
+.article-body h4 {
+    font-family: 'Noto Sans SC', sans-serif;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.article-body h1 {
+    font-size: 2.5em;
+}
+
+.article-body h2 {
+    font-size: 2em;
+}
+
+.article-body h3 {
+    font-size: 1.5em;
+}
+
+.article-body h4 {
+    font-size: 1.2em;
+}
+
+.article-body p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+.article-body a:hover {
+    text-decoration: underline;
+}
+
+.article-body img {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.article-body blockquote {
+    margin: 20px 0;
+    padding: 10px 20px;
+    font-style: italic;
+    background-color: #f9f9f9;
+    border-left: 5px solid #007bff;
+}
+
+.article-body ul,
+.article-body ol {
+    margin-bottom: 1.5rem;
+    padding-left: 20px;
+}
+
+.article-body li {
+    margin-bottom: 10px;
+}
+
+.article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.article-body table th, 
+.article-body table td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.article-body table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.article-body code {
+    background-color: #f9f9f9;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+post-meta {
+    color: var(--bs-secondary-color);
+}
+
+[data-bs-theme=dark] .article-body blockquote {
+    margin: 20px 0;
+    padding: 10px 20px;
+    font-style: italic;
+    background-color: #333;
+    border-left: 5px solid #007bff;
+}
+
+[data-bs-theme=dark] .article-body table th {
+    background-color: #555;
+}
