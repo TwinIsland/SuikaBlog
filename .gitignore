@@ -15,3 +15,5 @@
 bin/
 suika.db
 key.bin
+
+prouter/__pycache__/
