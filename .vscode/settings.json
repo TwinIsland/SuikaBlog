@@ -9,6 +9,9 @@
         "blog_init.h": "c",
         "string.h": "c",
         "fs_helper.h": "c",
-        "termios.h": "c"
+        "termios.h": "c",
+        "stdint.h": "c",
+        "models.h": "c",
+        "time.h": "c"
     }
 }

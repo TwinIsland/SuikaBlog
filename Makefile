@@ -10,6 +10,11 @@ ifeq ($(DEBUG), 1)
 	CFLAGS+=-DDEBUG
 endif
 
+ifeq ($(TEST), 1)
+	CFLAGS+=-DDEBUG -DTEST
+endif
+
+	
 # executation source
 SRC=suika.c $(wildcard $(LIBDIR)/*.c) $(wildcard $(SRCDIR)/*.c) $(wildcard $(UTILSDIR)/*.c)
 OUT=suika
@@ -27,6 +32,9 @@ $(OUT): $(OBJS)
 
 debug:
 	$(MAKE) DEBUG=1
+
+test:
+	$(MAKE) TEST=1
 
 clean:
 	rm -rf $(OUTDIR) $(OBJDIR)

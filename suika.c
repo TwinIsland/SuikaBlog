@@ -7,7 +7,7 @@
 #include "blog_init.h"
 #include "utils.h"
 #include "crud.h"
-#include "ipc.h"
+#include "models.h"
 
 #define ASCII_LOGO_PATH "assets/ascii_logo"
 
@@ -25,6 +25,14 @@ void print_logo()
 
 print_welcome:
     printf("\n\nWelcome to Suika Blog System!\n\n");
+}
+
+void free_config(configuration *config) {
+    if (config->admin_email) free(config->admin_email);
+    if (config->admin_name) free(config->admin_name);
+    if (config->db_name) free(config->db_name);
+    if (config->ipc_path) free(config->ipc_path);
+    if (config->key_file) free(config->key_file);
 }
 
 int main()
@@ -51,13 +59,28 @@ int main()
         exit(1);
     }
 
-    PRINT_LOG("init: %s", ret, 0, config->db_name);
-    PRINT_LOG("init: passkey", ret, 0);
+    PRINT_LOG("init: %s", ret, 1, config->db_name);
+    PRINT_LOG("init: passkey", ret, 1);
 
-    // init_ipc(config);
-    // send_ipc("hello world");
-    // sleep(100);
-    // cleanup_ipc();
+#ifdef TEST
+    // test code
+    db_init(config->db_name);
+    Post cur;
+    int total_post;
+
+    ret = get_post(1, &cur);
+    PRINT_LOG("test: get_post", ret, 0);
+    printf("content: %ld\n", cur.DatePublished);
+
+    ret = get_total_post_count(&total_post);
+    PRINT_LOG("test: get_total_post_count", ret, 0);
+    printf("content: %d\n", total_post);
+    destroy_post(&cur);    
+    db_close();
+#endif
+
+    // free all heap resources
+    free_config(config);
 
     return 0;
 }
