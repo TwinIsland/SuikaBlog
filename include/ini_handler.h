@@ -17,6 +17,8 @@ typedef struct
     char *key_file;
     int server_port;
     char *db_name;
+    char *ipc_path;
+    int ipc_size;
 } configuration;
 
 

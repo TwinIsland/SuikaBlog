@@ -20,6 +20,10 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->server_port = atoi(value);
     else if (MATCH("database", "db_name"))
         pconfig->db_name = strdup(value);
+    else if (MATCH("ipc", "ipc_path"))
+        pconfig->ipc_path = strdup(value);
+    else if (MATCH("ipc", "ipc_size"))
+        pconfig->ipc_size = atoi(value);
 
     else
         return 0; // raise error is no such entry
@@ -37,7 +41,7 @@ Result init_config()
     }
 
     is_init = 1;
-    return (Result) {
+    return (Result){
         .status = OK,
         .ptr = &config,
     };
@@ -45,7 +49,8 @@ Result init_config()
 
 configuration *get_config()
 {
-    if (!is_init) return NULL;
+    if (!is_init)
+        return NULL;
 
     return &config;
 }

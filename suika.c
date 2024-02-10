@@ -7,6 +7,7 @@
 #include "blog_init.h"
 #include "utils.h"
 #include "crud.h"
+#include "ipc.h"
 
 #define ASCII_LOGO_PATH "assets/ascii_logo"
 
@@ -53,11 +54,10 @@ int main()
     PRINT_LOG("init: %s", ret, 0, config->db_name);
     PRINT_LOG("init: passkey", ret, 0);
 
-    printf("\n");
-
-    db_init(config->db_name);
-    ret = create_post("test", "test excerpts", "test contents");
-    PRINT_LOG("test create post", ret, 0);
+    // init_ipc(config);
+    // send_ipc("hello world");
+    // sleep(100);
+    // cleanup_ipc();
 
     return 0;
 }
