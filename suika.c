@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <mongoose.h>
+#include <signal.h>
 
 #include "result.h"
 #include "ini_handler.h"
@@ -8,8 +10,12 @@
 #include "utils.h"
 #include "crud.h"
 #include "models.h"
+#include "router.h"
 
 #define ASCII_LOGO_PATH "assets/ascii_logo"
+
+static configuration *config;
+static struct mg_mgr mgr;
 
 void print_logo()
 {
@@ -27,24 +33,34 @@ print_welcome:
     printf("\n\nWelcome to Suika Blog System!\n\n");
 }
 
-void free_config(configuration *config) {
-    if (config->admin_email) free(config->admin_email);
-    if (config->admin_name) free(config->admin_name);
-    if (config->db_name) free(config->db_name);
-    if (config->ipc_path) free(config->ipc_path);
-    if (config->key_file) free(config->key_file);
+
+void exit_handler()
+{
+    // clean config
+    destory_config();
+    // clean server
+    mg_mgr_free(&mgr);
+    
+    printf("\nbye\n");
+    exit(1);
 }
 
 int main()
 {
     Result ret;
+    char server_addr[32];
+
+    // register signal handler
+    signal(SIGINT, exit_handler);
+    PRINT_LOG("init: signal handler", (Result){.status = OK}, 0);
 
     // print welcome message
     print_logo();
 
     // load configurations
     ret = init_config();
-    configuration *config = get_config();
+    config = get_config();
+
     PRINT_LOG("loading config", ret, 1);
 
     // checking config files
@@ -68,6 +84,8 @@ int main()
     Post cur;
     int total_post;
 
+    ret = create_post("test title", "test excerpt", "test content");
+
     ret = get_post(1, &cur);
     PRINT_LOG("test: get_post", ret, 0);
     printf("content: %ld\n", cur.DatePublished);
@@ -75,12 +93,23 @@ int main()
     ret = get_total_post_count(&total_post);
     PRINT_LOG("test: get_total_post_count", ret, 0);
     printf("content: %d\n", total_post);
-    destroy_post(&cur);    
+    destroy_post(&cur);
     db_close();
 #endif
 
-    // free all heap resources
-    free_config(config);
+    // start the server
+    sprintf(server_addr, "http://0.0.0.0:%d", config->server_port);
+
+    mg_mgr_init(&mgr);
+    mg_http_listen(&mgr, server_addr, (mg_event_handler_t)server_fn, NULL);
+
+    PRINT_LOG("boost: server", (Result){.status = OK}, 0);
+    printf("\nServer start at %s, enjoy!\n", server_addr);
+
+    for (;;)
+        mg_mgr_poll(&mgr, 1000); // Infinite event loop
+
+    exit_handler();
 
     return 0;
 }

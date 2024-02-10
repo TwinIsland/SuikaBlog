@@ -54,3 +54,17 @@ configuration *get_config()
 
     return &config;
 }
+
+void destory_config()
+{
+    if (config.admin_email)
+        free(config.admin_email);
+    if (config.admin_name)
+        free(config.admin_name);
+    if (config.db_name)
+        free(config.db_name);
+    if (config.ipc_path)
+        free(config.ipc_path);
+    if (config.key_file)
+        free(config.key_file);
+}

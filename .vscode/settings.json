@@ -12,6 +12,7 @@
         "termios.h": "c",
         "stdint.h": "c",
         "models.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "mongoose.h": "c"
     }
 }

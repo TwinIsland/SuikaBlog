@@ -22,15 +22,13 @@ typedef struct
 } configuration;
 
 
-/*
-    initialize config handler
-
-*/
+// initialize config handler
 Result init_config();
 
-/*
-    get the config
-*/
+// get the config
 configuration *get_config();
+
+// config destoryer
+void destory_config();
 
 #endif
