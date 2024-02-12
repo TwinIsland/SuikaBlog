@@ -13,6 +13,10 @@
         "stdint.h": "c",
         "models.h": "c",
         "time.h": "c",
-        "mongoose.h": "c"
+        "mongoose.h": "c",
+        "ini_handler.h": "c",
+        "router.h": "c",
+        "cmath": "c",
+        "utils.h": "c"
     }
 }

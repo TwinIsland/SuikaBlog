@@ -1,10 +1,8 @@
 #include <sqlite3.h>
-#include <termios.h>
 
 #include "blog_init.h"
 #include "fs_helper.h"
 #include "utils.h"
-
 
 static Result initialize_pass(const char *key_file, const BYTE *pass)
 {
@@ -102,35 +100,19 @@ static Result initialize_db(const char *db_path)
     };
 }
 
-static void disable_echo()
-{
-    struct termios old_term, new_term;
-    tcgetattr(STDIN_FILENO, &old_term);
-    new_term = old_term;
-    new_term.c_lflag &= ~(ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
-}
-
-// Function to enable terminal echo
-static void enable_echo()
-{
-    struct termios term;
-    tcgetattr(STDIN_FILENO, &term);
-    term.c_lflag |= ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &term);
-}
-
 // Function to get password input securely
 static void get_password(BYTE *password)
 {
-    disable_echo();
     fgets((char *)password, MAX_PASS_LENGTH, stdin);
-    enable_echo();
-    // Remove trailing newline character, if any
+
+    char *newline = strchr((char *)password, '\n');
+    if (newline)
+        *newline = '\0';
 }
 
 void initialize_blog(configuration *config)
 {
+    int c;
     char input;
     Result ret;
 
@@ -146,21 +128,21 @@ void initialize_blog(configuration *config)
             printf("\n");
             PRINT_LOG("init %s", ret, 1, config->db_name);
         }
-    }
-    if (!file_exists(config->key_file))
-    {
-        int c;
-        BYTE password[MAX_PASS_LENGTH];
 
         // clear stdin
         while ((c = getchar()) != '\n' && c != EOF)
             ;
+    }
+    if (!file_exists(config->key_file))
+    {
+        BYTE password[MAX_PASS_LENGTH];
 
         printf("\nCreate key Pass: ");
         get_password(password);
 
         printf("\n\n");
         ret = initialize_pass(config->key_file, password);
+
         PRINT_LOG("init passcode", ret, 1);
     }
 

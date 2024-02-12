@@ -47,6 +47,36 @@ Result init_config()
     };
 }
 
+Result load_passcode_to_config()
+{
+    FILE *file = fopen(config.key_file, "rb");
+
+    if (file == NULL)
+        return (Result){
+            .status = FAILED,
+            .msg = "Failed to open file for reading",
+        };
+
+    BYTE *buf = malloc(sizeof(BYTE) * SHA256_BLOCK_SIZE);
+    size_t bytes_read = fread(buf, sizeof(BYTE), SHA256_BLOCK_SIZE, file);
+    fclose(file);
+
+    if (bytes_read < SHA256_BLOCK_SIZE)
+    {
+        return (Result){
+            .status = FAILED,
+            .msg = "Failed to read complete passcode",
+        };
+    }
+
+    config.pass_sha256 = buf;
+
+    return (Result) {
+        .status = OK,
+        .msg = "Passcode loaded successfully",
+    };
+}
+
 configuration *get_config()
 {
     if (!is_init)
@@ -67,4 +97,6 @@ void destory_config()
         free(config.ipc_path);
     if (config.key_file)
         free(config.key_file);
+    if (config.pass_sha256)
+        free(config.pass_sha256);
 }

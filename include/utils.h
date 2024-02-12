@@ -1,6 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "sha256.h"
+#include "string.h"
+
 #define PRINT_LOG(info, ret, is_err_critical, ...) \
     do                                             \
     {                                              \
@@ -34,6 +37,11 @@
 #else
 #define debug(msg, ...)
 #endif
+
+#define SHA256_PASS_MATCHED(pass1, pass2) strncmp((char *)pass1, (char *) pass2, SHA256_BLOCK_SIZE) == 0
+
+// get the sha256 encrypt result from string
+BYTE *get_sha256_encrypt(const BYTE *keypass);
 
 
 #endif

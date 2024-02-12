@@ -33,14 +33,13 @@ print_welcome:
     printf("\n\nWelcome to Suika Blog System!\n\n");
 }
 
-
 void exit_handler()
 {
     // clean config
     destory_config();
     // clean server
     mg_mgr_free(&mgr);
-    
+
     printf("\nbye\n");
     exit(1);
 }
@@ -50,17 +49,16 @@ int main()
     Result ret;
     char server_addr[32];
 
+    // print welcome message
+    print_logo();
+
     // register signal handler
     signal(SIGINT, exit_handler);
     PRINT_LOG("init: signal handler", (Result){.status = OK}, 0);
 
-    // print welcome message
-    print_logo();
-
     // load configurations
     ret = init_config();
     config = get_config();
-
     PRINT_LOG("loading config", ret, 1);
 
     // checking config files
@@ -75,26 +73,20 @@ int main()
         exit(1);
     }
 
+    // load passcode to config
+    ret = load_passcode_to_config();
+    PRINT_LOG("init: keypass", ret, 1);
+
     PRINT_LOG("init: %s", ret, 1, config->db_name);
-    PRINT_LOG("init: passkey", ret, 1);
+    // CONFIG INIT END
 
 #ifdef TEST
     // test code
-    db_init(config->db_name);
-    Post cur;
-    int total_post;
+    const char *exp_password = "twinisland";
+    BYTE *exp_sha256 = get_sha256_encrypt((const BYTE *)exp_password);
+    debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
+    free(exp_sha256);
 
-    ret = create_post("test title", "test excerpt", "test content");
-
-    ret = get_post(1, &cur);
-    PRINT_LOG("test: get_post", ret, 0);
-    printf("content: %ld\n", cur.DatePublished);
-
-    ret = get_total_post_count(&total_post);
-    PRINT_LOG("test: get_total_post_count", ret, 0);
-    printf("content: %d\n", total_post);
-    destroy_post(&cur);
-    db_close();
 #endif
 
     // start the server
@@ -104,7 +96,7 @@ int main()
     mg_http_listen(&mgr, server_addr, (mg_event_handler_t)server_fn, NULL);
 
     PRINT_LOG("boost: server", (Result){.status = OK}, 0);
-    printf("\nServer start at %s, enjoy!\n", server_addr);
+    printf("\nServer start at %s\n", server_addr);
 
     for (;;)
         mg_mgr_poll(&mgr, 1000); // Infinite event loop
