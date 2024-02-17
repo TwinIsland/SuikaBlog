@@ -1,0 +1,154 @@
+.container {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    padding: 0 30px;
+    max-width: 1320px;
+}
+
+
+
+@font-face {
+    font-family: LogoFont;
+    src: url(.././font/logo_font.ttf);
+}
+
+.brand {
+    font-family: LogoFont;
+    font-size: 2.25rem;
+    padding-bottom: 0.5rem;
+}
+
+.header {
+    padding-top: 0.6rem;
+    align-items: center;
+}
+
+.search {
+    margin-bottom: -10px;
+    padding-right: 15px;
+    text-align: right;
+    padding-bottom: 0;
+    text-align: right;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.6rem;
+}
+
+.navbar a {
+    color: rgb(108,117,125);
+}
+
+.cover-article {
+    border-radius: 10px;
+    padding: 20px 20px 24px 35px;
+    min-height: 300px;
+    max-height: 400px;
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgb(81 53 53 / 50%)), url(../img/banner.webp);
+    color: white;
+    text-overflow: ellipsis;
+    margin-bottom: 1rem;
+}
+
+.cover-article-inner {
+    max-height: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+a {
+    color: #B98A82;
+    text-decoration: underline;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    font-style: italic;
+}
+
+h3 {
+    font-weight: 300;
+    font-size: 30px;
+}
+
+
+
+.trend-article {
+    margin-bottom: 15px;
+
+}
+
+.trend-article-post {
+    height: 250px;
+    border-style: solid;
+    border-radius: 0.375rem;
+    border-color: #dee2e6;
+    border-width: 1px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    overflow: hidden;
+    padding: 25px;
+    text-overflow: ellipsis;
+
+}
+
+
+.normal-article {
+    min-height: 230px;
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    background-position: center;
+    background-size: cover;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../img/banner.webp);
+}
+
+.normal-article-inner {
+    padding: 20px;
+}
+
+.card-box {
+    min-height: 20px;
+    border-style: none;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.card-box header {
+    font-size: 25px;
+    border-bottom: none;
+}
+
+.sidebar {
+    top: 2rem;
+    position: sticky;
+}
+
+.footer {
+    background-color: rgb(248, 249, 250);
+    height: 150px;
+    text-align: center;
+    padding-top: 2rem;
+    font-family: LogoFont;
+    font-size: 22px;
+    user-select: none;
+    padding-bottom: 3rem;
+    color: rgba(33, 37, 41, 0.75);
+}
+
+button {
+    font-size: 15px;
+    background-color: rgb(128, 125, 126);
+    ;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(128, 125, 126) transparent;
+}

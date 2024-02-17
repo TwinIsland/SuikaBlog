@@ -17,3 +17,6 @@ suika.db
 key.bin
 
 prouter/__pycache__/
+
+# npm
+node_modules/

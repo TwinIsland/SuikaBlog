@@ -60,7 +60,7 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
     }
     else
     {
-      struct mg_http_serve_opts opts = {.root_dir = "theme"};
+      struct mg_http_serve_opts opts = {.root_dir = "theme_new"};
       mg_http_serve_dir(c, hm, &opts); // Serve static files
     }
   }
