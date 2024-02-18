@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TwinIsland's Blog">
+    <meta name="author" content="TwinIsland">
+
+    <title>贰岛博客</title>
+
+</head>
+
+<body>
+
+    <script type="module">
+        import { createElement, render } from 'https://esm.sh/preact';
+        import htm from 'https://esm.sh/htm';
+
+        function App() {
+            return (
+                html`<div>
+                    <p class="count">计数：</p>
+                    <button>点我！</button>
+                </div>`
+            )
+
+        }
+
+        render(html`<${App} />`, document.getElementById("app"));
+
+
+    </script>
+
+</body>
+
+</html>

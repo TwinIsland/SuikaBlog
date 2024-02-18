@@ -38,3 +38,13 @@ test:
 
 clean:
 	rm -rf $(OUTDIR) $(OBJDIR)
+
+gzip:
+	find ./theme/css/ -type f -name '*.css' -exec gzip {} \;
+	find ./theme/js/ -type f -name '*.js' -exec gzip {} \;
+	find ./theme/ -type f -name '*.html' -exec gzip {} \;
+
+gunzip:
+	find ./theme/css/ -type f -name '*.css.gz' -exec gunzip {} \;
+	find ./theme/js/ -type f -name '*.js.gz' -exec gunzip {} \;
+	find ./theme/ -type f -name '*.html.gz' -exec gunzip {} \;
