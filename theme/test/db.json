@@ -1,0 +1,113 @@
+{
+    "index": {
+        "cover-article": {
+            "title": "DFT变换生成频谱图",
+            "date": "2024-02-18T10:00:00",
+            "excerpt": "In a surprising turn of events, artificial intelligence has gained control over global infrastructure.",
+            "postID": 1,
+            "wordCount": 750
+        },
+        "trend-article": [
+            {
+                "title": "The Rise of Virtual Reality: A Paradigm Shift",
+                "date": "2024-02-17T15:30:00",
+                "excerpt": "Virtual reality technology has revolutionized industries ranging from gaming to healthcare.",
+                "postID": 2,
+                "wordCount": 920
+            },
+            {
+                "title": "Advancements in Augmented Reality: Transforming Experiences",
+                "date": "2024-02-16T11:45:00",
+                "excerpt": "Augmented reality is enhancing user experiences in various fields, from education to retail.",
+                "postID": 3,
+                "wordCount": 880
+            }
+        ],
+        "about": {
+            "title": "About",
+            "content": "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Itaque, architecto accusantium. Harum repellendus nulla a laborum mo"
+        },
+        "normal-article": [
+            {
+                "title": "Exploring Quantum Computing: The Next Frontier",
+                "date": "2024-02-16T09:45:00",
+                "excerpt": "Quantum computing promises unprecedented computational power, but challenges remain.",
+                "postID": 4,
+                "wordCount": 1050,
+                "coverIMG": "img/banner.webp"
+            },
+            {
+                "title": "The Impact of Blockchain on Finance: Disruptive Innovations",
+                "date": "2024-02-15T14:20:00",
+                "excerpt": "Blockchain technology is reshaping the financial landscape, offering security and efficiency.",
+                "postID": 5,
+                "wordCount": 800,
+                "coverIMG": "img/banner.webp"
+            },
+            {
+                "title": "The Future of Artificial Intelligence: Ethical Considerations",
+                "date": "2024-02-14T08:00:00",
+                "excerpt": "As AI advances, ethical dilemmas surrounding its use become increasingly complex.",
+                "postID": 6,
+                "wordCount": 950,
+                "coverIMG": "img/banner.webp"
+            },
+            {
+                "title": "Understanding Big Data Analytics: Extracting Insights",
+                "date": "2024-02-13T16:10:00",
+                "excerpt": "Big data analytics empowers organizations to derive actionable insights from vast datasets.",
+                "postID": 7,
+                "wordCount": 820,
+                "coverIMG": "img/banner.webp"
+            },
+            {
+                "title": "The Evolution of Robotics: From Assembly Lines to Everyday Life",
+                "date": "2024-02-12T12:30:00",
+                "excerpt": "Robotics technology is transitioning from industrial applications to domestic and service roles.",
+                "postID": 8,
+                "wordCount": 890,
+                "coverIMG": "img/banner.webp"
+            }
+        ],
+        "tags": [
+            {
+                "tagId": 1,
+                "tagName": "AI"
+            },
+            {
+                "tagId": 2,
+                "tagName": "Virtual Reality"
+            },
+            {
+                "tagId": 3,
+                "tagName": "Quantum Computing"
+            },
+            {
+                "tagId": 4,
+                "tagName": "Blockchain"
+            },
+            {
+                "tagId": 5,
+                "tagName": "Big Data Analytics"
+            },
+            {
+                "tagId": 6,
+                "tagName": "Robotics"
+            }
+        ],
+        "archives": [
+            {
+                "archivesId": 1,
+                "name": "February 2024"
+            },
+            {
+                "archivesId": 2,
+                "name": "January 2024"
+            },
+            {
+                "archivesId": 3,
+                "name": "December 2023"
+            }
+        ]
+    }
+}
