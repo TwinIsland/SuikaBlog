@@ -77,9 +77,9 @@
             <a href="#">实验室</a>
         </div>
 
-        <div class="none full-1200 cover-article">
-            <div class="flex three">
-                <div class="full half-800" id="cover-article-container">
+        <div class="none full-800 cover-article">
+            <div class="flex two">
+                <div class="two-third" id="cover-article-container">
                     <div class="loading-block" style="height: 80px;"></div>
                     <div class="loading-block" style="height: 170px;"></div>
                 </div>
@@ -197,9 +197,13 @@
     </footer>
 
     <div id="suika" style="position: fixed; bottom: 0px; user-select: none; display:flex; z-index: 10;">
-        <img src="img/suika.webp" style="height:100px" onclick="toggleCloud()">
+        <img src="img/suika.webp" style="height:100px; width: 100px;" onclick="toggleCloud()">
         <div id="conversationCloud" style="opacity: 0;"></div>
     </div>
+
+    <a tabindex="-1" class="top pseudo button"
+        style="position: fixed; bottom: 0px; right: 200px; border-radius: .3em .3em 0 0; display: none; font-weight: bold;">▲ Up you go
+        ▲</a>
 
     <!-- index content rendering -->
     <script async src="js/index.js"></script>
@@ -212,7 +216,6 @@
             }
         }
     </script>
-
 </body>
 
 </html>

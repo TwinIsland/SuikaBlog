@@ -22,19 +22,18 @@ function openUrlInNewTab(url) {
 }
 
 function renderWrapper(elementDOM, newHTML) {
-
-  if (elementDOM) {
+  setTimeout(() => {
+    elementDOM.classList.add('fade-in');
     setTimeout(() => {
-      if (elementDOM) {
-        elementDOM.innerHTML = newHTML;
-      }
-    }, 300);
-  }
+      elementDOM.innerHTML = newHTML;
+      elementDOM.classList.add('visible');
+    }, 230);
+  }, 150);
 }
 
 function renderCoverArticle(coverArticleJSON) {
   return `
-  <a href="/post/${coverArticleJSON.postID}" style="text-decoration: none; color: inherit; ">
+  <a href="/post/${coverArticleJSON.postID}" style="text-decoration: none; color: inherit;">
     <h1 class="inline-text" style="padding-top: 20px; min-height: 154px">${coverArticleJSON.title}</h1>
     <p style="font-size: 20px; height: 92px; overflow: hidden">${coverArticleJSON.excerpt}</p>
   </a>
@@ -93,7 +92,13 @@ function renderArchives(archivesJSON) {
   `).join('')
 }
 
-fetch('http://localhost:3000/index')
+AbortSignal.timeout ??= function timeout(ms) {
+  const ctrl = new AbortController()
+  setTimeout(() => ctrl.abort(), ms)
+  return ctrl.signal
+}
+
+fetch('http://localhost:3000/index', { signal: AbortSignal.timeout(5000) })
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -129,4 +134,6 @@ fetch('http://localhost:3000/index')
   })
   .catch(error => {
     console.error('There was a problem with your fetch operation:', error);
+    elementDOM = document.getElementById('cover-article-container');
+    renderWrapper(elementDOM, "<h1 >⚠エラー発生!⚠</h1><h2>Oppps, Something Bad Happens, Please Contact Admin for help (ᗜ˰ᗜ)</h2>")
   });
