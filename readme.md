@@ -37,7 +37,7 @@ make test_server
 ```
 
 ## Frontend
-The default frontend theme, [Suika Ultimate Theme](./theme/readme.md), is optimized for ultimate performance, boasting a total dependency of less than 10kb. It primarily utilizes vanilla JavaScript and CSS for streamlined efficiency.
+The default frontend theme, [Suika Ultimate Theme](./theme/readme.md), is optimized for ultimate performance, boasting a total dependency of less than 3kb. It primarily utilizes vanilla JavaScript and CSS for streamlined efficiency.
 
 
 ## Thanks
