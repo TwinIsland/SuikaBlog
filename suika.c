@@ -79,10 +79,11 @@ int main()
 
     PRINT_LOG("init: %s", ret, 1, config->db_name);
     // CONFIG INIT END
-
 #ifdef TEST
     // test code
-    const char *exp_password = "twinisland";
+    debug("make sure you set the passkey=test");
+
+    const char *exp_password = "test";
     BYTE *exp_sha256 = get_sha256_encrypt((const BYTE *)exp_password);
     debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
     free(exp_sha256);
@@ -90,6 +91,11 @@ int main()
 #endif
 
     // start the server
+
+// #ifdef DEBUG
+//     mg_log_set(MG_LL_DEBUG);
+// #endif
+
     sprintf(server_addr, "http://0.0.0.0:%d", config->server_port);
 
     mg_mgr_init(&mgr);

@@ -17,6 +17,8 @@
         "ini_handler.h": "c",
         "router.h": "c",
         "cmath": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "random": "c",
+        "sha256.h": "c"
     }
 }

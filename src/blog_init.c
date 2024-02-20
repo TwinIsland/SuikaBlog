@@ -4,18 +4,14 @@
 #include "fs_helper.h"
 #include "utils.h"
 
-static Result initialize_pass(const char *key_file, const BYTE *pass)
+static Result initialize_pass(const char *key_file, const BYTE *keypass)
 {
-    SHA256_CTX ctx;
-    sha256_init(&ctx);
-    sha256_update(&ctx, pass, strlen((const char *)pass));
-    BYTE buf[SHA256_BLOCK_SIZE];
-
-    sha256_final(&ctx, buf);
+    BYTE *buf = get_sha256_encrypt(keypass);
 
     FILE *file = fopen(key_file, "wb");
     if (file == NULL)
     {
+        free(buf);
         return (Result){
             .status = FAILED,
             .msg = "Failed to open file",
@@ -25,13 +21,16 @@ static Result initialize_pass(const char *key_file, const BYTE *pass)
     size_t bytes_written = fwrite(buf, sizeof(BYTE), SHA256_BLOCK_SIZE, file);
     if (bytes_written < SHA256_BLOCK_SIZE)
     {
+        free(buf);
         fclose(file);
+        delete_file(key_file);
         return (Result){
             .status = FAILED,
             .msg = "Failed to write the full buffer to the file",
         };
     }
 
+    free(buf);
     fclose(file);
 
     return (Result){

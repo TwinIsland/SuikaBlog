@@ -2299,7 +2299,7 @@ void mg_http_serve_file(struct mg_connection *c, struct mg_http_message *hm,
   // Failed to open, and page404 is configured? Open it, then
   if (fd == NULL && opts->page404 != NULL) {
     fd = mg_fs_open(fs, opts->page404, MG_FS_READ);
-    mime = guess_content_type(mg_str(path), opts->mime_types);
+    mime = mg_str("text/html; charset=utf-8");
     path = opts->page404;
   }
 

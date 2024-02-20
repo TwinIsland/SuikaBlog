@@ -40,7 +40,7 @@
 
 #define SHA256_PASS_MATCHED(pass1, pass2) strncmp((char *)pass1, (char *) pass2, SHA256_BLOCK_SIZE) == 0
 
-// get the sha256 encrypt result from string
+// get the sha256 encrypt result from string, size equal to SHA256_BLOCK_SIZE
 BYTE *get_sha256_encrypt(const BYTE *keypass);
 
 

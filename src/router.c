@@ -4,6 +4,7 @@
 #include "fs_helper.h"
 
 static configuration *config;
+static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
 void init_router(configuration *_config)
 {
@@ -42,7 +43,7 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
   if (ev == MG_EV_HTTP_MSG)
   {
     struct mg_http_message *hm = (struct mg_http_message *)ev_data;    
-    struct mg_http_serve_opts opts = {.root_dir = "theme"};
+    struct mg_http_serve_opts opts = {.root_dir = "theme", .page404 = "theme/index.html"};
 
     // Cache all image request
     char uri[hm->uri.len+1];
@@ -51,11 +52,11 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
 
     debug("request: %s", uri);
 
-    if (is_file_image(uri)) {
-      debug("cache image: %s", uri);
+    if (check_file_with_exts(uri, cached_exts)) {
+      debug("cache file: %s", uri);
       opts.extra_headers = "Cache-Control: max-age=259200\n";
     }
-    
+
 
     mg_http_serve_dir(c, hm, &opts); // Serve static files
   }
