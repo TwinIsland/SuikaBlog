@@ -1,0 +1,38 @@
+const route = (event) => {
+    event = event || window.event;
+    event.preventDefault();
+    window.history.pushState({}, "", event.target.href);
+    handleLocation();
+};
+
+const routes = {
+    404: { html: "/pages/404.html", js: null },
+    "/": { html: "/pages/index.html", js: "js/index.js" },
+    "/about": { html: "/pages/about.html", js: "js/about.js" },
+    "/lorem": { html: "/pages/lorem.html", js: "js/lorem.js" },
+};
+
+const handleLocation = async () => {
+    const path = window.location.pathname;
+    const route = routes[path] || routes[404];
+    const html = await fetch(route.html).then((data) => data.text());
+    
+    document.getElementById("page-content").innerHTML = html;
+
+    const oldScript = document.querySelector('.route-script');
+    if (oldScript) {
+        oldScript.parentNode.removeChild(oldScript);
+    }
+
+    if (route.js) {
+        const script = document.createElement("script");
+        script.src = route.js;
+        script.className = 'route-script';
+        document.body.appendChild(script);
+    }
+};
+
+window.onpopstate = handleLocation;
+window.route = route;
+
+handleLocation();
