@@ -52,10 +52,14 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
 
     debug("request: %s", uri);
 
+#ifndef DEBUG
     if (check_file_with_exts(uri, cached_exts)) {
       debug("cache file: %s", uri);
       opts.extra_headers = "Cache-Control: max-age=259200\n";
     }
+#else
+    (void) cached_exts; // disable warning
+#endif
 
 
     mg_http_serve_dir(c, hm, &opts); // Serve static files

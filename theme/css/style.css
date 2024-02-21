@@ -4,9 +4,8 @@
     width: 100%;
     padding: 0 30px;
     max-width: 1320px;
+    min-height: 90vh;
 }
-
-
 
 @font-face {
     font-family: LogoFont;
@@ -106,16 +105,18 @@ h3 {
 }
 
 .footer {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
     background-color: rgb(248, 249, 250);
-    height: 150px;
-    text-align: center;
-    padding-top: 2rem;
+    height: 15vh; 
     font-family: LogoFont;
     font-size: 22px;
     user-select: none;
-    padding-bottom: 3rem;
     color: rgba(33, 37, 41, 0.75);
+    margin: 0; 
 }
+
 
 button {
     font-size: 15px;

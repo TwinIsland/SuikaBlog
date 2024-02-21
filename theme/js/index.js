@@ -116,6 +116,5 @@ fetch('http://localhost:3000/index', { signal: AbortSignal.timeout(5000) })
   })
   .catch(error => {
     console.error('There was a problem with your fetch operation:', error);
-    elementDOM = document.getElementById('cover-article-container');
-    renderWrapper(elementDOM, "<h1 >⚠エラー発生!⚠</h1><h2>Oppps, Something Bad Happens, Please Contact Admin for help (ᗜ˰ᗜ)</h2>")
+    window.location.href = '/err';
   });
