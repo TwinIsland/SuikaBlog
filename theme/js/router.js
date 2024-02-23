@@ -15,9 +15,9 @@ const routes = {
 const handleLocation = async () => {
     // cleanup the previous page renderer
     if (window.currentCleanup) {
-        window.currentCleanup(); 
+        const cleaner_name = window.currentCleanup(); 
         window.currentCleanup = null; 
-        console.log("clean previous page listener")
+        console.log("clean script: " + cleaner_name)
     }
 
     const path = window.location.pathname;
@@ -32,6 +32,7 @@ const handleLocation = async () => {
     }
 
     if (route.js) {
+        console.log("loading script: " + route.js)
         const script = document.createElement("script");
         script.src = route.js;
         script.className = 'route-script';

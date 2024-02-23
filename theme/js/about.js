@@ -37,6 +37,8 @@ function TableOfContents(container, output) {
     document.querySelector(output).innerHTML += toc;
 };
 
+TableOfContents(".article", "#toc")
+
 function handleScroll() {
     var scrolledHeight = window.pageYOffset;
     var parallaxSpeed = 0.5; // Adjust this value for different speeds. Less than 1 will be slower.
@@ -47,42 +49,44 @@ function handleScroll() {
     bannerDecoration.style.bottom = newBottomPosition + 'px';
 }
 
-// Placeholder for function to send likes to the backend
-function sendLikesToBackend(count) {
-    console.log('Sending likes to the backend:', count);
-}
+document.addEventListener('scroll', handleScroll);
+
 
 (function () {
-    TableOfContents(".article", "#toc")
-
-
-    document.addEventListener('scroll', handleScroll);
-
     const likeButton = document.getElementById('like');
     const likeCountElement = document.getElementById('likeCount');
     let likeCount = parseInt(likeCountElement.textContent, 10);
     let counterInterval;
     let incrementAmount = 1;
+    let stop_sending = false;
+
+    // Placeholder for function to send likes to the backend
+    function sendLikesToBackend(count) {
+        console.log('Sending likes to the backend:', count);
+    }
 
     function handleLikeMouseDown() {
-        incrementLikes();    
+        incrementLikes();
         // Continue incrementing the like count every 200ms
         counterInterval = setInterval(function () {
             incrementLikes();
-        }, 200);
+        }, 150);
     }
-    
+
     function stopLikeIncrement() {
         clearInterval(counterInterval);
-        sendLikesToBackend(likeCount); // Send the updated count to the backend
+        if (!stop_sending)
+            sendLikesToBackend(likeCount); // Send the updated count to the backend
     }
-    
+
     function incrementLikes() {
         if (incrementAmount <= 20) { // Check if maximum increment amount reached
             likeCount++;
             likeCountElement.textContent = likeCount;
             incrementAmount++;
         } else {
+            stop_sending = true;
+            toggleCloud("感谢你的喜爱！")
             stopLikeIncrement(); // Stop incrementing if maximum reached
         }
     }
@@ -95,6 +99,7 @@ function sendLikesToBackend(count) {
 // Cleanup function
 window.currentCleanup = function () {
     document.removeEventListener('scroll', handleScroll);
+    return "/about listeners";
 }
 
 
