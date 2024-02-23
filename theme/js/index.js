@@ -78,19 +78,59 @@ function renderArchives(archivesJSON) {
   `).join('')
 }
 
+// END RENDERING HELPERS
+
 AbortSignal.timeout ??= function timeout(ms) {
   const ctrl = new AbortController()
   setTimeout(() => ctrl.abort(), ms)
   return ctrl.signal
 }
 
-fetch('http://localhost:3000/index', { signal: AbortSignal.timeout(5000) })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
+function cacheData(key, data) {
+  const now = new Date().getTime();
+  const item = {
+    data: data,
+    expiry: now + 12 * 60 * 60 * 1000, // Current time + 12 hours in milliseconds
+  };
+  localStorage.setItem(key, JSON.stringify(item));
+}
+
+function getCachedData(key) {
+  const itemStr = localStorage.getItem(key);
+  if (!itemStr) {
+    return null;
+  }
+  const item = JSON.parse(itemStr);
+  const now = new Date().getTime();
+  if (now > item.expiry) {
+    localStorage.removeItem(key);
+    return null;
+  }
+  return item.data;
+}
+
+async function fetchDataWithCache(url) {
+  const cachedData = getCachedData(url);
+  if (cachedData) {
+    console.log("index cache hit!")
+    return Promise.resolve(cachedData);
+  } else {
+    console.log("fetch index data from server")
+    return fetch(url, { signal: AbortSignal.timeout(5000) })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        cacheData(url, data);
+        return data;
+      });
+  }
+}
+
+fetchDataWithCache('http://localhost:3000/index')
   .then(data => {
     let elementDOM = null;
 

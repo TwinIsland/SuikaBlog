@@ -13,6 +13,13 @@ const routes = {
 };
 
 const handleLocation = async () => {
+    // cleanup the previous page renderer
+    if (window.currentCleanup) {
+        window.currentCleanup(); 
+        window.currentCleanup = null; 
+        console.log("clean previous page listener")
+    }
+
     const path = window.location.pathname;
     const route = routes[path] || routes[404];
     const html = await fetch(route.html).then((data) => data.text());
