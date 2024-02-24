@@ -157,7 +157,18 @@ function updateTOC(container, output) {
     if (level) {
         toc += (new Array(level + 1)).join('</ul>');
     }
-    document.querySelector(output).innerHTML += toc;
+
+    let elementDOM = document.querySelector(output)
+
+    setTimeout(() => {
+        elementDOM.classList.add('fade-in');
+        setTimeout(() => {
+          elementDOM.innerHTML = toc;
+          elementDOM.classList.add('visible');
+        }, 230);
+      }, 150);
+
+    // document.querySelector(output).innerHTML += toc;
 };
 
 function registerLikeButton() {

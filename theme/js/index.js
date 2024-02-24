@@ -17,10 +17,6 @@ function formatTimestamp(timestamp) {
   return `${month} ${day}, ${year}`;
 }
 
-function openUrlInNewTab(url) {
-  window.open(url);
-}
-
 function renderWrapper(elementDOM, newHTML) {
   setTimeout(() => {
     elementDOM.classList.add('fade-in');
@@ -33,7 +29,7 @@ function renderWrapper(elementDOM, newHTML) {
 
 function renderCoverArticle(coverArticleJSON) {
   return `
-  <a href="/post/${coverArticleJSON.postID}" style="text-decoration: none; color: inherit;">
+  <a href="/post/${coverArticleJSON.postID}" onclick="route()" style="text-decoration: none; color: inherit;">
     <h1 class="inline-text" style="padding-top: 20px; min-height: 154px">${coverArticleJSON.title}</h1>
     <p style="font-size: 20px; height: 92px; overflow: hidden">${coverArticleJSON.excerpt}</p>
   </a>
@@ -42,7 +38,7 @@ function renderCoverArticle(coverArticleJSON) {
 
 function renderNormalArticle(normalArticlesJSON) {
   return normalArticlesJSON.map(normalArticleJSON => `
-  <a href="/post/${normalArticleJSON.postID}" style="text-decoration: none; color: inherit;">
+  <a href="/post/${normalArticleJSON.postID}" onclick="route()" style="text-decoration: none; color: inherit;">
     <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${normalArticleJSON.coverIMG}')";>
         <h2 class="inline-text" style="padding: 10px 0 10px 0;">${normalArticleJSON.title}</h2>
         <div style="margin-bottom: 45px;">
@@ -66,14 +62,14 @@ function renderAbout(aboutJSON) {
 
 function renderTags(tagsJSON) {
   return tagsJSON.map(tagJSON => `
-    <button onclick=openUrlInNewTab("/tag/${tagJSON.tagId}")>${tagJSON.tagName}</button>
+    <button href="/tag/${tagJSON.tagId}" onclick="route()">${tagJSON.tagName}</button>
   `).join('')
 }
 
 function renderArchives(archivesJSON) {
   return archivesJSON.map(archiveJSON => `
     <li>
-      <a href="/archives/${archiveJSON.archivesId}">${archiveJSON.name}</a>
+      <a href="/archives/${archiveJSON.archivesId}" onclick="route()">${archiveJSON.name}</a>
     </li>  
   `).join('')
 }

@@ -135,7 +135,7 @@
 }
 
 
-#toc h2 {
+.sidebar-title {
     font-size: 1.25rem;
     color: #333;
     text-transform: uppercase;
@@ -160,8 +160,6 @@
 }
 
 .like-icon {
-    width: 70px;
-    fill: #888; /* Default color for the icon */
     transition: fill 0.2s ease; /* Smooth color transition for the icon */
 }
 
@@ -174,4 +172,8 @@
 
 .like-button:hover {
     transform: scale(1.1); /* Slightly enlarges the button on hover */
+}
+
+#page-qr {
+    margin:2rem
 }
