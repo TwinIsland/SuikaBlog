@@ -112,10 +112,9 @@ function getCachedData(key) {
 async function fetchDataWithCache(url) {
   const cachedData = getCachedData(url);
   if (cachedData) {
-    console.log("index cache hit!")
     return Promise.resolve(cachedData);
   } else {
-    console.log("fetch index data from server")
+    console.log("load data: index")
     return fetch(url, { signal: AbortSignal.timeout(5000) })
       .then(response => {
         if (!response.ok) {

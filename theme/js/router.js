@@ -6,11 +6,13 @@ const route = (event) => {
 };
 
 const routes = {
-    404: { html: "/pages/404.html", js: null },
-    "/": { html: "/pages/index.html", js: "/js/index.js" },
-    "/about": { html: "/pages/about.html", js: "/js/about.js" },
-    "/err": { html: "/pages/503.html", js: null},
+    404: { html: "/pages/404.html", js: null, css: []},
+    "/": { html: "/pages/index.html", js: "/js/index.js", css: []},
+    "/about": { html: "/pages/about.html", js: "/js/about.js", css: ["/css/article.css"]},
+    "/err": { html: "/pages/503.html", js: null, css: []},
 };
+
+const loadedCSS = {};
 
 const handleLocation = async () => {
     // cleanup the previous page renderer
@@ -23,6 +25,21 @@ const handleLocation = async () => {
     const path = window.location.pathname;
     const route = routes[path] || routes[404];
     const html = await fetch(route.html).then((data) => data.text());
+
+    if (route.css.length > 0) {
+        route.css.forEach(url => {
+            if (!loadedCSS[url]) {
+                const link = document.createElement('link');
+                link.href = url;
+                link.type = 'text/css';
+                link.rel = 'stylesheet';
+                document.head.appendChild(link);
+        
+                loadedCSS[url] = true;
+                console.log(`load css: ${url}`);
+            }
+        });
+    }
     
     document.getElementById("page-content").innerHTML = html;
 
@@ -32,7 +49,7 @@ const handleLocation = async () => {
     }
 
     if (route.js) {
-        console.log("loading script: " + route.js)
+        console.log("load script: " + route.js)
         const script = document.createElement("script");
         script.src = route.js;
         script.className = 'route-script';

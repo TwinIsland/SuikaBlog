@@ -5,6 +5,7 @@
 */
 
 let currentTypingOperation = null;
+
 const phrases = [
     "嘿，别小看鬼哦！",
     "不错嘛，挺有意思的。",
@@ -119,3 +120,112 @@ document.querySelector('.top').addEventListener('click', function (event) {
 
     toggleCloud("↑↑↑↑↑")
 });
+
+function updateTOC(container, output) {
+    var toc = "";
+    var level = 0;
+    var container = document.querySelector(container) || document.querySelector('#contents');
+    var output = output || '#toc';
+
+    container.innerHTML =
+        container.innerHTML.replace(
+            /<h([\d])>([^<]+)<\/h([\d])>/gi,
+            function (str, openLevel, titleText, closeLevel) {
+                if (openLevel != closeLevel) {
+                    return str;
+                }
+
+                if (openLevel > level) {
+                    toc += (new Array(openLevel - level + 1)).join('<ul>');
+                } else if (openLevel < level) {
+                    toc += (new Array(level - openLevel + 1)).join('</li></ul>');
+                } else {
+                    toc += (new Array(level + 1)).join('</li>');
+                }
+
+                level = parseInt(openLevel);
+
+                var anchor = titleText.replace(/ /g, "_");
+                toc += '<li><a href="#' + anchor + '">' + titleText
+                    + '</a>';
+
+                return '<h' + openLevel + ' id="' + anchor + '">'
+                    + titleText + '</h' + closeLevel + '>';
+            }
+        );
+
+    if (level) {
+        toc += (new Array(level + 1)).join('</ul>');
+    }
+    document.querySelector(output).innerHTML += toc;
+};
+
+function registerLikeButton() {
+    const likeButton = document.getElementById('like');
+    const likeCountElement = document.getElementById('likeCount');
+    const likeCounterElement = document.getElementById('likeCounter');
+    const likeIcon = document.querySelector('.like-button .like-icon');
+    const likeText = document.querySelector('.like-button .like-text');
+
+    let likeCount = parseInt(likeCountElement.textContent, 10);
+    let clickEnabled = false;
+    let timer;
+    let start_timer = false;
+    let scalar = 2;
+    let love_icon = confetti.shapeFromText({ text: '♥', scalar});
+
+    if (typeof countdown !== "undefined")
+        clearInterval(countdown)
+
+    likeButton.addEventListener('click', function () {
+    
+        likeIcon.style.fill = '#e63946'; 
+        likeText.style.color = '#e63946'; 
+
+        if (!start_timer) {
+            likeCounterElement.parentNode.style.display = ''; // Show the counter
+            let counter = 5;
+
+            countdown = setInterval(() => {
+                counter -= 1;
+                likeCounterElement.textContent = counter;
+                if (counter <= 0) {
+                    clearInterval(countdown);
+                    likeCounterElement.parentNode.style.display = 'none';
+                }
+            }, 1000);
+
+            timer = setTimeout(() => {
+                clickEnabled = false;
+                toggleCloud("感谢你的喜爱！");
+            }, 5000);
+            clickEnabled = true
+            start_timer = true
+        }
+
+        if (clickEnabled) {
+            likeCount += 1;
+            likeCountElement.textContent = likeCount;
+            confetti({
+                particleCount: 15,
+                scalar: 1,
+                startVelocity: -35,
+                spread: 180,
+                origin: { y: 0, },
+                shapes: [love_icon]
+              });
+        } else {
+            toggleCloud("感谢你的喜爱！")
+        }
+    });
+};
+
+function textScrollHandler() {
+    var scrolledHeight = window.pageYOffset;
+    var parallaxSpeed = 0.5; // Adjust this value for different speeds. Less than 1 will be slower.
+    var bannerDecoration = document.querySelector(".scroll-text-decoration");
+
+    // This will move the decoration at half the speed of the default scroll
+    var newBottomPosition = -scrolledHeight * parallaxSpeed;
+    bannerDecoration.style.bottom = newBottomPosition + 'px';
+}

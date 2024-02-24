@@ -2,6 +2,7 @@
     font-family: 'Arial', sans-serif;
     /* A sans-serif font for modern look */
     padding: 0 20px 20px 20px;
+    margin-bottom: 20px;
     /* Padding inside the article for space */
 }
 
@@ -97,3 +98,80 @@
     background: rgba(0,0,25,.025)
 }
 
+#banner {
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    position: relative;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-image: url(../img/banner.webp);
+    margin-bottom: 20px;
+    user-select: none;
+}
+
+#banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); 
+    backdrop-filter: blur(8px); 
+    -webkit-backdrop-filter: blur(8px); /* For Safari compatibility */
+    z-index: 1;
+}
+
+.banner-title {
+    position: absolute;
+    right: 5%; 
+    bottom: 10%; 
+    z-index: 2;
+    color: white;
+    text-align: right;
+    max-width: 40%; 
+}
+
+
+#toc h2 {
+    font-size: 1.25rem;
+    color: #333;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+}
+
+#toc a {
+    text-decoration: none;
+
+}
+
+.like-button {
+    display: flex;
+    align-items: center;
+    margin: 30px;
+    gap: 20px;
+    user-select: none;
+    cursor: pointer; /* Changes the cursor to indicate it's clickable */
+    transition: transform 0.2s ease; /* Smooth transition for the button */
+}
+
+.like-icon {
+    width: 70px;
+    fill: #888; /* Default color for the icon */
+    transition: fill 0.2s ease; /* Smooth color transition for the icon */
+}
+
+.like-text {
+    font-size: 16px;
+    color: #888; /* Matching color with the icon */
+    transition: color 0.2s ease; /* Smooth color transition for the text */
+    margin: 0;
+}
+
+.like-button:hover {
+    transform: scale(1.1); /* Slightly enlarges the button on hover */
+}
