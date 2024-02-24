@@ -2298,9 +2298,17 @@ void mg_http_serve_file(struct mg_connection *c, struct mg_http_message *hm,
 
   // Failed to open, and page404 is configured? Open it, then
   if (fd == NULL && opts->page404 != NULL) {
-    fd = mg_fs_open(fs, opts->page404, MG_FS_READ);
     path = opts->page404;
     mime = guess_content_type(mg_str(path), opts->mime_types);
+
+    struct mg_str *ae = mg_http_get_header(hm, "Accept-Encoding");
+    if (ae != NULL && mg_strstr(*ae, mg_str("gzip")) != NULL) {
+      mg_snprintf(tmp, sizeof(tmp), "%s.gz", path);
+      fd = mg_fs_open(fs, tmp, MG_FS_READ);
+      if (fd != NULL) gzip = true, path = tmp;
+    }
+    // No luck opening .gz? Open what we've told to open
+    if (fd == NULL) fd = mg_fs_open(fs, path, MG_FS_READ);
   }
 
   if (fd == NULL || fs->st(path, &size, &mtime) == 0) {
