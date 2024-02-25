@@ -103,17 +103,6 @@ function toggleCloud(sayWhat = null) {
 
 toggleCloud("欢迎来到 贰岛博客！")
 
-document.addEventListener('scroll', function () {
-    var top = window.scrollY || document.documentElement.scrollTop;
-    var backToTopButton = document.querySelector('.top');
-
-    if (top > 800) {
-        backToTopButton.style.display = 'block';
-    } else {
-        backToTopButton.style.display = 'none';
-    }
-});
-
 document.querySelector('.top').addEventListener('click', function (event) {
     event.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -121,7 +110,86 @@ document.querySelector('.top').addEventListener('click', function (event) {
     toggleCloud("↑↑↑↑↑")
 });
 
-function updateTOC(container, output) {
+function formatTimestamp(timestamp) {
+    // Create a Date object from the timestamp
+    const date = new Date(timestamp);
+
+    // Get the month, day, and year from the Date object
+    const month = date.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const day = ("0" + date.getDate()).slice(-2); // Ensure the day is two digits
+    const year = date.getFullYear();
+
+    // Combine the components into the desired format
+    return `${month} ${day}, ${year}`;
+}
+
+function renderWrapper(elementDOM, newHTML) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            elementDOM.classList.add('fade-in');
+            setTimeout(() => {
+                elementDOM.innerHTML = newHTML;
+                elementDOM.classList.add('visible');
+                resolve();
+            }, 230);
+        }, 150);
+    });
+}
+
+
+AbortSignal.timeout ??= function timeout(ms) {
+    const ctrl = new AbortController()
+    setTimeout(() => ctrl.abort(), ms)
+    return ctrl.signal
+}
+
+function cacheData(key, data, exp_hour) {
+    const now = new Date().getTime();
+    const item = {
+        data: data,
+        expiry: now + exp_hour * 60 * 60 * 1000, 
+    };
+    localStorage.setItem(key, JSON.stringify(item));
+}
+
+function getCachedData(key) {
+    const itemStr = localStorage.getItem(key);
+    if (!itemStr) {
+        return null;
+    }
+    const item = JSON.parse(itemStr);
+    const now = new Date().getTime();
+    if (now > item.expiry) {
+        localStorage.removeItem(key);
+        return null;
+    }
+    return item.data;
+}
+
+async function fetchDataWithCache(url, name, exp_hour = 1) {
+    const cachedData = getCachedData(url);
+    if (cachedData) {
+        return Promise.resolve(cachedData);
+    } else {
+        console.log(`load data: ${name}`)
+        return fetch(url, { signal: AbortSignal.timeout(5000) })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        navigateTo("/404");
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                cacheData(url, data, exp_hour);
+                return data;
+            });
+    }
+}
+
+async function updateTOC(container, output) {
     var toc = "";
     var level = 0;
     var container = document.querySelector(container) || document.querySelector('#contents');
@@ -160,22 +228,26 @@ function updateTOC(container, output) {
 
     let elementDOM = document.querySelector(output)
 
-    setTimeout(() => {
-        elementDOM.classList.add('fade-in');
+    await new Promise((resolve) => {
         setTimeout(() => {
-          elementDOM.innerHTML = toc;
-          elementDOM.classList.add('visible');
-        }, 230);
-      }, 150);
-
-    // document.querySelector(output).innerHTML += toc;
+            elementDOM.classList.add('fade-in');
+            setTimeout(() => {
+                if (toc === "") 
+                    elementDOM.style.display = "none"
+        
+                elementDOM.innerHTML = toc;
+                elementDOM.classList.add('visible');
+                resolve(); // Resolve the promise after the animation completes
+            }, 230);
+        }, 150);
+    });
 };
 
 function registerLikeButton() {
     const likeButton = document.getElementById('like');
     const likeCountElement = document.getElementById('likeCount');
     const likeCounterElement = document.getElementById('likeCounter');
-    const likeIcon = document.querySelector('.like-button .like-icon');
+    const likeIconInner = document.querySelector('.like-button .like-icon #like-icon-inner');
     const likeText = document.querySelector('.like-button .like-text');
 
     let likeCount = parseInt(likeCountElement.textContent, 10);
@@ -183,15 +255,15 @@ function registerLikeButton() {
     let timer;
     let start_timer = false;
     let scalar = 2;
-    let love_icon = confetti.shapeFromText({ text: '♥', scalar});
+    let love_icon = confetti.shapeFromText({ text: '♥', scalar });
 
     if (typeof countdown !== "undefined")
         clearInterval(countdown)
 
     likeButton.addEventListener('click', function () {
-    
-        likeIcon.style.fill = '#e63946'; 
-        likeText.style.color = '#e63946'; 
+
+        likeIconInner.style.fill = '#FF5050';
+        likeText.style.color = '#FF5050';
 
         if (!start_timer) {
             likeCounterElement.parentNode.style.display = ''; // Show the counter
@@ -208,7 +280,6 @@ function registerLikeButton() {
 
             timer = setTimeout(() => {
                 clickEnabled = false;
-                toggleCloud("感谢你的喜爱！");
             }, 5000);
             clickEnabled = true
             start_timer = true
@@ -224,9 +295,7 @@ function registerLikeButton() {
                 spread: 180,
                 origin: { y: 0, },
                 shapes: [love_icon]
-              });
-        } else {
-            toggleCloud("感谢你的喜爱！")
+            });
         }
     });
 };
