@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
 
     <script defer rel="preload" src="/js/confetti.browser.min.js"></script>
-    <script defer rel="preload" src="/js/qrcode.min.js"></script>
     <script defer rel="preload" src="/js/blog.js"></script>
 
 </head>
@@ -96,8 +95,7 @@
         <div id="conversationCloud" style="opacity: 0;"></div>
     </div>
 
-    <a tabindex="-1" class="top pseudo button"
-        style="position: fixed; bottom: 0px; right: 20vh; border-radius: .3em .3em 0 0; display: none; font-weight: bold;">
+    <a tabindex="-1" class="top pseudo button" id="go">
         ▲Up you go▲
     </a>
 
@@ -111,6 +109,17 @@
                 [].forEach.call(mods, function (mod) { mod.checked = false; });
             }
         }
+
+        document.addEventListener('scroll', function () {
+            var top = window.scrollY || document.documentElement.scrollTop;
+            var backToTopButton = document.querySelector('#go');
+
+            if (top > 800) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
     </script>
 </body>
 

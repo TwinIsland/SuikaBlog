@@ -1,0 +1,64 @@
+<div id="banner">
+    <img src="../img/banner.webp" alt="Banner Image" class="banner-img" />
+    <div class="scroll-text-decoration"></div>
+    <div class="banner-title">
+        <h1 style="margin: 0; padding: 0; font-size: 2rem;" id="article-title"></h1>
+        <p style="margin: 0; padding: 0; font-size: 1rem; opacity: 0.8;" id="article-meta"></p>
+    </div>
+</div>
+
+<div class="flex four" style="margin-top: 24px; margin-bottom: 20px;">
+    <section class="article full three-fourth-800" id="article-body">
+        <div class="loading-block" style="height: 700px;"></div>
+    </section>
+    <section class="none fourth-800" style="padding-left: 40px;">
+        <div class="sidebar">
+            <div id="toc">
+                <h2 class="sidebar-title">TOC</h2>
+                <div id="toc-body">
+                    <div class="loading-block" style="height: 190px;"></div>
+                </div>
+            </div>
+            <h2 class="sidebar-title">Endore</h2>
+            <div id="like" class="like-button">
+
+                <svg class="like-icon" viewBox="0 0 128 128" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 64px;">
+                    <g>
+                        <polygon id="like-icon-inner" style="fill: #bbb"
+                            points="114,34 114,24 104,24 104,14 74,14 74,24 64,24 54,24 54,14 24,14 24,24 14,24 14,34 4,34 4,64 14,64    14,74 24,74 24,84 34,84 34,94 44,94 44,104 54,104 54,114 64,114 124,54 124,34  " />
+                    </g>
+                    <g>
+                        <rect style="fill: #FFFFFF;" height="10" width="10" x="24" y="34" />
+                    </g>
+                    <g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="64" y="104" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="74" y="94" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="84" y="84" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="94" y="74" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="104" y="64" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="114" y="54" />
+                        </g>
+                    </g>
+                </svg>
+                <div>
+                    <p class="like-text">Love x <span id="likeCount"></span></p>
+                    <p class="like-text" style="display: none;">00:0<span id="likeCounter">5</span></p>
+                </div>
+            </div>
+            <h2 class="sidebar-title">Share</h2>
+            <div id="page-qr"></div>
+        </div>
+    </section>
+</div>
