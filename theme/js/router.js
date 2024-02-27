@@ -94,7 +94,4 @@ function navigateTo(page) {
     handleLocation(); 
 }
 
-window.onpopstate = handleLocation;
-window.route = route;
-
 handleLocation();

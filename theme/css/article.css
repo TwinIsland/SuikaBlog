@@ -1,84 +1,42 @@
 .article {
-    font-family: 'Arial', sans-serif;
-    /* A sans-serif font for modern look */
     padding: 0 20px 20px 20px;
-    /* Padding inside the article for space */
 }
 
 .article p {
-    font-family: 'Georgia', 'Times New Roman', Times, serif;
-    /* A serif font for a classic look */
     font-size: 18px;
-    /* A font size that's large enough for readability but not too large */
     line-height: 1.8;
-    /* Increased line height for better readability */
     color: #333;
-    /* A color that's easy on the eyes */
     margin-bottom: 1.5em;
-    /* Space after paragraphs to separate text blocks */
     text-align: justify;
 }
 
-/* Responsive design adjustments */
-@media (max-width: 768px) {
-    .article {
-        padding: 15px;
-    }
-}
-
-/* Enhance links within articles */
-.article a {
-    /* Standard link color */
-    text-decoration: none;
-    /* No underline for a cleaner look */
-    border-bottom: 1px solid #1a0dab;
-    /* Underline effect with border for links */
-    transition: all 0.3s ease;
-    /* Transition for hover effect */
-}
-
-.article a:hover {
-    border-bottom: 1px solid transparent;
-    /* Hover effect to remove the border underline */
-    background-color: #e8f0fe;
-    /* Background highlight on hover */
-}
-
-/* If you're using headers within your articles, style them too */
-
 .article h2 {
     font-size: 1.5em;
-    /* Larger size for h2 headers */
 }
 
 .article h3 {
     font-size: 1.3em;
-    /* Smaller than h2 but noticeable */
 }
 
 .article h4 {
     font-size: 1.1em;
-    /* Subtle heading style */
 }
 
-/* Adjustments for lists within articles */
 .article ul,
 .article ol {
     margin-left: 20px;
-    /* Indent lists for clarity */
     padding-left: 0;
 }
 
 .article li {
     margin-bottom: 0.5em;
-    /* Space between list items */
 }
 
-.article p.notice {
+p.notice {
     padding: .5rem;
     padding-left: .75rem;
     border-left: solid 4px #fbbc05;
-    background: rgba(0,0,25,.025)
+    background: rgba(0, 0, 25, .025)
 }
 
 #banner {
@@ -96,8 +54,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Cover the banner area without distorting the image */
-    z-index: 0; /* Ensure the image stays below the text */
+    object-fit: cover;
+    /* Cover the banner area without distorting the image */
+    z-index: 0;
+    /* Ensure the image stays below the text */
 }
 
 #banner::before {
@@ -109,14 +69,14 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px); /* For Safari compatibility */
+    -webkit-backdrop-filter: blur(8px);
     z-index: 1;
 }
 
 .banner-title {
     position: absolute;
-    right: 5%; 
-    bottom: 10%; 
+    right: 5%;
+    bottom: 10%;
     z-index: 2;
     color: white;
     text-align: right;
@@ -135,9 +95,9 @@
 }
 
 #toc-body {
-    min-height: 180px; 
-    max-height: 400px; 
-    overflow: scroll; 
+    min-height: 180px;
+    max-height: 400px;
+    overflow: scroll;
 }
 
 
@@ -151,25 +111,88 @@
     margin: 30px;
     gap: 20px;
     user-select: none;
-    cursor: pointer; /* Changes the cursor to indicate it's clickable */
-    transition: transform 0.2s ease; /* Smooth transition for the button */
+    cursor: pointer;
+    /* Changes the cursor to indicate it's clickable */
+    transition: transform 0.2s ease;
+    /* Smooth transition for the button */
 }
 
 .like-icon {
-    transition: fill 0.2s ease; /* Smooth color transition for the icon */
+    transition: fill 0.2s ease;
+    /* Smooth color transition for the icon */
 }
 
 .like-text {
     font-size: 16px;
-    color: #888; /* Matching color with the icon */
-    transition: color 0.2s ease; /* Smooth color transition for the text */
+    color: #888;
+    /* Matching color with the icon */
+    transition: color 0.2s ease;
+    /* Smooth color transition for the text */
     margin: 0;
 }
 
 .like-button:hover {
-    transform: scale(1.1); /* Slightly enlarges the button on hover */
+    transform: scale(1.1);
+    /* Slightly enlarges the button on hover */
 }
 
 #page-qr {
-    margin:2rem
+    margin: 2rem
+}
+
+#comment-field {
+    margin-left: 0;
+    width: 100%;
+    padding: 0 20px;
+    max-width: 910px;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+#comment-field button {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border: 3px solid rgba(0, 0, 0, .1) !important;
+    max-width: 10rem;
+    max-width: -webkit-max-content;
+    max-width: -moz-max-content;
+    max-width: max-content;
+    text-align: center;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, .6);
+    background: 0 0;
+    transition: .3s cubic-bezier(.25,.46,.45,.94) all;
+    cursor: pointer;
+}
+
+#OwO-logo {
+    font-size: 10px;
+    font-weight: bold;
+    color: #B98A82; /* Change this color to match your theme */
+    background-color: #f0f0f0; /* Light background to make it pop */
+    border-radius: 1px;
+    height: 24px;
+    padding: 5px;    
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+    transition: transform 0.3s ease;
+}
+
+#OwO-logo:hover {
+    transform: scale(1.1); /* Slight scale on hover for interactive effect */
+}
+
+#copyright {
+    user-select: none;
+    font-style: normal;
+    font-size: 95%;
+    color: #555;
+    /* Lighter text color */
+    border-left: 4px solid #bf1932;
+    margin: 40px 0;
+    padding: 15px;
+    background-color: rgb(148 148 148 / 7%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

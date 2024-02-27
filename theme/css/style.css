@@ -7,6 +7,7 @@ a {
     text-decoration: underline;
 }
 
+
 @font-face {
     font-family: LogoFont;
     src: url(.././font/logo_font.ttf);
@@ -21,7 +22,7 @@ a {
     min-height: 100vh;
 }
 
-.brand {
+.brand a {
     font-family: LogoFont;
     font-size: 2.25rem;
     padding-bottom: 0.5rem;
@@ -84,8 +85,9 @@ a {
 }
 
 .normal-article h2 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 300;
+    font-family: "Lucida Grande", "Corbel", sans-serif;
 }
 
 
@@ -223,10 +225,14 @@ a {
     opacity: 1;
 }
 
+#page-content {
+    margin-bottom: 20px;
+}
+
 .scroll-text-decoration {
     user-select: none;
     position: absolute;
-    bottom: 0; 
+    bottom: 0;
     left: 140px;
     display: flex;
     color: white;
@@ -245,12 +251,12 @@ a {
     right: 20vh;
     border-radius: 0.3em 0.3em 0px 0px;
     font-weight: bold;
-    display: block;
+    display: none;
 }
 
 /* Hide the element on screens smaller than 800px */
 @media (max-width: 800px) {
     #go {
-        display: none!important;
+        display: none !important;
     }
 }

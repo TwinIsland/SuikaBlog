@@ -58,7 +58,7 @@ fetchDataWithCache('http://localhost:3000/post/' + getPostIdFromUri(), `post/${g
     })
     .catch(error => {
         console.error('There was a problem with your fetch operation:', error);
-        // window.location.href = '/err';
+        navigateTo("/err");
     });
 
 
