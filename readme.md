@@ -1,5 +1,5 @@
 # Suika Blog
-New generation blog
+Ultimate blog, born for speed ⚡
 
 ## Run
 install dependencies
