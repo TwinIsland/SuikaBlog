@@ -1,7 +1,12 @@
 # Suika Blog
 Ultimate blog, born for speed ⚡
 
+## Features
++ Designed for speed and efficiency. We've meticulously included only the necessary libraries, ensuring a lean and powerful experience.
++ Managing dependencies becomes a thing of the past. Simply compress the entire folder into a zip file, and you're fully prepared for easy delivery and backup. Enjoy a hassle-free experience that lets you focus on what truly matters.
+
 ## Run
+
 install dependencies
 
 ```bash
