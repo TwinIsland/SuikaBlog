@@ -1,5 +1,5 @@
 # Suika Blog
-Ultimate blog, born for speed ⚡
+Ultimate Blog System Engineered for Ultimate Speed and Efficiency⚡
 
 ## Features
 + Designed for speed and efficiency. We've meticulously included only the necessary libraries, ensuring a lean and powerful experience.
@@ -14,13 +14,13 @@ sudo apt update
 sudo apt-get install libsqlite3-dev
 ```
 
-then, start the server via 
+then, start the server by 
 ```bash
 make
 ./bin/suika
 ```
 
-## Gzip
+## Gzip (Optional)
 gzip is off by default, and you need to enable it manually by running:
 ```bash
 make gzip       # turn on gzip feature
