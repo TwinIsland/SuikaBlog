@@ -44,6 +44,76 @@ make test_server
 ## Frontend
 The default frontend theme, [Suika Ultimate Theme](./theme/readme.md), is optimized for ultimate performance, boasting a total dependency of less than 3kb. It primarily utilizes vanilla JavaScript and CSS for streamlined efficiency.
 
+## Database Design
+3NF Guarantee ⭐
+
+```mermaid
+erDiagram
+    Posts {
+        integer PostID PK "AUTOINCREMENT"
+        varchar(255) Title "NOT NULL"
+        text Banner
+        text Excerpt
+        text Content "NOT NULL"
+        datetime CreateDate "DEFAULT CURRENT_TIMESTAMP"
+        datetime DateModified "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        int UpVoted "NOT NULL DEFAULT 0"
+        int Views "DEFAULT 0"
+    }
+
+    Visitors {
+        integer VisitorID PK "AUTOINCREMENT"
+        text Name "NOT NULL UNIQUE"
+        text Email
+        text Website
+        integer Banned
+        varchar(64) Ip "NOT NULL"
+    }
+
+    Comment {
+        integer CommentID PK "AUTOINCREMENT"
+        integer PostID FK "NOT NULL"
+        integer VisitorID FK
+        datetime CreateDate "DEFAULT CURRENT_TIMESTAMP"
+        text Content "NOT NULL"
+        int UpVoted "DEFAULT 0"
+    }
+
+    CommentPage {
+        integer CommentID PK "AUTOINCREMENT"
+        integer VisitorID FK
+        varchar(64) PageName "NOT NULL"
+        datetime CreateDate "DEFAULT CURRENT_TIMESTAMP"
+        text Content "NOT NULL"
+        int UpVoted "DEFAULT 0"
+    }
+
+    Activity {
+        integer ActivityID PK "AUTOINCREMENT"
+        integer VisitorID FK
+        text Description "NOT NULL"
+        datetime CreateDate "DEFAULT CURRENT_TIMESTAMP"
+    }
+
+    Meta {
+        integer MetaID PK "AUTOINCREMENT"
+        text Name "UNIQUE NOT NULL"
+        varchar(32) Type "NOT NULL"
+    }
+
+    PostMeta {
+        integer PostID FK
+        integer MetaID FK
+        PostID MetaID PK
+    }
+
+    Posts ||--o{ Comment : ""
+    Visitors ||--o{ Comment : ""
+    Visitors ||--o{ CommentPage : ""
+    Visitors ||--o{ Activity : ""
+    Posts ||--o{ PostMeta : ""
+    Meta ||--o{ PostMeta : ""
+```
 
 ## Thanks
 + [cesanta/mongoose](https://github.com/cesanta/mongoose)
