@@ -1,63 +1,82 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE Posts (
     PostID INTEGER PRIMARY KEY AUTOINCREMENT,
     Title VARCHAR(255) NOT NULL,
-    Excerpts TEXT,
+    Banner TEXT,
+    Excerpt TEXT,
     Content TEXT NOT NULL,
-    DatePublished DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     DateModified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UpVoted INT NOT NULL DEFAULT 0,
     Views INT DEFAULT 0
 );
 
 CREATE TABLE Visitors (
-    visitorID INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT,
-    website TEXT,
-    ip TEXT NOT NULL
+    VisitorID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL UNIQUE,
+    Email TEXT,
+    Website TEXT,
+    Banned INTEGER,
+    Ip VARCHAR(64) NOT NULL,
+    UNIQUE(Name, Email)
 );
 
 CREATE TABLE Comment (
-    commentID INTEGER PRIMARY KEY AUTOINCREMENT,
-    postID INTEGER NOT NULL,
-    visitorID INTEGER, 
-    content TEXT NOT NULL,
-    upVoted INTEGER DEFAULT 0,
-    downVoted INTEGER DEFAULT 0,
-    FOREIGN KEY (postID) REFERENCES Posts(PostID),
-    FOREIGN KEY (visitorID) REFERENCES Visitors(visitorID)
+    CommentID INTEGER PRIMARY KEY AUTOINCREMENT,
+    PostID INTEGER NOT NULL,
+    VisitorID INTEGER, 
+    CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Content TEXT NOT NULL,
+    UpVoted INTEGER DEFAULT 0,
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
+    FOREIGN KEY (VisitorID) REFERENCES Visitors(VisitorID) ON DELETE CASCADE
+);
+
+CREATE TABLE CommentPage (
+    CommentID INTEGER PRIMARY KEY AUTOINCREMENT,
+    VisitorID INTEGER, 
+    PageName VARCHAR(64) NOT NULL,
+    CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Content TEXT NOT NULL,
+    UpVoted INTEGER DEFAULT 0,
+    FOREIGN KEY (VisitorID) REFERENCES Visitors(VisitorID) ON DELETE CASCADE
 );
 
 CREATE TABLE Activity (
-    activityID INTEGER PRIMARY KEY AUTOINCREMENT,
-    visitorID INTEGER,
-    type TEXT NOT NULL,
-    createDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (visitorID) REFERENCES Visitors(visitorID)
+    ActivityID INTEGER PRIMARY KEY AUTOINCREMENT,
+    VisitorID INTEGER,
+    Description TEXT NOT NULL,
+    CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (VisitorID) REFERENCES Visitors(VisitorID)
 );
 
-CREATE TABLE Tag (
-    tagID INTEGER PRIMARY KEY AUTOINCREMENT,
-    tagName TEXT UNIQUE NOT NULL
+CREATE TABLE Meta (
+    MetaID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT UNIQUE NOT NULL,
+    Type VARCHAR(32) NOT NULL
 );
 
-CREATE TABLE Category (
-    categoryID INTEGER PRIMARY KEY AUTOINCREMENT,
-    categoryName TEXT UNIQUE NOT NULL
-);
-
-CREATE TABLE PostTags (
+CREATE TABLE PostMeta (
     PostID INTEGER,
-    TagID INTEGER,
-    PRIMARY KEY (PostID, TagID),
+    MetaID INTEGER,
+    PRIMARY KEY (PostID, MetaID),
     FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (TagID) REFERENCES Tag(TagID) ON DELETE CASCADE
+    FOREIGN KEY (MetaID) REFERENCES Meta(MetaID) ON DELETE CASCADE
 );
 
-CREATE TABLE PostCategories (
-    PostID INTEGER,
-    CategoryID INTEGER,
-    PRIMARY KEY (PostID, CategoryID),
-    FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID) ON DELETE CASCADE
-);
+
+-- Triggers
+CREATE TRIGGER InsertCommentActivity AFTER INSERT ON Comment
+BEGIN
+    INSERT INTO Activity (visitorID, description, createDate)
+    SELECT NEW.visitorID, 'comment on post: ' || Posts.Title, NEW.createDate
+    FROM Posts
+    WHERE Posts.PostID = NEW.postID;
+END;
+
+CREATE TRIGGER InsertCommentPageActivity AFTER INSERT ON CommentPage
+BEGIN
+    INSERT INTO Activity (visitorID, description, createDate)
+    VALUES (NEW.visitorID, 'comment on page: ' || NEW.pageName, NEW.createDate);
+END;
