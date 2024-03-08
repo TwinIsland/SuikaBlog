@@ -13,7 +13,7 @@
 
 # other
 bin/
-suika.db
+*.db
 key.bin
 
 prouter/__pycache__/
