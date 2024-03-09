@@ -6,6 +6,7 @@ CREATE TABLE Posts (
     Banner TEXT,
     Excerpt TEXT,
     Content TEXT NOT NULL,
+    IsPage INTEGER NOT NULL DEFAULT 0,  -- 0 or 1
     CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     DateModified DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UpVoted INT NOT NULL DEFAULT 0,
@@ -13,72 +14,76 @@ CREATE TABLE Posts (
 );
 
 CREATE TABLE Visitors (
-    VisitorID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT NOT NULL UNIQUE,
+    Name VARCHAR(64) PRIMARY KEY,
     Email TEXT,
     Website TEXT,
     Banned INTEGER,
-    Ip VARCHAR(64) NOT NULL,
-    UNIQUE(Name, Email)
+    Ip VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE Comment (
     CommentID INTEGER PRIMARY KEY AUTOINCREMENT,
     PostID INTEGER NOT NULL,
-    VisitorID INTEGER, 
+    AuthorName VARCHAR(64), 
     CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     Content TEXT NOT NULL,
     UpVoted INTEGER DEFAULT 0,
     FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (VisitorID) REFERENCES Visitors(VisitorID) ON DELETE CASCADE
-);
-
-CREATE TABLE CommentPage (
-    CommentID INTEGER PRIMARY KEY AUTOINCREMENT,
-    VisitorID INTEGER, 
-    PageName VARCHAR(64) NOT NULL,
-    CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Content TEXT NOT NULL,
-    UpVoted INTEGER DEFAULT 0,
-    FOREIGN KEY (VisitorID) REFERENCES Visitors(VisitorID) ON DELETE CASCADE
+    FOREIGN KEY (AuthorName) REFERENCES Visitors(Name) ON DELETE CASCADE
 );
 
 CREATE TABLE Activity (
     ActivityID INTEGER PRIMARY KEY AUTOINCREMENT,
-    VisitorID INTEGER,
+    AuthorName INTEGER,
     Description TEXT NOT NULL,
     CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (VisitorID) REFERENCES Visitors(VisitorID)
+    FOREIGN KEY (AuthorName) REFERENCES Visitors(Name)
 );
 
 CREATE TABLE Meta (
-    MetaID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT UNIQUE NOT NULL,
-    Type VARCHAR(32) NOT NULL
+    Name VARCHAR(32) PRIMARY KEY,
+    Type VARCHAR(32) NOT NULL  -- tag or category
 );
 
 CREATE TABLE PostMeta (
     PostID INTEGER,
-    MetaID INTEGER,
-    PRIMARY KEY (PostID, MetaID),
+    MetaName VARCHAR(32),
     FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
-    FOREIGN KEY (MetaID) REFERENCES Meta(MetaID) ON DELETE CASCADE
+    FOREIGN KEY (MetaName) REFERENCES Meta(Name) ON DELETE CASCADE,
+    PRIMARY KEY (PostID, MetaName)
 );
 
 
--- Triggers
+-- Triggers to update Activity when detect new comment
 CREATE TRIGGER InsertCommentActivity AFTER INSERT ON Comment
 BEGIN
-    INSERT INTO Activity (visitorID, description, createDate)
-    SELECT NEW.visitorID, 'comment on post: ' || Posts.Title, NEW.createDate
+    INSERT INTO Activity (AuthorName, description, createDate)
+    SELECT NEW.AuthorName, 'comment on: ' || Posts.Title, NEW.createDate
     FROM Posts
     WHERE Posts.PostID = NEW.postID;
 END;
 
-CREATE TRIGGER InsertCommentPageActivity AFTER INSERT ON CommentPage
+
+-- Trigger to check 'Post' insert and update
+CREATE TRIGGER CheckIsPageBeforeInsert
+BEFORE INSERT ON Posts
+FOR EACH ROW
 BEGIN
-    INSERT INTO Activity (visitorID, description, createDate)
-    VALUES (NEW.visitorID, 'comment on page: ' || NEW.pageName, NEW.createDate);
+    SELECT CASE
+        WHEN NEW.IsPage NOT IN (0, 1) THEN
+            RAISE(FAIL, 'IsPage must be either 0 or 1.')
+        END;
+END;
+
+-- Trigger to check 'Meta' insert and update
+CREATE TRIGGER CheckMetaTypeBeforeInsert
+BEFORE INSERT ON Meta
+FOR EACH ROW
+BEGIN
+    SELECT CASE
+        WHEN NEW.type NOT IN ('tag', 'category') THEN
+            RAISE(FAIL, 'MetaType must be either tag or category.')
+        END;
 END;
 
 -- attaching the databases
@@ -91,6 +96,13 @@ SELECT cid, title, text, datetime(created, 'unixepoch'), datetime(modified, 'uni
 FROM source.blog_contents
 WHERE type != 'page' 
 AND title NOT LIKE '%.%';
+
+INSERT INTO suika.Posts (PostID, Title, Content, createDate, DateModified, UpVoted, Views, IsPage)
+SELECT cid, title, text, datetime(created, 'unixepoch'), datetime(modified, 'unixepoch'), likes, viewsNum, 1
+FROM source.blog_contents
+WHERE type = 'page' 
+AND title NOT LIKE '%.%';
+
 
 -- Updating Excerpts for all posts
 UPDATE suika.Posts 
@@ -149,40 +161,20 @@ WHERE author IS NOT NULL AND mail IS NOT NULL
 GROUP BY author, mail;
 
 
-INSERT INTO suika.Comment (postID, visitorID, createDate, content, upVoted)
-SELECT cid, (SELECT visitorID FROM suika.Visitors WHERE name = source.blog_comments.author), datetime(created, 'unixepoch'), text, likes
+INSERT INTO suika.Comment (postID, AuthorName, createDate, content, upVoted)
+SELECT cid, source.blog_comments.author, datetime(created, 'unixepoch'), text, likes
 FROM source.blog_comments
-WHERE cid IN (SELECT PostID FROM suika.Posts);
-
-
-
-INSERT INTO suika.CommentPage (visitorID, pageName, createDate, content, upVoted)
-SELECT (SELECT visitorID FROM suika.Visitors WHERE name = source.blog_comments.author), CAST(cid AS VARCHAR(64)), datetime(created, 'unixepoch'), text, likes
-FROM source.blog_comments
-WHERE cid NOT IN (SELECT PostID FROM suika.Posts)
-AND cid != 598;
-
-
--- Update Comment PageName
-UPDATE suika.CommentPage
-SET pageName = "About"
-WHERE pageName = "9";
-
-UPDATE suika.CommentPage
-SET pageName = "Lucky"
-WHERE pageName = "344";
-
-UPDATE suika.CommentPage
-SET pageName = "Friends"
-WHERE pageName = "433";
+WHERE cid != 598;
 
 -- Update Metas 
-INSERT INTO suika.Meta (MetaID, Name, type)
-SELECT DISTINCT mid, name, type
+INSERT INTO suika.Meta (Name, type)
+SELECT name, type
 FROM source.blog_metas;
 
-INSERT INTO suika.PostMeta (PostID, MetaID)
-SELECT cid, mid
-FROM source.blog_relationships;
+INSERT INTO suika.PostMeta (PostID, MetaName)
+SELECT br.cid, bm.name
+FROM source.blog_relationships AS br
+JOIN source.blog_metas AS bm ON bm.mid = br.mid;
 
 
+SELECT Banner FROM suika.Posts
