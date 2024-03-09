@@ -91,12 +91,12 @@ int main()
 
 #endif
 
-    // start the server
-
 // #ifdef DEBUG
 //     mg_log_set(MG_LL_DEBUG);
 // #endif
 
+    // start the server
+    
     sprintf(server_addr, "http://0.0.0.0:%d", config->server_port);
 
     mg_mgr_init(&mgr);

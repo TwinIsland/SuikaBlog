@@ -3,8 +3,8 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE Posts (
     PostID INTEGER PRIMARY KEY AUTOINCREMENT,
     Title VARCHAR(255) NOT NULL,
-    Banner TEXT,
-    Excerpt TEXT,
+    Banner VARCHAR(255),
+    Excerpt VARCHAR(255),
     Content TEXT NOT NULL,
     IsPage INTEGER NOT NULL DEFAULT 0,  -- 0 or 1
     CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,

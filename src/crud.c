@@ -23,6 +23,34 @@ Result db_init(const char *db_name)
     };
 }
 
+static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx, int cp_on_heap) {
+    const char *src = (const char *)sqlite3_column_text(stmt, idx);
+    if (!src) {
+        // If src is NULL, behave according to cp_on_heap
+        if (cp_on_heap) {
+            *dist = malloc(1);
+            if (*dist) (*dist)[0] = '\0';
+        } else {
+            (*dist)[0] = '\0';
+        }
+    } else {
+        size_t srcLen = strlen(src) + 1;
+
+        if (cp_on_heap) {
+            *dist = malloc(srcLen);
+            if (*dist) {
+                strncpy(*dist, src, srcLen);
+                (*dist)[srcLen - 1] = '\0'; 
+            }
+        } else {
+            if (*dist) {
+                strncpy(*dist, src, strlen(src));
+                (*dist)[srcLen - 1] = '\0'; 
+            }
+        }
+    }
+}
+
 Result get_post(const int32_t PostID, Post *ret)
 {
     if (db == NULL)
@@ -31,7 +59,7 @@ Result get_post(const int32_t PostID, Post *ret)
             .msg = "uninitialized database connection",
         };
 
-    const char *sql = "SELECT PostID, Title, Excerpts, Content, strftime('%s', DatePublished), strftime('%s', DateModified), UpVoted, Views FROM Posts WHERE PostID = ?";
+    const char *sql = "SELECT * FROM Posts WHERE PostID = ?";
     sqlite3_stmt *stmt;
 
     // Prepare the SQL statement
@@ -47,19 +75,15 @@ Result get_post(const int32_t PostID, Post *ret)
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
         ret->PostID = sqlite3_column_int(stmt, 0);
-        strncpy(ret->Title, (char *)sqlite3_column_text(stmt, 1), sizeof(ret->Title) - 1);
-        ret->Title[sizeof(ret->Title) - 1] = '\0'; // Ensure null termination
+        cp_stmt_str(ret->Title, stmt, 1, 1);
+        cp_stmt_str(ret->Banner, stmt, 2, 0);
+        cp_stmt_str(ret->Excerpts, stmt, 3, 0);
+        cp_stmt_str(ret->Content, stmt, 4, 0);
 
-        const char *excerpts = (const char *)sqlite3_column_text(stmt, 2);
-        ret->Excerpts = excerpts ? strdup(excerpts) : NULL;
-
-        const char *content = (const char *)sqlite3_column_text(stmt, 3);
-        ret->Content = content ? strdup(content) : NULL;
-
-        ret->DatePublished = (time_t)sqlite3_column_int(stmt, 4);
-        ret->DateModified = (time_t)sqlite3_column_int(stmt, 5);
-        ret->UpVoted = sqlite3_column_int(stmt, 6);
-        ret->Views = sqlite3_column_int(stmt, 7);
+        ret->CreateDate = (time_t)sqlite3_column_int(stmt, 5);
+        ret->DateModified = (time_t)sqlite3_column_int(stmt, 6);
+        ret->UpVoted = sqlite3_column_int(stmt, 7);
+        ret->Views = sqlite3_column_int(stmt, 8);
 
         sqlite3_finalize(stmt);
         return (Result){

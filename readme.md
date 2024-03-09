@@ -70,6 +70,11 @@ erDiagram
         varchar Ip "NOT NULL"
     }
 
+    Meta {
+        varchar Name PK
+        varchar Type "NOT NULL"
+    }
+
     Comment {
         integer CommentID PK "AUTOINCREMENT"
         integer PostID FK "NOT NULL"
@@ -86,22 +91,10 @@ erDiagram
         datetime CreateDate "DEFAULT CURRENT_TIMESTAMP"
     }
 
-    Meta {
-        varchar Name PK
-        varchar Type "NOT NULL"
-    }
-
-    PostMeta {
-        integer PostID FK
-        varchar MetaName FK
-        composite PostID_MetaName PK
-    }
-
     Posts ||--o{ Comment : "has"
     Visitors ||--o{ Comment : "writes"
     Visitors ||--o{ Activity : "triggers"
-    Posts ||--|| PostMeta : "categorizes"
-    Meta ||--|| PostMeta : "tags"
+    Posts }|--o{ Meta : "has"
 ```
 
 ## Thanks
