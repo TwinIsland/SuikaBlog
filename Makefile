@@ -58,5 +58,10 @@ run_release:
 	make all
 	./$(OUT)
 
+run_test:
+	make clean
+	make test
+	./$(OUT)
+	
 before_push:
 	make gunzip

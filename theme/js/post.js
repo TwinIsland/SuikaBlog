@@ -49,8 +49,8 @@ fetchDataWithCache('http://localhost:3000/post/' + getPostIdFromUri(), `post/${g
             renderWrapper(document.getElementById("likeCount"), renderLikeCount(data))
         ];
 
-        return Promise.all(renderPromises);
-    })
+            return Promise.all(renderPromises);
+        })
     .then(() => {
         Prism.highlightAll();
         registerLikeButton();

@@ -4,18 +4,15 @@
 #include "sqlite3.h"
 #include "result.h"
 #include "models.h"
+#include "ini_handler.h"
 
 // Initializes the database connection
-Result db_init(const char *db_name);
+Result init_db(configuration *config);
 
-// Creates a new post
-Result create_post(const char *title, const char *excerpts, const char *content);
-
-// Get a post via post ID
+Result create_post(const char *title, const char *excerpt, const char *content, int isPage);
 Result get_post(const int32_t PostID, Post *ret);
-
-// Get the total post count
-Result get_total_post_count();
+Result delete_post_by_id(long long int post_id);
+Result get_total_post_count(int *ret);
 
 // Close database
 void db_close(void);

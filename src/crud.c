@@ -7,9 +7,9 @@
 
 static sqlite3 *db = NULL;
 
-Result db_init(const char *db_name)
+Result init_db(configuration *config)
 {
-    int rc = sqlite3_open(db_name, &db);
+    int rc = sqlite3_open(config->db_name, &db);
     if (rc != SQLITE_OK)
     {
         debug("Can't open database: %s\n", sqlite3_errmsg(db));
@@ -23,32 +23,19 @@ Result db_init(const char *db_name)
     };
 }
 
-static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx, int cp_on_heap) {
+static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx) {
     const char *src = (const char *)sqlite3_column_text(stmt, idx);
+    
     if (!src) {
-        // If src is NULL, behave according to cp_on_heap
-        if (cp_on_heap) {
-            *dist = malloc(1);
-            if (*dist) (*dist)[0] = '\0';
-        } else {
-            (*dist)[0] = '\0';
-        }
-    } else {
-        size_t srcLen = strlen(src) + 1;
-
-        if (cp_on_heap) {
-            *dist = malloc(srcLen);
-            if (*dist) {
-                strncpy(*dist, src, srcLen);
-                (*dist)[srcLen - 1] = '\0'; 
-            }
-        } else {
-            if (*dist) {
-                strncpy(*dist, src, strlen(src));
-                (*dist)[srcLen - 1] = '\0'; 
-            }
-        }
+        *dist = (char *)malloc(1);
+        if (*dist) (*dist)[0] = '\0';
+        return;
     }
+
+    size_t srcLen = strlen(src) + 1;
+    *dist = (char *)malloc(srcLen);
+    if (!*dist) return; 
+    strncpy(*dist, src, srcLen);
 }
 
 Result get_post(const int32_t PostID, Post *ret)
@@ -75,10 +62,11 @@ Result get_post(const int32_t PostID, Post *ret)
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
         ret->PostID = sqlite3_column_int(stmt, 0);
-        cp_stmt_str(ret->Title, stmt, 1, 1);
-        cp_stmt_str(ret->Banner, stmt, 2, 0);
-        cp_stmt_str(ret->Excerpts, stmt, 3, 0);
-        cp_stmt_str(ret->Content, stmt, 4, 0);
+
+        cp_stmt_str(&ret->Title, stmt, 1);
+        cp_stmt_str(&ret->Banner, stmt, 2);
+        cp_stmt_str(&ret->Excerpts, stmt, 3);
+        cp_stmt_str(&ret->Content, stmt, 4);
 
         ret->CreateDate = (time_t)sqlite3_column_int(stmt, 5);
         ret->DateModified = (time_t)sqlite3_column_int(stmt, 6);
@@ -99,9 +87,8 @@ Result get_post(const int32_t PostID, Post *ret)
     };
 }
 
-Result create_post(const char *title, const char *excerpts, const char *content)
+Result create_post(const char *title, const char *excerpt, const char *content, int isPage)
 {
-
     if (db == NULL)
         return (Result){
             .status = FAILED,
@@ -110,7 +97,7 @@ Result create_post(const char *title, const char *excerpts, const char *content)
 
     long long int post_id;
     char post_id_buf[256];
-    const char *sql = "INSERT INTO Posts (Title, Excerpts, Content) VALUES (?, ?, ?);";
+    const char *sql = "INSERT INTO Posts (Title, Excerpt, Content, IsPage) VALUES (?, ?, ?, ?);";
     sqlite3_stmt *stmt;
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
@@ -125,8 +112,9 @@ Result create_post(const char *title, const char *excerpts, const char *content)
 
     // Bind the values to the statement
     sqlite3_bind_text(stmt, 1, title, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, excerpts, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, excerpt, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, content, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 4, isPage);
 
     // Execute the statement
     rc = sqlite3_step(stmt);
@@ -147,6 +135,52 @@ Result create_post(const char *title, const char *excerpts, const char *content)
     return (Result){
         .status = rc == SQLITE_DONE ? OK : FAILED,
         .msg = rc == SQLITE_DONE ? post_id_buf : "sql query failed at execution",
+    };
+}
+
+Result delete_post_by_id(long long int post_id)
+{
+    if (db == NULL)
+        return (Result){
+            .status = FAILED,
+            .msg = "uninitialized database connection",
+        };
+
+    const char *sql = "DELETE FROM Posts WHERE PostID = ?;";
+    sqlite3_stmt *stmt;
+
+    // Prepare the SQL statement
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        debug("Preparation failed: %s\n", sqlite3_errmsg(db));
+        return (Result){
+            .status = FAILED,
+            .msg = "sql query failed at preparation",
+        };
+    }
+
+    // Bind the post_id to the statement
+    sqlite3_bind_int64(stmt, 1, post_id);
+
+    // Execute the statement
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE)
+    {
+        debug("Execution failed: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt); // Finalize the statement to prevent memory leaks
+        return (Result){
+            .status = FAILED,
+            .msg = "sql query failed at execution",
+        };
+    }
+
+    // Finalize the statement to prevent memory leaks
+    sqlite3_finalize(stmt);
+
+    return (Result){
+        .status = OK,
+        .msg = "Post deleted successfully",
     };
 }
 

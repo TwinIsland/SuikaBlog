@@ -109,7 +109,7 @@ static void get_password(BYTE *password)
         *newline = '\0';
 }
 
-void initialize_blog(configuration *config)
+void initialize_blog(configuration *config, void (*exit_handler)())
 {
     int c;
     char input;
@@ -125,7 +125,7 @@ void initialize_blog(configuration *config)
         {
             ret = initialize_db(config->db_name);
             printf("\n");
-            PRINT_LOG("init %s", ret, 1, config->db_name);
+            PRINT_LOG("init %s", ret, ERR_IS_CRITICAL, exit_handler, config->db_name);
         }
 
         // clear stdin
@@ -142,7 +142,7 @@ void initialize_blog(configuration *config)
         printf("\n\n");
         ret = initialize_pass(config->key_file, password);
 
-        PRINT_LOG("init passcode", ret, 1);
+        PRINT_LOG("init passcode", ret, ERR_IS_CRITICAL, exit_handler);
     }
 
     printf("\n----------------------\n");

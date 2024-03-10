@@ -4,29 +4,37 @@
 #include "sha256.h"
 #include "string.h"
 
-#define PRINT_LOG(info, ret, is_err_critical, ...) \
-    do                                             \
-    {                                              \
-        printf("\033[0;34m");                      \
-        printf("* ");                              \
-        printf("\033[0m");                         \
-        printf(info, ##__VA_ARGS__);               \
-        if (ret.status == OK)                      \
-        {                                          \
-            printf(" \033[0;32m");                 \
-            printf("\t--> ok\n");                  \
-            printf("\033[0m");                     \
-        }                                          \
-        else                                       \
-        {                                          \
-            printf("\033[0;31m");                  \
-            printf("\t--> fail: %s\n", ret.msg);   \
-            printf("\033[0m");                     \
-            if (is_err_critical)                   \
-                exit(1);                           \
-        }                                          \
-    } while (0);
+#define ERR_IS_CRITICAL 1
+#define ERR_IS_IGN 0
 
+#define PRINT_LOG(info, ret, is_err_critical, exit_handler, ...) \
+    do                                                           \
+    {                                                            \
+        printf("\033[0;34m");                                    \
+        printf("* ");                                            \
+        printf("\033[0m");                                       \
+        printf(info, ##__VA_ARGS__);                             \
+        if (ret.status == OK)                                    \
+        {                                                        \
+            printf(" \033[0;32m");                               \
+            printf("\t--> ok\n");                               \
+            printf("\033[0m");                                   \
+        }                                                        \
+        else                                                     \
+        {                                                        \
+            printf("\033[0;31m");                                \
+            printf("\t--> fail: %s\n", ret.msg);                 \
+            printf("\033[0m");                                   \
+            if (is_err_critical)                                 \
+            {                                                    \
+                if (exit_handler != NULL)                        \
+                {                                                \
+                    exit_handler();                              \
+                }                                                \
+                exit(1);                                         \
+            }                                                    \
+        }                                                        \
+    } while (0);
 
 #ifdef DEBUG
 #define debug(msg, ...)                             \
@@ -38,10 +46,10 @@
 #define debug(msg, ...)
 #endif
 
-#define SHA256_PASS_MATCHED(pass1, pass2) strncmp((char *)pass1, (char *) pass2, SHA256_BLOCK_SIZE) == 0
+#define SHA256_PASS_MATCHED(pass1, pass2) strncmp((char *)pass1, (char *)pass2, SHA256_BLOCK_SIZE) == 0
 
 // get the sha256 encrypt result from string, size equal to SHA256_BLOCK_SIZE
+// The result byte list will be allocate on heap
 BYTE *get_sha256_encrypt(const BYTE *keypass);
-
 
 #endif

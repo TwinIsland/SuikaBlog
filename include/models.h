@@ -7,9 +7,9 @@
 typedef struct
 {
     int32_t PostID;
-    char Title[256];
-    char Banner[256];
-    char Excerpts[256];
+    char *Title;
+    char *Banner;
+    char *Excerpts;
     char *Content;
     int32_t IsPage;
     time_t CreateDate;
@@ -18,6 +18,6 @@ typedef struct
     int32_t Views;
 } Post;
 
-void destroy_post(Post *post);
+void free_post(Post *post);
 
 #endif // MODELS_H

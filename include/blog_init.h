@@ -17,6 +17,6 @@
     initialize blog via asking input for pass key and db 
 
  */
-void initialize_blog(configuration *config);
+void initialize_blog(configuration *config, void (*exit_handler)());
 
 #endif
