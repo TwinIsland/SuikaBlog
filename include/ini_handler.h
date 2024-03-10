@@ -33,6 +33,6 @@ configuration *get_config();
 void destory_config();
 
 // load the local passcode to the config
-Result load_passcode_to_config();
+Result load_passcode_to_config(configuration *old_config);
 
 #endif

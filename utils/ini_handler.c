@@ -47,7 +47,7 @@ Result init_config()
     };
 }
 
-Result load_passcode_to_config()
+Result load_passcode_to_config(configuration *old_config)
 {
     FILE *file = fopen(config.key_file, "rb");
 
@@ -70,6 +70,7 @@ Result load_passcode_to_config()
     }
 
     config.pass_sha256 = buf;
+    old_config = get_config();
 
     return (Result) {
         .status = OK,

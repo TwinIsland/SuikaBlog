@@ -15,7 +15,6 @@
 
 #define ASCII_LOGO_PATH "assets/ascii_logo"
 
-static configuration *config;
 static struct mg_mgr mgr;
 
 void print_logo()
@@ -56,6 +55,7 @@ int main()
 
     Result ret;
     char server_addr[32];
+    configuration *config;
 
     // print welcome message
     print_logo();
@@ -69,7 +69,7 @@ int main()
     config = get_config();
     PRINT_LOG("loading config", ret, ERR_IS_CRITICAL, exit_handler);
 
-    // checking config files
+    // checking necessary files
     if (!(file_exists(config->key_file) & file_exists(config->db_name)))
     {
         ret.status = FAILED;
@@ -81,8 +81,8 @@ int main()
         exit(1);
     }
 
-    // load passcode to config
-    ret = load_passcode_to_config();
+    // update passcode to config struct
+    ret = load_passcode_to_config(config);
     PRINT_LOG("init: keypass", ret, ERR_IS_CRITICAL, exit_handler);
 
     // initialize the database
@@ -91,12 +91,12 @@ int main()
 
 #ifdef TEST
     // test code
-    debug("make sure you set the passkey=test");
+    // debug("make sure you set the passkey=test");
 
-    const char *exp_password = "test";
-    BYTE *exp_sha256 = get_sha256_encrypt((const BYTE *)exp_password);
-    debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
-    free(exp_sha256);
+    // const char *exp_password = "test";
+    // BYTE *exp_sha256 = get_sha256_encrypt((const BYTE *)exp_password);
+    // debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
+    // free(exp_sha256);
 
     // ret = create_post("testTitle", "test excerpt", "hello world", 0);
     // PRINT_LOG("test create post", ret, ERR_IS_CRITICAL, exit_handler);
