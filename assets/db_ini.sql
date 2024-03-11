@@ -51,8 +51,13 @@ CREATE TABLE PostMeta (
     FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
     FOREIGN KEY (MetaName) REFERENCES Meta(Name) ON DELETE CASCADE,
     PRIMARY KEY (PostID, MetaName)
-);
+); 
 
+-- The field that allowed operation by plugins
+CREATE TABLE Info (
+    Key VARCHAR(64) PRIMARY KEY,
+    Value VARCHAR(128)
+);
 
 -- Triggers to update Activity when detect new comment
 CREATE TRIGGER InsertCommentActivity AFTER INSERT ON Comment

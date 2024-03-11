@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mongoose.h>
 #include <signal.h>
 
+#include "mongoose.h"
 #include "result.h"
 #include "ini_handler.h"
 #include "fs_helper.h"
@@ -12,10 +12,19 @@
 #include "crud.h"
 #include "models.h"
 #include "router.h"
+#include "suika_state.h"
+
+#define PLUGIN_LOADER_ALLOWED
+#include "plugin.h"
 
 #define ASCII_LOGO_PATH "assets/ascii_logo"
 
 static struct mg_mgr mgr;
+
+// initialize system state
+SUIKA_STATE SYSTEM_STATE = (SUIKA_STATE){
+    .is_db_first_initialize = false,
+};
 
 void print_logo()
 {
@@ -50,7 +59,7 @@ int main()
 {
 
 #ifndef DEBUG
-    mg_log_set(0);    // disable moogoose logging 
+    mg_log_set(0); // disable moogoose logging
 #endif
 
     Result ret;
@@ -89,6 +98,13 @@ int main()
     ret = init_db(config);
     PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, exit_handler, config->db_name);
 
+    // load all the plugins
+    load_plugins();
+
+    // initialize the plugins
+    ret = init_plugin();
+    PRINT_LOG("init plug-ins", ret, ERR_IS_CRITICAL, exit_handler);
+
 #ifdef TEST
     // test code
     // debug("make sure you set the passkey=test");
@@ -98,25 +114,25 @@ int main()
     // debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
     // free(exp_sha256);
 
-    // ret = create_post("testTitle", "test excerpt", "hello world", 0);
-    // PRINT_LOG("test create post", ret, ERR_IS_CRITICAL, exit_handler);
-    // int32_t new_postid = atoi(ret.msg);
-    // Post test;
-    // get_post(new_postid, &test);
-    // debug("Content is: %s", test.Content);
-    // free_post(&test);
-    // delete_post_by_id(new_postid);
-    // get_post(new_postid, &test);
-    // debug("Content after delete is: %s", test.Content);
-    // free_post(&test);
-    // int total_count;
-    // get_total_post_count(&total_count);
-    // debug("total post count is: %d", total_count);
+    int new_postid;
+    ret = create_post("testTitle", "test excerpt", "hello world", IS_POST, &new_postid);
+    PRINT_LOG("test create post", ret, ERR_IS_CRITICAL, exit_handler);
 
-    // exit_handler();
+    Post test;
+    get_post(new_postid, &test);
+    debug("Content is: %s", test.Content);
+    free_post(&test);
+    delete_post_by_id(new_postid);
+    get_post(new_postid, &test);
+    debug("Content after delete is: %s", test.Content);
+    free_post(&test);
+    int total_count;
+    get_total_post_count(&total_count);
+    debug("total post count is: %d", total_count);
+
+    exit_handler();
 
 #endif
-
     // start the server
     sprintf(server_addr, "http://0.0.0.0:%d", config->server_port);
 
@@ -127,11 +143,9 @@ int main()
         char err_text[64];
         sprintf(err_text, "can't listen on port %d", config->server_port);
 
-        ret = (Result)
-        {
+        ret = (Result){
             .status = FAILED,
-            .msg = err_text
-        };
+            .msg = err_text};
     }
     else
         ret = (Result){.status = OK};

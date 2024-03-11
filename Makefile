@@ -1,7 +1,7 @@
 CC=gcc
 
 LDFLAGS=-lsqlite3
-CFLAGS=-Wall -Iinclude
+CFLAGS=-Wall -Iinclude -export-dynamic
 LIBDIR=./lib
 SRCDIR=./src
 UTILSDIR=./utils

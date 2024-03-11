@@ -3,8 +3,8 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE Posts (
     PostID INTEGER PRIMARY KEY AUTOINCREMENT,
     Title VARCHAR(255) NOT NULL,
-    Banner TEXT,
-    Excerpt TEXT,
+    Banner VARCHAR(255),
+    Excerpt VARCHAR(255),
     Content TEXT NOT NULL,
     IsPage INTEGER NOT NULL DEFAULT 0,  -- 0 or 1
     CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -51,8 +51,13 @@ CREATE TABLE PostMeta (
     FOREIGN KEY (PostID) REFERENCES Posts(PostID) ON DELETE CASCADE,
     FOREIGN KEY (MetaName) REFERENCES Meta(Name) ON DELETE CASCADE,
     PRIMARY KEY (PostID, MetaName)
-);
+); 
 
+-- The field that allowed operation by plugins
+CREATE TABLE Info (
+    Key VARCHAR(64) PRIMARY KEY,
+    Value VARCHAR(128)
+);
 
 -- Triggers to update Activity when detect new comment
 CREATE TRIGGER InsertCommentActivity AFTER INSERT ON Comment
@@ -177,4 +182,4 @@ FROM source.blog_relationships AS br
 JOIN source.blog_metas AS bm ON bm.mid = br.mid;
 
 
-SELECT Banner FROM suika.Posts
+-- SELECT Banner FROM suika.Posts

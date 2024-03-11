@@ -91,6 +91,11 @@ erDiagram
         datetime CreateDate "DEFAULT CURRENT_TIMESTAMP"
     }
 
+    Info {
+        varchar Key PK
+        varchar Value 
+    }
+
     Posts ||--o{ Comment : "has"
     Visitors ||--o{ Comment : "writes"
     Visitors ||--o{ Activity : "triggers"

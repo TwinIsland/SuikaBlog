@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "models.h": "c"
+        "models.h": "c",
+        "crud.h": "c",
+        "sqlite3.h": "c",
+        "plugin.h": "c",
+        "result.h": "c",
+        "suika_state.h": "c",
+        "stdio.h": "c"
     }
 }

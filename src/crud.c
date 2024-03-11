@@ -5,6 +5,10 @@
 #include "crud.h"
 #include "utils.h"
 
+#define PLUGIN_LOADER_ALLOWED
+#include "plugin.h"
+
+
 static sqlite3 *db = NULL;
 
 Result init_db(configuration *config)
@@ -23,18 +27,33 @@ Result init_db(configuration *config)
     };
 }
 
-static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx) {
+Result init_plugin()
+{
+    if (db == NULL)
+        return (Result){
+            .status = FAILED,
+            .msg = "please initialize db first",
+        };
+
+    return plugin_init(db);
+}
+
+static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx)
+{
     const char *src = (const char *)sqlite3_column_text(stmt, idx);
-    
-    if (!src) {
+
+    if (!src)
+    {
         *dist = (char *)malloc(1);
-        if (*dist) (*dist)[0] = '\0';
+        if (*dist)
+            (*dist)[0] = '\0';
         return;
     }
 
     size_t srcLen = strlen(src) + 1;
     *dist = (char *)malloc(srcLen);
-    if (!*dist) return; 
+    if (!*dist)
+        return;
     strncpy(*dist, src, srcLen);
 }
 
@@ -87,7 +106,7 @@ Result get_post(const int32_t PostID, Post *ret)
     };
 }
 
-Result create_post(const char *title, const char *excerpt, const char *content, int isPage)
+Result create_post(const char *title, const char *excerpt, const char *content, int isPage, int *ret)
 {
     if (db == NULL)
         return (Result){
@@ -96,7 +115,6 @@ Result create_post(const char *title, const char *excerpt, const char *content, 
         };
 
     long long int post_id;
-    char post_id_buf[256];
     const char *sql = "INSERT INTO Posts (Title, Excerpt, Content, IsPage) VALUES (?, ?, ?, ?);";
     sqlite3_stmt *stmt;
 
@@ -125,7 +143,7 @@ Result create_post(const char *title, const char *excerpt, const char *content, 
     else
     {
         post_id = sqlite3_last_insert_rowid(db);
-        sprintf(post_id_buf, "%lld", post_id);
+        *ret = post_id;
         debug("Post created successfully\n");
     }
 
@@ -134,7 +152,7 @@ Result create_post(const char *title, const char *excerpt, const char *content, 
 
     return (Result){
         .status = rc == SQLITE_DONE ? OK : FAILED,
-        .msg = rc == SQLITE_DONE ? post_id_buf : "sql query failed at execution",
+        .msg = rc == SQLITE_DONE ? "ok" : "sql query failed at execution",
     };
 }
 
@@ -184,21 +202,31 @@ Result delete_post_by_id(long long int post_id)
     };
 }
 
-Result get_total_post_count(int *ret) {
+Result get_total_post_count(int *ret)
+{
+    if (db == NULL)
+        return (Result){
+            .status = FAILED,
+            .msg = "uninitialized database connection",
+        };
     const char *sql = "SELECT COUNT(*) FROM Posts";
     sqlite3_stmt *stmt;
-    
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
-        if (sqlite3_step(stmt) == SQLITE_ROW) {
-            *ret = sqlite3_column_int(stmt, 0); 
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            *ret = sqlite3_column_int(stmt, 0);
         }
         sqlite3_finalize(stmt);
-    } else {
+    }
+    else
+    {
         *ret = -1;
         debug("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
     }
-    
-    return (Result) {
+
+    return (Result){
         .status = OK,
         .ptr = ret,
     };
