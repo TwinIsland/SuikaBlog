@@ -13,7 +13,7 @@
 Result init_db(configuration *config);
 
 // Plugin initialize function
-Result init_plugin();
+Result init_plugins();
 
 // Post
 Result create_post(const char *title, const char *excerpt, const char *content, int isPage, int *ret);

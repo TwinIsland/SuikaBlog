@@ -16,18 +16,22 @@
         printf("* ");                \
         printf("\033[0m");           \
         printf(info, ##__VA_ARGS__); \
-        printf("\n");        \
+        printf(" \033[0;32m");       \
+        printf("\t--> ok\n");        \
+        printf("\033[0m");           \
     } while (0);
 
-#define PRINT_ERR(info, ...) \
-    do { \
-        printf("\033[0;31m"); \
-        printf("ERROR: "); \
-        printf("\033[0m"); \
-        printf(info, ##__VA_ARGS__); \
-        printf("\n"); \
+#define PRINT_ERR(info, ...)              \
+    do                                    \
+    {                                     \
+        printf("\033[0;34m");             \
+        printf("* ");                     \
+        printf("\033[0m");                \
+        printf("\033[0;31m");             \
+        printf("ERROR: ");                \
+        printf("\033[0m");                \
+        printf(info "\n", ##__VA_ARGS__); \
     } while (0);
-
 
 #define PRINT_LOG(info, ret, is_err_critical, exit_handler, ...) \
     do                                                           \

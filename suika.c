@@ -50,6 +50,8 @@ void exit_handler()
     mg_mgr_free(&mgr);
     // close db
     db_close();
+    // upload plugins
+    unload_plugins();
 
     printf("\nbye\n");
     exit(1);
@@ -98,12 +100,9 @@ int main()
     ret = init_db(config);
     PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, exit_handler, config->db_name);
 
-    // load all the plugins
-    load_plugins();
-
     // initialize the plugins
-    ret = init_plugin();
-    PRINT_LOG("init plug-ins", ret, ERR_IS_CRITICAL, exit_handler);
+    ret = init_plugins();
+    PRINT_LOG("init: plugins", ret, ERR_IS_IGN, exit_handler);
 
 #ifdef TEST
     // test code

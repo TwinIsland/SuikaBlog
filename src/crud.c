@@ -8,7 +8,6 @@
 #define PLUGIN_LOADER_ALLOWED
 #include "plugin.h"
 
-
 static sqlite3 *db = NULL;
 
 Result init_db(configuration *config)
@@ -27,7 +26,7 @@ Result init_db(configuration *config)
     };
 }
 
-Result init_plugin()
+Result init_plugins()
 {
     if (db == NULL)
         return (Result){
@@ -35,7 +34,8 @@ Result init_plugin()
             .msg = "please initialize db first",
         };
 
-    return plugin_init(db);
+    load_plugins();
+    return plugins_bind(db);
 }
 
 static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx)

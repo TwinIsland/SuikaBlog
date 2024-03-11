@@ -6,6 +6,7 @@
         "plugin.h": "c",
         "result.h": "c",
         "suika_state.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "typeinfo": "c"
     }
 }

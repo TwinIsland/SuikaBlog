@@ -6,6 +6,8 @@
 #include "result.h"
 #include "suika_state.h"
 
+#define PLUGIN_MANAGER_VERSION 1
+
 #ifdef USE_PLUGIN_UTILS
 #define PRINT_LOG(name, msg, ...)                      \
     do                                                 \
@@ -15,14 +17,18 @@
 #endif
 
 #ifdef PLUGIN_LOADER_ALLOWED
-Result plugin_init(sqlite3 *db);
+Result plugins_bind(sqlite3 *db);
 void load_plugins();
+void unload_plugins();
 #endif
 
 typedef struct
 {
     char *name;
-    void (*before_server_start)();
+    int version;
+    void *handler;
+    void (*cleanup_func)();
+    void (*after_binding_func)();
 } Plugin;
 
 void register_plugin(Plugin plugin);
