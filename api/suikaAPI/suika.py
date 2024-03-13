@@ -1,7 +1,7 @@
 import mmap
 import os
 
-from inilib import SimpleIniParser
+from suikaAPI.inilib import SimpleIniParser
 
 CONFIG_DIR = "../config.ini"
 
@@ -67,11 +67,3 @@ class IPC:
             os.remove(self.IPC_FILE_PATH)
         except OSError as e:
             print(f"Error removing IPC file: {e}")
-
-
-# import time
-# test = IPC()
-# test.init_ipc()
-
-# time.sleep(4)
-# test.read_ipc()
