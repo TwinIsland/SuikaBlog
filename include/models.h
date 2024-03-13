@@ -31,17 +31,26 @@ typedef struct
     time_t DateModified;
     int32_t UpVoted;
     int32_t Views;
-} PostInfo ;
+} PostInfo;
 
-typedef struct {
+typedef struct
+{
     char *title;
     char *content;
 } Notice;
 
-typedef char* Archieve;
-typedef char* Tag;
 
-typedef struct {
+typedef struct
+{
+    int year;
+    size_t articleCount;
+    PostInfo *posts;
+} Archieve;
+
+typedef char *Tag;
+
+typedef struct
+{
     Tag *data;
     size_t size;
 } Tags;
@@ -52,14 +61,13 @@ typedef struct
     size_t size;
 } Archieves;
 
-
 typedef struct
 {
     PostInfo CoverArticleInfo;
     Notice Notice;
     Tags Tags;
     Archieves Archieves;
-    PostInfo NormalArticleInfos[INDEX_DATA_POST_N]; 
+    PostInfo NormalArticleInfos[INDEX_DATA_POST_N];
 } IndexData;
 
 void free_post(Post *post);

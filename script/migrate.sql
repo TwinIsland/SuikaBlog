@@ -180,6 +180,3 @@ INSERT INTO suika.PostMeta (PostID, MetaName)
 SELECT br.cid, bm.name
 FROM source.blog_relationships AS br
 JOIN source.blog_metas AS bm ON bm.mid = br.mid;
-
-
--- SELECT Banner FROM suika.Posts

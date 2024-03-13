@@ -78,7 +78,7 @@ Result plugins_bind(sqlite3 *_db)
         if (plugins[i].after_binding_func)
         {
             plugins[i].after_binding_func();
-            PRINT_OK("init: %s", plugins[i].name);
+            PRINT_OK_LOG("init: %s", plugins[i].name);
         }
     }
 

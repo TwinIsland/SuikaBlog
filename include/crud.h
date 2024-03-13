@@ -21,8 +21,14 @@ Result get_post(const int32_t PostID, Post *ret);
 Result delete_post_by_id(long long int post_id);
 Result get_total_post_count(int *ret);
 
-// Index
+// Tag
+Result get_all_tags(Tags *ret);
 
+// Archieve
+Result get_archieves(Archieves *ret);
+
+// Index
+Result get_index(IndexData *ret);
 
 // Close database
 void db_close(void);

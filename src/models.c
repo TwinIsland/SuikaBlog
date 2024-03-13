@@ -20,43 +20,59 @@ void free_post(Post *post)
 
 void free_postInfo(PostInfo *postInfo)
 {
-    if (postInfo != NULL)
-    {
-        free(postInfo->Title);
-        free(postInfo->Banner);
-        free(postInfo->Excerpts);
+    if (postInfo == NULL)
+        return;
 
-        postInfo->Title = NULL;
-        postInfo->Banner = NULL;
-        postInfo->Excerpts = NULL;
+    free(postInfo->Title);
+    free(postInfo->Banner);
+    free(postInfo->Excerpts);
+
+    postInfo->Title = NULL;
+    postInfo->Banner = NULL;
+    postInfo->Excerpts = NULL;
+}
+
+void free_tags(Tags *tags)
+{
+    if (tags == NULL)
+        return;
+    for (int i = 0; i < tags->size; ++i)
+    {
+        free(tags->data[i]);
+        tags->data[i] = NULL;
     }
+    free(tags->data);
+}
+
+void free_archieves(Archieves *archieves)
+{
+    if (archieves == NULL)
+        return;
+    for (int i = 0; i < archieves->size; ++i)
+    {
+        for (int j = 0; j < archieves->data[i].articleCount; ++j)
+        {
+            free_postInfo(&archieves->data[i].posts[j]);
+        }
+        free(archieves->data[i].posts);
+    }
+    free(archieves->data);
+    archieves->data = NULL;
 }
 
 void free_indexData(IndexData *indexData)
 {
-    if (indexData != NULL)
-    {
-        free_postInfo(&indexData->CoverArticleInfo);
+    if (indexData == NULL)
+        return;
 
-        for (int i = 0; i < INDEX_DATA_POST_N; ++i)
-            free_postInfo(&indexData->NormalArticleInfos[i]);
+    free_postInfo(&indexData->CoverArticleInfo);
 
-        free(indexData->Notice.content);
-        free(indexData->Notice.title);
+    for (int i = 0; i < INDEX_DATA_POST_N; ++i)
+        free_postInfo(&indexData->NormalArticleInfos[i]);
 
-        for (int i = 0; i < indexData->Archieves.size; ++i)
-        {
-            free(indexData->Archieves.data[i]);
-            indexData->Archieves.data[i] = NULL;
-        }
+    free(indexData->Notice.content);
+    free(indexData->Notice.title);
 
-        free(indexData->Archieves.data);
-
-        for (int i = 0; i < indexData->Tags.size; ++i)
-        {
-            free(indexData->Tags.data[i]);
-            indexData->Tags.data[i] = NULL;
-        }
-        free(indexData->Tags.data);
-    }
+    free_tags(&indexData->Tags);
+    free_archieves(&indexData->Archieves);
 }

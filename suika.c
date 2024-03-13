@@ -73,13 +73,13 @@ int main()
 
     // register signal handler
     signal(SIGINT, exit_handler);
-    PRINT_LOG("init: signal handler", (Result){.status = OK}, ERR_IS_IGN, exit_handler);
+    PRINT_OK_LOG("init: signal handler");
 
     // load configurations
     ret = init_config();
     config = get_config();
     PRINT_LOG("loading config", ret, ERR_IS_CRITICAL, exit_handler);
-
+    
     // checking necessary files
     if (!(file_exists(config->key_file) & file_exists(config->db_name)))
     {
@@ -113,25 +113,30 @@ int main()
     // debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
     // free(exp_sha256);
 
-    int new_postid;
-    ret = create_post("testTitle", "test excerpt", "hello world", IS_POST, &new_postid);
-    PRINT_LOG("test create post", ret, ERR_IS_CRITICAL, exit_handler);
+    // int new_postid;
+    // ret = create_post("testTitle", "test excerpt", "hello world", IS_POST, &new_postid);
+    // PRINT_LOG("test create post", ret, ERR_IS_CRITICAL, exit_handler);
 
-    Post test;
-    get_post(new_postid, &test);
-    debug("Content is: %s", test.Content);
-    free_post(&test);
-    delete_post_by_id(new_postid);
-    get_post(new_postid, &test);
-    debug("Content after delete is: %s", test.Content);
-    free_post(&test);
-    int total_count;
-    get_total_post_count(&total_count);
-    debug("total post count is: %d", total_count);
+    // Post test;
+    // get_post(new_postid, &test);
+    // debug("Content is: %s", test.Content);
+    // free_post(&test);
+    // delete_post_by_id(new_postid);
+    // get_post(new_postid, &test);
+    // debug("Content after delete is: %s", test.Content);
+    // free_post(&test);
+    // int total_count;
+    // get_total_post_count(&total_count);
+    // debug("total post count is: %d", total_count);
+
+    IndexData test;
+    ret = get_index(&test);
+    debug("status %d index archieve count: %lu", ret.status,  test.Archieves.size);
+    free_indexData(&test);
 
     exit_handler();
-
 #endif
+
     // start the server
     sprintf(server_addr, "http://0.0.0.0:%d", config->server_port);
 

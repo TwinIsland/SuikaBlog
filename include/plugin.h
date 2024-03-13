@@ -8,14 +8,6 @@
 
 #define PLUGIN_MANAGER_VERSION 1
 
-#ifdef USE_PLUGIN_UTILS
-#define PRINT_LOG(name, msg, ...)                      \
-    do                                                 \
-    {                                                  \
-        printf("(%s) " msg "\n", name, ##__VA_ARGS__); \
-    } while (0)
-#endif
-
 #ifdef PLUGIN_LOADER_ALLOWED
 Result plugins_bind(sqlite3 *db);
 void load_plugins();

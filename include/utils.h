@@ -9,7 +9,28 @@
 #define ERR_IS_CRITICAL 1
 #define ERR_IS_IGN 0
 
-#define PRINT_OK(info, ...)          \
+// OK: info
+#define PRINT_OK(info, ...)               \
+    do                                    \
+    {                                     \
+        printf("\033[0;32m");            \
+        printf("OK: ");                   \
+        printf("\033[0m");                \
+        printf(info "\n", ##__VA_ARGS__); \
+    } while (0);
+
+// ERROR: info
+#define PRINT_ERR(info, ...)              \
+    do                                    \
+    {                                     \
+        printf("\033[0;31m");             \
+        printf("ERROR: ");                \
+        printf("\033[0m");                \
+        printf(info "\n", ##__VA_ARGS__); \
+    } while (0);
+
+// * info   --> ok
+#define PRINT_OK_LOG(info, ...)      \
     do                               \
     {                                \
         printf("\033[0;34m");        \
@@ -21,18 +42,7 @@
         printf("\033[0m");           \
     } while (0);
 
-#define PRINT_ERR(info, ...)              \
-    do                                    \
-    {                                     \
-        printf("\033[0;34m");             \
-        printf("* ");                     \
-        printf("\033[0m");                \
-        printf("\033[0;31m");             \
-        printf("ERROR: ");                \
-        printf("\033[0m");                \
-        printf(info "\n", ##__VA_ARGS__); \
-    } while (0);
-
+// * info   --> ok/fail:[ret.msg]
 #define PRINT_LOG(info, ret, is_err_critical, exit_handler, ...) \
     do                                                           \
     {                                                            \
