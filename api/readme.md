@@ -6,8 +6,12 @@ Suika blog system support router integration, which means that you can create ro
 
 ```python
 # read the content sent by C
-test = IPC()
-test.init_ipc()
+import suikaAPI
+import time
+
+ipc_session = suikaAPI.IPC()
+ipc_session.init_ipc()
+
 time.sleep(4)
-test.read_ipc()
+ipc_session.read_ipc()
 ```
