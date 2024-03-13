@@ -1,8 +1,13 @@
 CC=gcc
 
-LDFLAGS=-lsqlite3
+LDFLAGS=-L$(LIBDIR) -lsqlite3 -llibrary
 CFLAGS=-Wall -Iinclude -export-dynamic
+
 LIBDIR=./lib
+LIB_SRC=$(wildcard $(LIBDIR)/*.c)
+LIB_OBJ=$(LIB_SRC:.c=.o)
+LIB_OUT=$(LIBDIR)/liblibrary.a
+
 SRCDIR=./src
 UTILSDIR=./utils
 
@@ -21,10 +26,13 @@ OUT=$(OUTDIR)/suika
 
 all: $(OUTDIR) $(OUT)
 
+$(LIB_OUT): $(LIB_OBJ)
+	ar rcs $@ $(LIB_OBJ)
+
 $(OUTDIR):
 	mkdir -p $(OUTDIR)
 
-$(OUT): $(SRC)
+$(OUT): $(SRC) $(LIB_OUT)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 debug:
