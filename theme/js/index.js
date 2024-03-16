@@ -30,23 +30,23 @@ function renderNormalArticle(normalArticlesJSON) {
   `).join('');
 }
 
-function renderAbout(aboutJSON) {
+function renderNotice(noticeJSON) {
   return `
-    <header>${aboutJSON.title}</header>
-    <p>${aboutJSON.content}</p>
+    <header>${noticeJSON.title}</header>
+    <p>${noticeJSON.content}</p>
   `
 }
 
 function renderTags(tagsJSON) {
   return tagsJSON.map(tagJSON => `
-    <button href="/tag/${tagJSON.tagId}" onclick="route()">${tagJSON.tagName}</button>
+    <button href="/tag/${tagJSON.uri}" onclick="route()">${tagJSON.tagName}</button>
   `).join('')
 }
 
 function renderArchives(archivesJSON) {
   return archivesJSON.map(archiveJSON => `
     <li>
-      <a href="/archives/${archiveJSON.archivesId}" onclick="route()">${archiveJSON.name}</a>
+      <a href="/archives/${archiveJSON.uri}" onclick="route()">${archiveJSON.name}</a>
     </li>  
   `).join('')
 }
@@ -57,7 +57,7 @@ fetchDataWithCache('http://localhost:3000/index', "index")
     const renderPromises = [
       renderWrapper(document.getElementById('cover-article-container'), renderCoverArticle(data['cover-article'])),
       renderWrapper(document.getElementById('normal-article-container'), renderNormalArticle(data['normal-article'])),
-      renderWrapper(document.getElementById('about-container'), renderAbout(data['about'])),
+      renderWrapper(document.getElementById('notice-container'), renderNotice(data['notice'])),
       renderWrapper(document.getElementById('tags-container'), renderTags(data['tags'])),
       renderWrapper(document.getElementById('archives-container'), renderArchives(data['archives']))
     ];
