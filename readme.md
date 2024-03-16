@@ -7,17 +7,22 @@ Ultimate Blog System Engineered for Ultimate Speed and Efficiency⚡
 
 ## Run
 
-install dependencies
+install dependencies (via apt):
 
 ```bash
 sudo apt update
 sudo apt-get install libsqlite3-dev
 ```
+or via yum:
 
-then, start the server by 
 ```bash
-make
-./bin/suika
+sudo yum check-update
+sudo yum install libsqlite3x-devel.x86_64
+```
+
+then, start the server by:
+```bash
+make run
 ```
 
 ## Gzip (Optional)
@@ -30,8 +35,8 @@ make gunzip     # turn off gzip feature
 ## Test/Debug
 **Backend:**
 ```bash
-make test       # build test executable
-make debug      # build debug executable
+make run_test       # build and run test executable
+make run_debug      # build and run debug executable
 ```
 **Frontend:**
 > need npm to run frontend test server
