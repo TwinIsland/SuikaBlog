@@ -36,7 +36,7 @@ make gunzip     # turn off gzip feature
 **Backend:**
 ```bash
 make run_test       # build and run test executable
-make run_debug      # build and run debug executable
+make run_dev        # build and run debug executable
 ```
 **Frontend:**
 > need npm to run frontend test server

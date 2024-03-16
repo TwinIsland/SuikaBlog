@@ -12,6 +12,8 @@
         "string_view": "c",
         "initializer_list": "c",
         "utility": "c",
-        "string": "c"
+        "string": "c",
+        "stdint.h": "c",
+        "time.h": "c"
     }
 }
