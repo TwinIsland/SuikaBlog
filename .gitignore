@@ -20,3 +20,7 @@ prouter/__pycache__/
 
 # npm
 node_modules/
+
+# C
+*.a
+*.o
