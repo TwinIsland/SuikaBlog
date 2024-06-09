@@ -163,7 +163,7 @@ INSERT INTO suika.Visitors (name, email, website, ip)
 SELECT DISTINCT author, mail, url, ip
 FROM source.blog_comments
 WHERE author IS NOT NULL AND mail IS NOT NULL
-GROUP BY author, mail;
+GROUP BY author;
 
 
 INSERT INTO suika.Comment (postID, AuthorName, createDate, content, upVoted)

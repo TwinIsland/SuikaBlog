@@ -79,7 +79,7 @@ int main()
     ret = init_config();
     config = get_config();
     PRINT_LOG("loading config", ret, ERR_IS_CRITICAL, exit_handler);
-    
+
     // checking necessary files
     if (!(file_exists(config->key_file) & file_exists(config->db_name)))
     {
@@ -131,7 +131,7 @@ int main()
 
     IndexData test;
     ret = get_index(&test);
-    debug("status %d index archieve count: %lu", ret.status,  test.Archieves.size);
+    debug("status %d index archieve count: %lu", ret.status, test.Archieves.size);
     free_indexData(&test);
 
     exit_handler();

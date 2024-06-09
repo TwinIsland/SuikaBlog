@@ -21,7 +21,7 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
 
     // Cache all image request
     char uri[hm->uri.len+1];
-    strncpy(uri, hm->uri.ptr, hm->uri.len);
+    strncpy(uri, hm->uri.buf, hm->uri.len);
     uri[hm->uri.len] = '\0';
 
     debug("request: %s", uri);
