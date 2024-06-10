@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <time.h>
+#include <mongoose.h>
 
 #define INDEX_DATA_POST_N 5 // Number of Post shown on index page
 
@@ -53,12 +54,14 @@ typedef struct
 {
     Tag *data;
     size_t size;
+    size_t mem_size;
 } Tags;
 
 typedef struct
 {
     Archieve *data;
     size_t size;
+    size_t mem_size;
 } Archieves;
 
 typedef struct
@@ -72,6 +75,10 @@ typedef struct
 
 void free_post(Post *post);
 void free_postInfo(PostInfo *postInfo);
+void free_tags(Tags *tags);
 void free_indexData(IndexData *indexData);
+
+char *notice_to_json(Notice *notice);
+char *tags_to_json(Tags *tags);
 
 #endif // MODELS_H

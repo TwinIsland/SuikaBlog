@@ -20,6 +20,7 @@
         "sha256.h": "c",
         "random": "c",
         "blog_init.h": "c",
-        "config_loader.h": "c"
+        "config_loader.h": "c",
+        "utils.h": "c"
     }
 }

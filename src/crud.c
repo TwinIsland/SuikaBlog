@@ -268,11 +268,15 @@ Result get_all_tags(Tags *ret)
 
         ret->data = malloc(sizeof(Tag) * tagsCount);
         ret->size = tagsCount;
+        ret->mem_size = 0;
 
         size_t index = 0;
+        char *cur_tag;
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            ret->data[index++] = strdup((char *)sqlite3_column_text(stmt, 0));
+            cur_tag = (char *)sqlite3_column_text(stmt, 0);
+            ret->data[index++] = strdup(cur_tag);
+            ret->mem_size += strlen(cur_tag);
         }
     }
     else
@@ -300,6 +304,7 @@ Result get_archieves(Archieves *ret)
 
         ret->data = malloc(sizeof(Archieve) * archieveCount);
         ret->size = archieveCount;
+        ret->mem_size = 0;
 
         sqlite3_reset(stmtYearCounts);
 

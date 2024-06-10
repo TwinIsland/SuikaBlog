@@ -127,12 +127,12 @@ int main()
     // get_total_post_count(&total_count);
     // debug("total post count is: %d", total_count);
 
-    IndexData test;
-    ret = get_index(&test);
-    debug("status %d index archieve count: %lu", ret.status, test.Archieves.size);
-    free_indexData(&test);
+    // IndexData test;
+    // ret = get_index(&test);
+    // debug("status %d index archieve count: %lu", ret.status, test.Archieves.size);
+    // free_indexData(&test);
 
-    exit_handler();
+    // exit_handler();
 #endif
 
     // start the server

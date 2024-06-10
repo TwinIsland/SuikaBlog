@@ -76,3 +76,39 @@ void free_indexData(IndexData *indexData)
     free_tags(&indexData->Tags);
     free_archieves(&indexData->Archieves);
 }
+
+// char *format_time(time_t t)
+// {
+//     struct tm tm_info;
+//     char buffer[26];
+//     localtime_r(&t, &tm_info);
+//     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", &tm_info);
+//     return strdup(buffer);
+// }
+
+char *notice_to_json(Notice *notice)
+{
+    char *json = mg_mprintf("{%m: %m, %m: %m}",
+                            MG_ESC("title"), MG_ESC(notice->title),
+                            MG_ESC("content"), MG_ESC(notice->content));
+    return json;
+}
+
+char *tags_to_json(Tags *tags)
+{
+    char *json_str = malloc(tags->mem_size + (tags->size - 1) + 1);
+    size_t json_str_idx = 0;
+
+    for (size_t i = 0; i < tags->size - 1; ++i)
+    {
+        sprintf(json_str+json_str_idx, "%s,", tags->data[i]);
+        json_str_idx += strlen(tags->data[i]) + 1;
+    }
+    sprintf(json_str+json_str_idx, "%s,", tags->data[tags->size - 1]);
+    json_str_idx += strlen(tags->data[tags->size - 1]);
+    json_str[json_str_idx] = '\0';
+
+    char *result = mg_mprintf("[%s]", json_str);
+    free(json_str);
+    return result;
+}
