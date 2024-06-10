@@ -14,6 +14,12 @@
         "utility": "c",
         "string": "c",
         "stdint.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "ini_handler.h": "c",
+        "router.h": "c",
+        "sha256.h": "c",
+        "random": "c",
+        "blog_init.h": "c",
+        "config_loader.h": "c"
     }
 }

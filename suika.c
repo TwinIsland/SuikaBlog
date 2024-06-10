@@ -5,7 +5,7 @@
 
 #include "mongoose.h"
 #include "result.h"
-#include "ini_handler.h"
+#include "config_loader.h"
 #include "fs_helper.h"
 #include "blog_init.h"
 #include "utils.h"
@@ -66,7 +66,6 @@ int main()
 
     Result ret;
     char server_addr[32];
-    configuration *config;
 
     // print welcome message
     print_logo();
@@ -77,32 +76,31 @@ int main()
 
     // load configurations
     ret = init_config();
-    config = get_config();
-    PRINT_LOG("loading config", ret, ERR_IS_CRITICAL, exit_handler);
+    PRINT_LOG("loading config", ret, ERR_IS_CRITICAL);
 
     // checking necessary files
-    if (!(file_exists(config->key_file) & file_exists(config->db_name)))
+    if (!(file_exists(config.key_file) & file_exists(config.db_name)))
     {
         ret.status = FAILED;
         ret.msg = "blog system need to initialize";
-        PRINT_LOG("loading system files", ret, ERR_IS_IGN, exit_handler);
+        PRINT_LOG("loading system files", ret, ERR_IS_IGN);
 
-        initialize_blog(config, exit_handler);
+        initialize_blog();
         printf("initialize end, please restart the program...\n");
         exit(1);
     }
 
     // update passcode to config struct
-    ret = load_passcode_to_config(config);
-    PRINT_LOG("init: keypass", ret, ERR_IS_CRITICAL, exit_handler);
+    ret = load_passcode_to_config();
+    PRINT_LOG("init: keypass", ret, ERR_IS_CRITICAL);
 
     // initialize the database
-    ret = init_db(config);
-    PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, exit_handler, config->db_name);
+    ret = init_db();
+    PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, config.db_name);
 
     // initialize the plugins
     ret = init_plugins();
-    PRINT_LOG("init: plugins", ret, ERR_IS_IGN, exit_handler);
+    PRINT_LOG("init: plugins", ret, ERR_IS_IGN);
 
 #ifdef TEST
     // test code
@@ -138,14 +136,14 @@ int main()
 #endif
 
     // start the server
-    sprintf(server_addr, "http://0.0.0.0:%d", config->server_port);
+    sprintf(server_addr, "http://0.0.0.0:%d", config.server_port);
 
     mg_mgr_init(&mgr);
 
     if (!mg_http_listen(&mgr, server_addr, (mg_event_handler_t)server_fn, NULL))
     {
         char err_text[64];
-        sprintf(err_text, "can't listen on port %d", config->server_port);
+        sprintf(err_text, "can't listen on port %d", config.server_port);
 
         ret = (Result){
             .status = FAILED,
@@ -154,7 +152,7 @@ int main()
     else
         ret = (Result){.status = OK};
 
-    PRINT_LOG("boost: server", ret, ERR_IS_CRITICAL, exit_handler);
+    PRINT_LOG("boost: server", ret, ERR_IS_CRITICAL);
     printf("\nServer start at %s\n", server_addr);
 
     for (;;)

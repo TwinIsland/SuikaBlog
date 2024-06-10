@@ -4,13 +4,12 @@
 #include "sqlite3.h"
 #include "result.h"
 #include "models.h"
-#include "ini_handler.h"
 
 #define IS_PAGE 1
 #define IS_POST 0
 
 // Initializes the database connection
-Result init_db(configuration *config);
+Result init_db();
 
 // Plugin initialize function
 Result init_plugins();

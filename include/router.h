@@ -1,17 +1,17 @@
 #ifndef ROUTER_H_
 #define ROUTER_H_
 
-#include "ini_handler.h"
 #include "sha256.h"
 
-
 void server_fn(struct mg_connection *c, int ev, void *ev_data);
-
-void init_router(configuration *config);
 
 struct user
 {
   const char *name, *pass, *token;
 };
+
+#define ROUTER(router_name) void router_##router_name(struct mg_connection *c, int ev, void *ev_data)
+
+#define USE_ROUTER(router_name) router_##router_name(c, ev, ev_data)
 
 #endif /* !ROUTER_H_ */

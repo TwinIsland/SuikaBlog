@@ -3,6 +3,7 @@
 #include "blog_init.h"
 #include "fs_helper.h"
 #include "utils.h"
+#include "config_loader.h"
 
 static Result initialize_pass(const char *key_file, const BYTE *keypass)
 {
@@ -109,7 +110,7 @@ static void get_password(BYTE *password)
         *newline = '\0';
 }
 
-void initialize_blog(configuration *config, void (*exit_handler)())
+void initialize_blog()
 {
     int c;
     char input;
@@ -117,22 +118,22 @@ void initialize_blog(configuration *config, void (*exit_handler)())
 
     printf("\n----------------------");
 
-    if (!file_exists(config->db_name))
+    if (!file_exists(config.db_name))
     {
         printf("\ninitialize database? [Y/N]: ");
         scanf(" %c", &input);
         if (input == 'Y' || input == 'y')
         {
-            ret = initialize_db(config->db_name);
+            ret = initialize_db(config.db_name);
             printf("\n");
-            PRINT_LOG("init %s", ret, ERR_IS_CRITICAL, exit_handler, config->db_name);
+            PRINT_LOG("init %s", ret, ERR_IS_CRITICAL, config.db_name);
         }
 
         // clear stdin
         while ((c = getchar()) != '\n' && c != EOF)
             ;
     }
-    if (!file_exists(config->key_file))
+    if (!file_exists(config.key_file))
     {
         BYTE password[MAX_PASS_LENGTH];
 
@@ -140,9 +141,9 @@ void initialize_blog(configuration *config, void (*exit_handler)())
         get_password(password);
 
         printf("\n\n");
-        ret = initialize_pass(config->key_file, password);
+        ret = initialize_pass(config.key_file, password);
 
-        PRINT_LOG("init passcode", ret, ERR_IS_CRITICAL, exit_handler);
+        PRINT_LOG("init passcode", ret, ERR_IS_CRITICAL);
     }
 
     printf("\n----------------------\n");

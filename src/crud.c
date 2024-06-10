@@ -4,15 +4,16 @@
 
 #include "crud.h"
 #include "utils.h"
+#include "config_loader.h"
 
 #define PLUGIN_LOADER_ALLOWED
 #include "plugin.h"
 
 static sqlite3 *db = NULL;
 
-Result init_db(configuration *config)
+Result init_db()
 {
-    int rc = sqlite3_open(config->db_name, &db);
+    int rc = sqlite3_open(config.db_name, &db);
     if (rc != SQLITE_OK)
     {
         debug("Can't open database: %s\n", sqlite3_errmsg(db));

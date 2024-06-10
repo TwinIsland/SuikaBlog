@@ -1,7 +1,6 @@
-#include "ini_handler.h"
+#include "config_loader.h"
 
-static configuration config;
-static int is_init = 0;
+configuration config;
 
 static int config_loader(void *user, const char *section, const char *name,
                          const char *value)
@@ -40,14 +39,13 @@ Result init_config()
         };
     }
 
-    is_init = 1;
     return (Result){
         .status = OK,
         .ptr = &config,
     };
 }
 
-Result load_passcode_to_config(configuration *old_config)
+Result load_passcode_to_config()
 {
     FILE *file = fopen(config.key_file, "rb");
 
@@ -70,20 +68,11 @@ Result load_passcode_to_config(configuration *old_config)
     }
 
     config.pass_sha256 = buf;
-    old_config = get_config();
 
     return (Result) {
         .status = OK,
         .msg = "Passcode loaded successfully",
     };
-}
-
-configuration *get_config()
-{
-    if (!is_init)
-        return NULL;
-
-    return &config;
 }
 
 void destory_config()

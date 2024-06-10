@@ -3,13 +3,7 @@
 #include "utils.h"
 #include "fs_helper.h"
 
-static configuration *config;
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
-
-void init_router(configuration *_config)
-{
-  config = _config;
-}
 
 // Connection event handler function
 void server_fn(struct mg_connection *c, int ev, void *ev_data)

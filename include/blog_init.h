@@ -8,7 +8,6 @@
 
 #include "sha256.h"
 #include "result.h"
-#include "ini_handler.h"
 
 #define MAX_PASS_LENGTH 32
 #define DB_INI_SCRIPT_PATH "assets/db_ini.sql"
@@ -17,6 +16,6 @@
     initialize blog via asking input for pass key and db 
 
  */
-void initialize_blog(configuration *config, void (*exit_handler)());
+void initialize_blog();
 
 #endif

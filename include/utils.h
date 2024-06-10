@@ -9,6 +9,8 @@
 #define ERR_IS_CRITICAL 1
 #define ERR_IS_IGN 0
 
+extern void exit_handler();
+
 // OK: info
 #define PRINT_OK(info, ...)               \
     do                                    \
@@ -43,7 +45,7 @@
     } while (0);
 
 // * info   --> ok/fail:[ret.msg]
-#define PRINT_LOG(info, ret, is_err_critical, exit_handler, ...) \
+#define PRINT_LOG(info, ret, is_err_critical, ...) \
     do                                                           \
     {                                                            \
         printf("\033[0;34m");                                    \

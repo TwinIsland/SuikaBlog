@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "ini_handler.h"
+#include "config_loader.h"
 
 typedef enum ipc_status_t
 {

@@ -1,5 +1,5 @@
-#ifndef INI_HANDLER_H
-#define INI_HANDLER_H
+#ifndef CONFIG_LOADER_H
+#define CONFIG_LOADER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,16 +23,15 @@ typedef struct
     BYTE *pass_sha256;
 } configuration;
 
+extern configuration config;
+
 // initialize config handler
 Result init_config();
-
-// get the config
-configuration *get_config();
 
 // config destoryer
 void destory_config();
 
 // load the local passcode to the config
-Result load_passcode_to_config(configuration *old_config);
+Result load_passcode_to_config();
 
 #endif
