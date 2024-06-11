@@ -90,4 +90,8 @@ extern void exit_handler();
 // The result byte list will be allocate on heap
 BYTE *get_sha256_encrypt(const BYTE *keypass);
 
+// file system
+int check_file_with_exts(const char *path, const char **exts);
+
+
 #endif

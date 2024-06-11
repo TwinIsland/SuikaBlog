@@ -1,7 +1,7 @@
 #include <sqlite3.h>
+#include <unistd.h>
 
 #include "blog_init.h"
-#include "fs_helper.h"
 #include "utils.h"
 #include "config_loader.h"
 
@@ -24,7 +24,7 @@ static Result initialize_pass(const char *key_file, const BYTE *keypass)
     {
         free(buf);
         fclose(file);
-        delete_file(key_file);
+        remove(key_file);
         return (Result){
             .status = FAILED,
             .msg = "Failed to write the full buffer to the file",
@@ -118,7 +118,7 @@ void initialize_blog()
 
     printf("\n----------------------");
 
-    if (!file_exists(config.db_name))
+    if (!access(config.db_name, F_OK))
     {
         printf("\ninitialize database? [Y/N]: ");
         scanf(" %c", &input);
@@ -133,7 +133,7 @@ void initialize_blog()
         while ((c = getchar()) != '\n' && c != EOF)
             ;
     }
-    if (!file_exists(config.key_file))
+    if (!access(config.key_file, F_OK))
     {
         BYTE password[MAX_PASS_LENGTH];
 

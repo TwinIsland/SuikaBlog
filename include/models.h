@@ -80,5 +80,6 @@ void free_indexData(IndexData *indexData);
 
 char *notice_to_json(Notice *notice);
 char *tags_to_json(Tags *tags);
+char *post_to_json(Post *post);
 
 #endif // MODELS_H

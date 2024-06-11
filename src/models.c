@@ -77,14 +77,14 @@ void free_indexData(IndexData *indexData)
     free_archieves(&indexData->Archieves);
 }
 
-// char *format_time(time_t t)
-// {
-//     struct tm tm_info;
-//     char buffer[26];
-//     localtime_r(&t, &tm_info);
-//     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", &tm_info);
-//     return strdup(buffer);
-// }
+char *format_time(time_t t)
+{
+    struct tm tm_info;
+    char buffer[26];
+    localtime_r(&t, &tm_info);
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", &tm_info);
+    return strdup(buffer);
+}
 
 char *notice_to_json(Notice *notice)
 {
@@ -101,14 +101,37 @@ char *tags_to_json(Tags *tags)
 
     for (size_t i = 0; i < tags->size - 1; ++i)
     {
-        sprintf(json_str+json_str_idx, "%s,", tags->data[i]);
+        sprintf(json_str + json_str_idx, "%s,", tags->data[i]);
         json_str_idx += strlen(tags->data[i]) + 1;
     }
-    sprintf(json_str+json_str_idx, "%s,", tags->data[tags->size - 1]);
+    sprintf(json_str + json_str_idx, "%s,", tags->data[tags->size - 1]);
     json_str_idx += strlen(tags->data[tags->size - 1]);
     json_str[json_str_idx] = '\0';
 
     char *result = mg_mprintf("[%s]", json_str);
     free(json_str);
+    return result;
+}
+
+char *post_to_json(Post *post)
+{
+    char *createDate = format_time(post->CreateDate);
+    char *dateModified = format_time(post->DateModified);
+
+    char *result = mg_mprintf("{%m: %d, %m: %m, %m: %m, %m: %m, %m: %m, %m: %d, %m: %m, %m: %m, %m: %d, %m: %d}",
+                            MG_ESC("PostID"), post->PostID,
+                            MG_ESC("Title"), MG_ESC(post->Title),
+                            MG_ESC("Banner"), MG_ESC(post->Banner),
+                            MG_ESC("Excerpts"), MG_ESC(post->Excerpts),
+                            MG_ESC("Content"), MG_ESC(post->Content),
+                            MG_ESC("IsPage"), post->IsPage,
+                            MG_ESC("CreateDate"), MG_ESC(createDate),
+                            MG_ESC("DateModified"), MG_ESC(dateModified),
+                            MG_ESC("UpVoted"), post->UpVoted,
+                            MG_ESC("Views"), post->Views);
+
+    free(createDate);
+    free(dateModified);
+
     return result;
 }

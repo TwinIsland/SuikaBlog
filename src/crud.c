@@ -116,23 +116,18 @@ Result get_post(const int32_t PostID, Post *ret)
         cp_stmt_str(&ret->Banner, stmt, 2);
         cp_stmt_str(&ret->Excerpts, stmt, 3);
         cp_stmt_str(&ret->Content, stmt, 4);
-
-        ret->CreateDate = (time_t)sqlite3_column_int(stmt, 5);
-        ret->DateModified = (time_t)sqlite3_column_int(stmt, 6);
-        ret->UpVoted = sqlite3_column_int(stmt, 7);
-        ret->Views = sqlite3_column_int(stmt, 8);
-
-        sqlite3_finalize(stmt);
-        return (Result){
-            .status = OK,
-            .ptr = ret,
-        };
+        
+        ret->IsPage = sqlite3_column_int(stmt, 5);
+        ret->CreateDate = (time_t)sqlite3_column_int(stmt, 6);
+        ret->DateModified = (time_t)sqlite3_column_int(stmt, 7);
+        ret->UpVoted = sqlite3_column_int(stmt, 8);
+        ret->Views = sqlite3_column_int(stmt, 9);
     }
 
     sqlite3_finalize(stmt);
     return (Result){
-        .status = FAILED,
-        .msg = "sql query failed at execution",
+        .status = OK,
+        .ptr = ret,
     };
 }
 

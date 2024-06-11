@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
 
 #include "mongoose.h"
 #include "result.h"
 #include "config_loader.h"
-#include "fs_helper.h"
 #include "blog_init.h"
 #include "utils.h"
 #include "crud.h"
@@ -79,7 +79,7 @@ int main()
     PRINT_LOG("loading config", ret, ERR_IS_CRITICAL);
 
     // checking necessary files
-    if (!(file_exists(config.key_file) & file_exists(config.db_name)))
+    if (access(config.key_file, F_OK) || access(config.db_name, F_OK))
     {
         ret.status = FAILED;
         ret.msg = "blog system need to initialize";
