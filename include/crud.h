@@ -8,6 +8,20 @@
 #define IS_PAGE 1
 #define IS_POST 0
 
+#define PREPARATION_ERR                           \
+    (Result)                                      \
+    {                                             \
+        .status = FAILED,                         \
+        .msg = "sql query failed at preparation", \
+    }
+
+#define UNINITIALIZE_ERR                            \
+    (Result)                                        \
+    {                                               \
+        .status = FAILED,                           \
+        .msg = "uninitialized database connection", \
+    }
+
 // Initializes the database connection
 Result init_db();
 

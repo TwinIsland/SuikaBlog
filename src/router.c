@@ -45,6 +45,49 @@ ROUTER(tags)
   free(body);
 }
 
+ROUTER(archieves)
+{
+  Archieves archieves = {.data = NULL};
+  char *body = "";
+  Result ret = get_archieves(&archieves);
+
+  if (ret.status == FAILED)
+  {
+    ROUTER_ERR("post", ret, body);
+    return;
+  }
+
+  if (archieves.data)
+  {
+    body = archieves_to_json(&archieves);
+    free_archieves(&archieves);
+    mg_http_reply(c, 200, "Content-Type: application/json\r\n", body);
+    free(body);
+  }
+  else
+  {
+    body = mg_mprintf("{%m: %m}", MG_ESC("error"), MG_ESC("Post not found"));
+    mg_http_reply(c, 404, "Content-Type: application/json\r\n", body);
+    free(body);
+  }
+}
+
+ROUTER(index)
+{
+  IndexData index_data;
+  char *body;
+  Result ret = get_index(&index_data);
+
+  if (ret.status == FAILED)
+    ROUTER_ERR("index", ret, body);
+  else
+    body = indexData_to_json(&index_data);
+
+  free_indexData(&index_data);
+  mg_http_reply(c, 200, "Content-Type: application/json\r\n", body);
+  free(body);
+}
+
 ROUTER(post, const int32_t PostID)
 {
   Post post = {.PostID = -1};
@@ -93,6 +136,10 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
           goto default_router;
         USE_ROUTER(post, arg);
       }
+      if (mg_match(hm->uri, mg_str("/api/archieves"), NULL))
+        USE_ROUTER(archieves);
+      if (mg_match(hm->uri, mg_str("/api/index"), NULL))
+        USE_ROUTER(index);
     }
     else
     default_router:

@@ -23,6 +23,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->ipc_path = strdup(value);
     else if (MATCH("ipc", "ipc_size"))
         pconfig->ipc_size = atoi(value);
+    else if (MATCH("blog", "index_post_n"))
+        pconfig->index_post_n = atoi(value);
 
     else
         return 0; // raise error is no such entry

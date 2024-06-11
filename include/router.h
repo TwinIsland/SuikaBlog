@@ -26,4 +26,6 @@ struct user
     body = strdup("failed");                       \
   } while (0)
 
+#define MAGIC_NUM 114514
+
 #endif /* !ROUTER_H_ */

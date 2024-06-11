@@ -20,6 +20,7 @@ typedef struct
     char *db_name;
     char *ipc_path;
     int ipc_size;
+    int index_post_n;
     BYTE *pass_sha256;
 } configuration;
 

@@ -5,7 +5,7 @@
 #include <time.h>
 #include <mongoose.h>
 
-#define INDEX_DATA_POST_N 5 // Number of Post shown on index page
+#include "config_loader.h"
 
 typedef struct
 {
@@ -36,17 +36,28 @@ typedef struct
 
 typedef struct
 {
+    PostInfo *data;
+    size_t size;
+} PostInfos;
+
+typedef struct
+{
     char *title;
     char *content;
 } Notice;
-
 
 typedef struct
 {
     int year;
     size_t articleCount;
-    PostInfo *posts;
+    char **ArticleTitles; 
 } Archieve;
+
+typedef struct
+{
+    Archieve *data;
+    size_t size;
+} Archieves;
 
 typedef char *Tag;
 
@@ -54,15 +65,8 @@ typedef struct
 {
     Tag *data;
     size_t size;
-    size_t mem_size;
 } Tags;
 
-typedef struct
-{
-    Archieve *data;
-    size_t size;
-    size_t mem_size;
-} Archieves;
 
 typedef struct
 {
@@ -70,16 +74,20 @@ typedef struct
     Notice Notice;
     Tags Tags;
     Archieves Archieves;
-    PostInfo NormalArticleInfos[INDEX_DATA_POST_N];
+    PostInfos NormalArticleInfos;
 } IndexData;
 
 void free_post(Post *post);
 void free_postInfo(PostInfo *postInfo);
 void free_tags(Tags *tags);
+void free_archieves(Archieves *archieves);
 void free_indexData(IndexData *indexData);
 
 char *notice_to_json(Notice *notice);
 char *tags_to_json(Tags *tags);
 char *post_to_json(Post *post);
+char *postInfo_to_json(PostInfo *post_info);
+char *archieves_to_json(Archieves *archieves);
+char *indexData_to_json(IndexData *index_data);
 
 #endif // MODELS_H

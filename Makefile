@@ -12,7 +12,7 @@ SRCDIR=./src
 UTILSDIR=./utils
 
 ifeq ($(DEBUG), 1)
-	CFLAGS+=-DDEBUG
+	CFLAGS+=-DDEBUG -g
 endif
 
 ifeq ($(TEST), 1)

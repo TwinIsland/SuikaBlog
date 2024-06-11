@@ -39,20 +39,6 @@ Result init_plugins()
     return plugins_bind(db);
 }
 
-#define PREPARATION_ERR                           \
-    (Result)                                      \
-    {                                             \
-        .status = FAILED,                         \
-        .msg = "sql query failed at preparation", \
-    }
-
-#define UNINITIALIZE_ERR                            \
-    (Result)                                        \
-    {                                               \
-        .status = FAILED,                           \
-        .msg = "uninitialized database connection", \
-    }
-
 static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx)
 {
     const char *src = (const char *)sqlite3_column_text(stmt, idx);
@@ -73,12 +59,12 @@ static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx)
 }
 
 // SQL query should be like: SELECT * FROM Posts...
-static void populate_post_info_from_stmt(sqlite3_stmt *stmt, PostInfo *postInfo)
+static void populate_postInfo_from_stmt(sqlite3_stmt *stmt, PostInfo *postInfo)
 {
     postInfo->PostID = sqlite3_column_int(stmt, 0);
 
     const unsigned char *title = sqlite3_column_text(stmt, 1);
-    postInfo->Title = title ? strdup((char *)title) : NULL;
+    postInfo->Title = strdup((char *)title);
 
     const unsigned char *banner = sqlite3_column_text(stmt, 2);
     postInfo->Banner = banner ? strdup((char *)banner) : NULL;
@@ -86,11 +72,11 @@ static void populate_post_info_from_stmt(sqlite3_stmt *stmt, PostInfo *postInfo)
     const unsigned char *excerpts = sqlite3_column_text(stmt, 3);
     postInfo->Excerpts = excerpts ? strdup((char *)excerpts) : NULL;
 
-    postInfo->IsPage = sqlite3_column_int(stmt, 4); // Fixed column index for IsPage
-    postInfo->CreateDate = (time_t)sqlite3_column_int64(stmt, 5);
-    postInfo->DateModified = (time_t)sqlite3_column_int64(stmt, 6);
-    postInfo->UpVoted = sqlite3_column_int(stmt, 7);
-    postInfo->Views = sqlite3_column_int(stmt, 8);
+    postInfo->IsPage = sqlite3_column_int(stmt, 5); 
+    postInfo->CreateDate = (time_t)sqlite3_column_int64(stmt, 6);
+    postInfo->DateModified = (time_t)sqlite3_column_int64(stmt, 7);
+    postInfo->UpVoted = sqlite3_column_int(stmt, 8);
+    postInfo->Views = sqlite3_column_int(stmt, 9);
 }
 
 Result get_post(const int32_t PostID, Post *ret)
@@ -116,7 +102,7 @@ Result get_post(const int32_t PostID, Post *ret)
         cp_stmt_str(&ret->Banner, stmt, 2);
         cp_stmt_str(&ret->Excerpts, stmt, 3);
         cp_stmt_str(&ret->Content, stmt, 4);
-        
+
         ret->IsPage = sqlite3_column_int(stmt, 5);
         ret->CreateDate = (time_t)sqlite3_column_int(stmt, 6);
         ret->DateModified = (time_t)sqlite3_column_int(stmt, 7);
@@ -263,7 +249,6 @@ Result get_all_tags(Tags *ret)
 
         ret->data = malloc(sizeof(Tag) * tagsCount);
         ret->size = tagsCount;
-        ret->mem_size = 0;
 
         size_t index = 0;
         char *cur_tag;
@@ -271,13 +256,10 @@ Result get_all_tags(Tags *ret)
         {
             cur_tag = (char *)sqlite3_column_text(stmt, 0);
             ret->data[index++] = strdup(cur_tag);
-            ret->mem_size += strlen(cur_tag);
         }
     }
     else
-    {
         return PREPARATION_ERR;
-    }
 
     sqlite3_finalize(stmt);
     return (Result){
@@ -291,54 +273,50 @@ Result get_archieves(Archieves *ret)
     const char *sqlYearCounts = "SELECT strftime('%Y', CreateDate) AS Year, COUNT(*) FROM Posts GROUP BY Year ORDER BY Year DESC";
     sqlite3_stmt *stmtYearCounts;
 
-    if (sqlite3_prepare_v2(db, sqlYearCounts, -1, &stmtYearCounts, NULL) == SQLITE_OK)
-    {
-        size_t archieveCount = 0;
-        while (sqlite3_step(stmtYearCounts) == SQLITE_ROW)
-            archieveCount++;
-
-        ret->data = malloc(sizeof(Archieve) * archieveCount);
-        ret->size = archieveCount;
-        ret->mem_size = 0;
-
-        sqlite3_reset(stmtYearCounts);
-
-        size_t archieveIndex = 0;
-        while (sqlite3_step(stmtYearCounts) == SQLITE_ROW)
-        {
-            int year = atoi((char *)sqlite3_column_text(stmtYearCounts, 0));
-            size_t postCount = sqlite3_column_int(stmtYearCounts, 1);
-
-            PostInfo *posts = malloc(sizeof(PostInfo) * postCount);
-
-            const char *sqlPostsByYear = "SELECT * FROM Posts WHERE strftime('%Y', CreateDate) = ? ORDER BY CreateDate DESC";
-            sqlite3_stmt *stmtPostsByYear;
-
-            if (sqlite3_prepare_v2(db, sqlPostsByYear, -1, &stmtPostsByYear, NULL) == SQLITE_OK)
-            {
-                sqlite3_bind_text(stmtPostsByYear, 1, (char *)sqlite3_column_text(stmtYearCounts, 0), -1, SQLITE_STATIC);
-
-                size_t postIndex = 0;
-                while (sqlite3_step(stmtPostsByYear) == SQLITE_ROW && postIndex < postCount)
-                {
-                    populate_post_info_from_stmt(stmtPostsByYear, &posts[postIndex++]);
-                }
-                sqlite3_finalize(stmtPostsByYear);
-            }
-
-            ret->data[archieveIndex++] = (Archieve){.year = year, .articleCount = postCount, .posts = posts};
-        }
-    }
-    else
-    {
+    if (sqlite3_prepare_v2(db, sqlYearCounts, -1, &stmtYearCounts, NULL) != SQLITE_OK)
         return PREPARATION_ERR;
+
+    size_t archieveCount = 0;
+    while (sqlite3_step(stmtYearCounts) == SQLITE_ROW)
+    {
+        archieveCount++;
+    }
+
+    ret->data = malloc(sizeof(Archieve) * archieveCount);
+    ret->size = archieveCount;
+
+    sqlite3_reset(stmtYearCounts);
+
+    size_t archieveIndex = 0;
+    while (sqlite3_step(stmtYearCounts) == SQLITE_ROW)
+    {
+        int year = atoi((char *)sqlite3_column_text(stmtYearCounts, 0));
+        size_t postCount = sqlite3_column_int(stmtYearCounts, 1);
+
+        char **articleTitles = malloc(sizeof(char *) * postCount);
+
+        const char *sqlPostsByYear = "SELECT Title FROM Posts WHERE strftime('%Y', CreateDate) = ? ORDER BY CreateDate DESC";
+        sqlite3_stmt *stmtPostsByYear;
+
+        if (sqlite3_prepare_v2(db, sqlPostsByYear, -1, &stmtPostsByYear, NULL) != SQLITE_OK)
+            return PREPARATION_ERR;
+
+        sqlite3_bind_text(stmtPostsByYear, 1, (char *)sqlite3_column_text(stmtYearCounts, 0), -1, SQLITE_STATIC);
+
+        size_t postIndex = 0;
+        while (sqlite3_step(stmtPostsByYear) == SQLITE_ROW && postIndex < postCount)
+        {
+            const unsigned char *title = sqlite3_column_text(stmtPostsByYear, 0);
+            articleTitles[postIndex] = title ? strdup((char *)title) : NULL;
+            postIndex++;
+        }
+        sqlite3_finalize(stmtPostsByYear);
+
+        ret->data[archieveIndex++] = (Archieve){.year = year, .articleCount = postCount, .ArticleTitles = articleTitles};
     }
 
     sqlite3_finalize(stmtYearCounts);
-    return (Result){
-        .status = OK,
-        .ptr = ret,
-    };
+    return (Result){.status = OK, .ptr = ret};
 }
 
 Result get_index(IndexData *ret)
@@ -349,49 +327,52 @@ Result get_index(IndexData *ret)
     const char *sql = "SELECT * FROM Posts ORDER BY CreateDate DESC LIMIT ?";
     sqlite3_stmt *stmt;
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
     {
-        sqlite3_bind_int(stmt, 1, INDEX_DATA_POST_N + 1); // +1 to include the cover article
+        return PREPARATION_ERR;
+    }
 
-        int is_cover_article_row = 1;
-        int normal_article_cont = 0;
+    sqlite3_bind_int(stmt, 1, config.index_post_n + 1); // +1 for cover article
 
-        while (sqlite3_step(stmt) == SQLITE_ROW)
+    ret->NormalArticleInfos.data = malloc(sizeof(PostInfo) * config.index_post_n);
+    ret->NormalArticleInfos.size = 0;
+
+    int is_cover_article_row = 1;
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        if (is_cover_article_row)
         {
-            if (is_cover_article_row)
-            {
-                is_cover_article_row = 0;
-                // initialize cover article body
-                populate_post_info_from_stmt(stmt, &ret->CoverArticleInfo);
-                continue;
-            }
-            // initialize normal articles
-            populate_post_info_from_stmt(stmt, &ret->NormalArticleInfos[normal_article_cont++]);
+            is_cover_article_row = 0;
+            populate_postInfo_from_stmt(stmt, &ret->CoverArticleInfo);
+            continue;
+        }
+        if (ret->NormalArticleInfos.size < config.index_post_n)
+        {
+            populate_postInfo_from_stmt(stmt, &ret->NormalArticleInfos.data[ret->NormalArticleInfos.size++]);
         }
     }
-    else
-        return PREPARATION_ERR;
-
-    Result exe_ret;
-
-    exe_ret = get_all_tags(&ret->Tags);
-    if (exe_ret.status == FAILED)
-        PRINT_ERR("fail to fetch tags: %s", exe_ret.msg);
-
-    exe_ret = get_archieves(&ret->Archieves);
-    if (exe_ret.status == FAILED)
-        PRINT_ERR("fail to fetch archieves: %s", exe_ret.msg);
-
-    // TODO: hardcoding now, change later !!
-    ret->Notice.title = strdup("Welcome");
-    ret->Notice.content = strdup("Welcome to the SuikaBlog System!");
 
     sqlite3_finalize(stmt);
 
-    return (Result){
-        .status = OK,
-        .ptr = ret,
-    };
+    Result exe_ret = get_all_tags(&ret->Tags);
+    if (exe_ret.status == FAILED)
+    {
+        free(ret->NormalArticleInfos.data);
+        return exe_ret;
+    }
+
+    exe_ret = get_archieves(&ret->Archieves);
+    if (exe_ret.status == FAILED)
+    {
+        free(ret->NormalArticleInfos.data);
+        return exe_ret;
+    }
+
+    // TODO: hardcoding now, fetch from notice plugin in the future
+    ret->Notice.title = strdup("Welcome");
+    ret->Notice.content = strdup("Welcome to the SuikaBlog System!");
+
+    return (Result){.status = OK, .ptr = ret};
 }
 
 // Close the database connection
