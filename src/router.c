@@ -74,7 +74,7 @@ ROUTER(archieves)
 
 ROUTER(index)
 {
-  IndexData index_data;
+  IndexData index_data = {.CoverArticleInfo.PostID = -1};
   char *body;
   Result ret = get_index(&index_data);
 
@@ -129,17 +129,18 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
     {
       if (mg_match(hm->uri, mg_str("/api/tags"), NULL))
         USE_ROUTER(tags);
-      if (mg_match(hm->uri, mg_str("/api/post/*"), caps))
+      else if (mg_match(hm->uri, mg_str("/api/post/*"), caps))
       {
         int32_t arg;
-        if (!mg_str_to_num(caps[0], 10, &arg, sizeof(int32_t)))
-          goto default_router;
-        USE_ROUTER(post, arg);
+        if (mg_str_to_num(caps[0], 10, &arg, sizeof(int32_t)))
+          USE_ROUTER(post, arg);
       }
-      if (mg_match(hm->uri, mg_str("/api/archieves"), NULL))
+      else if (mg_match(hm->uri, mg_str("/api/archieves"), NULL))
         USE_ROUTER(archieves);
-      if (mg_match(hm->uri, mg_str("/api/index"), NULL))
+      else if (mg_match(hm->uri, mg_str("/api/index"), NULL))
         USE_ROUTER(index);
+      else
+        goto default_router;
     }
     else
     default_router:

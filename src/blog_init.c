@@ -118,7 +118,7 @@ void initialize_blog()
 
     printf("\n----------------------");
 
-    if (!access(config.db_name, F_OK))
+    if (access(config.db_name, F_OK))
     {
         printf("\ninitialize database? [Y/N]: ");
         scanf(" %c", &input);
@@ -133,7 +133,7 @@ void initialize_blog()
         while ((c = getchar()) != '\n' && c != EOF)
             ;
     }
-    if (!access(config.key_file, F_OK))
+    if (access(config.key_file, F_OK))
     {
         BYTE password[MAX_PASS_LENGTH];
 

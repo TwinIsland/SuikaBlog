@@ -82,7 +82,7 @@ int main()
     if (access(config.key_file, F_OK) || access(config.db_name, F_OK))
     {
         ret.status = FAILED;
-        ret.msg = "blog system need to initialize";
+        ret.msg = strerror(errno);
         PRINT_LOG("loading system files", ret, ERR_IS_IGN);
 
         initialize_blog();
