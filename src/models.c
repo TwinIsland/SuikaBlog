@@ -104,11 +104,12 @@ char *tags_to_json(Tags *tags)
 
     size_t index = 0;
     json_str[index++] = '[';
+    json_str[index++] = '"';
 
     for (size_t i = 0; i < tags->size; ++i)
     {
         size_t tag_len = strlen(tags->data[i]);
-        size_t needed_capacity = index + tag_len + 3; // Include space for comma, space, or closing bracket
+        size_t needed_capacity = index + tag_len + 4; // Include space for comma, double quotes, or closing bracket
 
         if (needed_capacity > buffer_size)
         {
@@ -124,10 +125,11 @@ char *tags_to_json(Tags *tags)
         if (i > 0)
         {
             json_str[index++] = ',';
-            json_str[index++] = ' ';
+            json_str[index++] = '"';
         }
         memcpy(json_str + index, tags->data[i], tag_len);
         index += tag_len;
+        json_str[index++] = '"';
     }
 
     json_str[index++] = ']';

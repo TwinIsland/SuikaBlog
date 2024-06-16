@@ -126,7 +126,7 @@ Result create_post(const char *title, const char *excerpt, const char *content, 
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
-        return (Result){FAILED, "Failed to prepare statement"};
+        return PREPARATION_ERR;
 
     sqlite3_bind_text(stmt, 1, title, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, excerpt, -1, SQLITE_STATIC);
@@ -281,7 +281,7 @@ Result get_index(IndexData *ret)
     if (db == NULL)
         return UNINITIALIZE_ERR;
 
-    const char *sql = "SELECT * FROM Posts ORDER BY CreateDate DESC LIMIT ?";
+    const char *sql = "SELECT * FROM Posts WHERE IsPage=0 ORDER BY CreateDate DESC LIMIT ?";
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
