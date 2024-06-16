@@ -72,11 +72,22 @@ int main()
 
     // register signal handler
     signal(SIGINT, exit_handler);
+    signal(SIGTERM, exit_handler);
     PRINT_OK_LOG("init: signal handler");
 
     // load configurations
     ret = init_config();
     PRINT_LOG("loading config", ret, ERR_IS_CRITICAL);
+
+
+    // loading uploading directory
+    if (access(config.upload_dir, F_OK)) {
+        if (mkdir(config.upload_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+            ret.status = FAILED;
+            ret.msg = strerror(errno);
+        }
+    }
+    PRINT_LOG("loading upload dir", ret, ERR_IS_CRITICAL);
 
     // checking necessary files
     if (access(config.key_file, F_OK) || access(config.db_name, F_OK))
@@ -103,36 +114,7 @@ int main()
     PRINT_LOG("init: plugins", ret, ERR_IS_IGN);
 
 #ifdef TEST
-    // test code
-    // debug("make sure you set the passkey=test");
-
-    // const char *exp_password = "test";
-    // BYTE *exp_sha256 = get_sha256_encrypt((const BYTE *)exp_password);
-    // debug("test matched %d", SHA256_PASS_MATCHED(exp_sha256, config->pass_sha256));
-    // free(exp_sha256);
-
-    // int new_postid;
-    // ret = create_post("testTitle", "test excerpt", "hello world", IS_POST, &new_postid);
-    // PRINT_LOG("test create post", ret, ERR_IS_CRITICAL, exit_handler);
-
-    // Post test;
-    // get_post(new_postid, &test);
-    // debug("Content is: %s", test.Content);
-    // free_post(&test);
-    // delete_post_by_id(new_postid);
-    // get_post(new_postid, &test);
-    // debug("Content after delete is: %s", test.Content);
-    // free_post(&test);
-    // int total_count;
-    // get_total_post_count(&total_count);
-    // debug("total post count is: %d", total_count);
-
-    // IndexData test;
-    // ret = get_index(&test);
-    // debug("status %d index archieve count: %lu", ret.status, test.Archieves.size);
-    // free_indexData(&test);
-
-    // exit_handler();
+// do something
 #endif
 
     // start the server

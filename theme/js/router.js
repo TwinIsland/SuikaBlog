@@ -10,6 +10,7 @@ const routes = {
     "/": { html: "/pages/index.html", js: "/js/index.js", css: [], jsr: [] },
     "/about": { html: "/pages/about.html", js: "/js/about.js", css: ["/css/article.css"], jsr: ["/js/qrcode.min.js"] },
     "/err": { html: "/pages/503.html", js: null, css: [], jsr: [] },
+    "/upload": { html: "pages/upload.html", js: "/js/upload.js", css: [], jsr: [] },
 };
 
 const loadedCSS = {};
@@ -29,10 +30,10 @@ const handleLocation = async () => {
     // Handle Post
     if (path.match(/^\/post\/\d+$/)) {
         route = {
-            html: "/pages/post.html", 
+            html: "/pages/post.html",
             js: "/js/post.js",
-            css: ["/css/article.css", "/css/prism.css"], 
-            jsr: ["/js/qrcode.min.js", "/js/prism.js", "/js/showdown.min.js"] 
+            css: ["/css/article.css", "/css/prism.css"],
+            jsr: ["/js/qrcode.min.js", "/js/prism.js", "/js/showdown.min.js"]
         };
     }
 
@@ -91,7 +92,7 @@ const handleLocation = async () => {
 
 function navigateTo(page) {
     window.history.pushState({}, '', page);
-    handleLocation(); 
+    handleLocation();
 }
 
 handleLocation();

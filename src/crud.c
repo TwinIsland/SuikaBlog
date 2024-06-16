@@ -122,39 +122,27 @@ Result create_post(const char *title, const char *excerpt, const char *content, 
     if (db == NULL)
         return UNINITIALIZE_ERR;
 
-    long long int post_id;
     const char *sql = "INSERT INTO Posts (Title, Excerpt, Content, IsPage) VALUES (?, ?, ?, ?);";
     sqlite3_stmt *stmt;
-
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
-        return PREPARATION_ERR;
+        return (Result){FAILED, "Failed to prepare statement"};
 
-    // Bind the values to the statement
     sqlite3_bind_text(stmt, 1, title, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, excerpt, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, content, -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 4, isPage);
 
-    // Execute the statement
     rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE)
-        debug("Execution failed: %s\n", sqlite3_errmsg(db));
-
-    else
-    {
-        post_id = sqlite3_last_insert_rowid(db);
-        *ret = post_id;
-        debug("Post created successfully\n");
+    if (rc != SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        return (Result){FAILED, sqlite3_errmsg(db)};
     }
 
-    // Finalize the statement to prevent memory leaks
+    long long int post_id = sqlite3_last_insert_rowid(db);
+    *ret = post_id;
     sqlite3_finalize(stmt);
-
-    return (Result){
-        .status = rc == SQLITE_DONE ? OK : FAILED,
-        .msg = rc == SQLITE_DONE ? "ok" : "sql query failed at execution",
-    };
+    return (Result){OK, "Post created successfully"};
 }
 
 Result delete_post_by_id(long long int post_id)
@@ -200,37 +188,6 @@ Result delete_post_by_id(long long int post_id)
     return (Result){
         .status = OK,
         .msg = "Post deleted successfully",
-    };
-}
-
-Result get_total_post_count(int *ret)
-{
-    if (db == NULL)
-        return (Result){
-            .status = FAILED,
-            .msg = "uninitialized database connection",
-        };
-    const char *sql = "SELECT COUNT(*) FROM Posts";
-    sqlite3_stmt *stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
-    {
-        if (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            *ret = sqlite3_column_int(stmt, 0);
-        }
-    }
-    else
-    {
-        *ret = -1;
-        return PREPARATION_ERR;
-    }
-
-    sqlite3_finalize(stmt);
-
-    return (Result){
-        .status = OK,
-        .ptr = ret,
     };
 }
 

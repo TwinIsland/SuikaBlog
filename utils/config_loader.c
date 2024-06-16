@@ -25,6 +25,10 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->ipc_size = atoi(value);
     else if (MATCH("blog", "index_post_n"))
         pconfig->index_post_n = atoi(value);
+    else if (MATCH("blog", "max_file_size"))
+        pconfig->max_file_size = atoi(value);
+    else if (MATCH("blog", "upload_dir"))
+        pconfig->upload_dir = strdup(value);
 
     else
         return 0; // raise error is no such entry
@@ -71,7 +75,7 @@ Result load_passcode_to_config()
 
     config.pass_sha256 = buf;
 
-    return (Result) {
+    return (Result){
         .status = OK,
         .msg = "Passcode loaded successfully",
     };
@@ -91,4 +95,6 @@ void destory_config()
         free(config.key_file);
     if (config.pass_sha256)
         free(config.pass_sha256);
+    if (config.upload_dir)
+        free(config.upload_dir);
 }

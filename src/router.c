@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "crud.h"
 #include "models.h"
+#include "config_loader.h"
 
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
@@ -115,6 +116,12 @@ ROUTER(post, const int32_t PostID)
   }
 }
 
+// fontend must take the responsibility to divide files into smaller chunks, see: https://mongoose.ws/documentation/#mg_http_upload
+ROUTER(upload)
+{
+  mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
+}
+
 // Connection event handler function
 void server_fn(struct mg_connection *c, int ev, void *ev_data)
 {
@@ -139,6 +146,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(archieves);
       else if (mg_match(hm->uri, mg_str("/api/index"), NULL))
         USE_ROUTER(index);
+      else if (mg_match(hm->uri, mg_str("/api/upload"), NULL))
+        USE_ROUTER(upload);
       else
         goto default_router;
     }

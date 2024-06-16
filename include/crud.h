@@ -32,7 +32,6 @@ Result init_plugins();
 Result create_post(const char *title, const char *excerpt, const char *content, int isPage, int *ret);
 Result get_post(const int32_t PostID, Post *ret);
 Result delete_post_by_id(long long int post_id);
-Result get_total_post_count(int *ret);
 
 // Tag
 Result get_all_tags(Tags *ret);
