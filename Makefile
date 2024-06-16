@@ -1,7 +1,7 @@
 CC=gcc
 
-LDFLAGS=-L$(LIBDIR) -lsqlite3 -llibrary
-CFLAGS=-Wall -Iinclude -export-dynamic
+LDFLAGS= -lsqlite3 
+CFLAGS=-Wall -Iinclude
 
 LIBDIR=./lib
 LIB_SRC=$(wildcard $(LIBDIR)/*.c)
@@ -33,7 +33,7 @@ $(OUTDIR):
 	mkdir -p $(OUTDIR)
 
 $(OUT): $(SRC) $(LIB_OUT)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) -export-dynamic $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 debug:
 	$(MAKE) DEBUG=1

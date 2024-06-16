@@ -11,7 +11,7 @@ TARGETS = $(PLUGINS:$(PLUGIN_DIR)/%.c=%.suika)
 
 all: $(TARGETS)
 
-%.suika: $(PLUGIN_DIR)/%.c
+%.suika: $(PLUGIN_DIR)/%.c 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
 clean:
