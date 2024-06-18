@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 
-#include "sha256.h"
 #include "string.h"
 
 #define ERR_IS_CRITICAL 1
@@ -88,7 +87,7 @@ extern void exit_handler();
 
 // get the sha256 encrypt result from string, size equal to SHA256_BLOCK_SIZE
 // The result byte list will be allocate on heap
-BYTE *get_sha256_encrypt(const BYTE *keypass);
+char *get_sha256_hashed(const char *keypass);
 
 // file system
 int check_file_with_exts(const char *path, const char **exts);

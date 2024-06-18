@@ -118,7 +118,7 @@ int main()
 #endif
 
     // start the server
-    sprintf(server_addr, "http://0.0.0.0:%d", config.server_port);
+    sprintf(server_addr, "http://127.0.0.1:%d", config.server_port);
 
     mg_mgr_init(&mgr);
 

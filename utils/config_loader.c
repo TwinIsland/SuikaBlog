@@ -1,5 +1,7 @@
 #include "config_loader.h"
 
+#include "sha256.h"
+
 configuration config;
 
 static int config_loader(void *user, const char *section, const char *name,
@@ -61,11 +63,9 @@ Result load_passcode_to_config()
             .msg = "Failed to open file for reading",
         };
 
-    BYTE *buf = malloc(sizeof(BYTE) * SHA256_BLOCK_SIZE);
-    size_t bytes_read = fread(buf, sizeof(BYTE), SHA256_BLOCK_SIZE, file);
-    fclose(file);
+    fgets(config.pass_sha256, SHA256_HEX_LEN+1, file);
 
-    if (bytes_read < SHA256_BLOCK_SIZE)
+    if (strlen(config.pass_sha256) != SHA256_HEX_LEN)
     {
         return (Result){
             .status = FAILED,
@@ -73,7 +73,7 @@ Result load_passcode_to_config()
         };
     }
 
-    config.pass_sha256 = buf;
+    fclose(file);
 
     return (Result){
         .status = OK,
@@ -93,8 +93,6 @@ void destory_config()
         free(config.ipc_path);
     if (config.key_file)
         free(config.key_file);
-    if (config.pass_sha256)
-        free(config.pass_sha256);
     if (config.upload_dir)
         free(config.upload_dir);
 }

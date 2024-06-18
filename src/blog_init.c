@@ -5,11 +5,11 @@
 #include "utils.h"
 #include "config_loader.h"
 
-static Result initialize_pass(const char *key_file, const BYTE *keypass)
+static Result initialize_pass(const char *key_file, const char *keypass)
 {
-    BYTE *buf = get_sha256_encrypt(keypass);
+    char *buf = get_sha256_hashed(keypass);
 
-    FILE *file = fopen(key_file, "wb");
+    FILE *file = fopen(key_file, "w");
     if (file == NULL)
     {
         free(buf);
@@ -19,18 +19,7 @@ static Result initialize_pass(const char *key_file, const BYTE *keypass)
         };
     }
 
-    size_t bytes_written = fwrite(buf, sizeof(BYTE), SHA256_BLOCK_SIZE, file);
-    if (bytes_written < SHA256_BLOCK_SIZE)
-    {
-        free(buf);
-        fclose(file);
-        remove(key_file);
-        return (Result){
-            .status = FAILED,
-            .msg = "Failed to write the full buffer to the file",
-        };
-    }
-
+    fputs(buf, file);
     free(buf);
     fclose(file);
 
@@ -101,7 +90,7 @@ static Result initialize_db(const char *db_path)
 }
 
 // Function to get password input securely
-static void get_password(BYTE *password)
+static void get_password(char *password)
 {
     fgets((char *)password, MAX_PASS_LENGTH, stdin);
 
@@ -135,7 +124,7 @@ void initialize_blog()
     }
     if (access(config.key_file, F_OK))
     {
-        BYTE password[MAX_PASS_LENGTH];
+        char password[MAX_PASS_LENGTH];
 
         printf("\nCreate key Pass: ");
         get_password(password);

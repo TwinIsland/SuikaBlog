@@ -1,22 +1,29 @@
-// Copyright (c) 2020 Cesanta Software Limited
-// All rights reserved
-
-// Helper function to display upload status
 var setStatus = function (text) {
     document.getElementById('el3').innerText = text;
 };
 
-// When user clicks on a button, trigger file selection dialog
+async function sha256(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
 var button = document.getElementById('el2');
 button.onclick = function (ev) {
-    input.click();
+    document.getElementById('el1').click();
 };
 
-// Send a large blob of data chunk by chunk
-var sendFileData = function (name, data, chunkSize) {
+var sendFileData = function (name, data, chunkSize, authHash) {
     var sendChunk = function (offset) {
         var chunk = data.subarray(offset, offset + chunkSize) || '';
-        var opts = { method: 'POST', body: chunk };
+        var opts = {
+            method: 'POST',
+            headers: {'SuikaToken': authHash},
+            body: chunk
+        };
         var url = '/api/upload?offset=' + offset + '&file=' + encodeURIComponent(name);
         var ok;
         setStatus(
@@ -35,14 +42,15 @@ var sendFileData = function (name, data, chunkSize) {
     sendChunk(0);
 };
 
-// If user selected a file, read it into memory and trigger sendFileData()
 var input = document.getElementById('el1');
-input.onchange = function (ev) {
+input.onchange = async function (ev) {
     if (!ev.target.files[0]) return;
     var f = ev.target.files[0], r = new FileReader();
     r.readAsArrayBuffer(f);
-    r.onload = function () {
+    r.onload = async function () {
+        var password = document.getElementById('password').value;
+        var authHash = await sha256(password);
         ev.target.value = '';
-        sendFileData(f.name, new Uint8Array(r.result), 2000000);
+        sendFileData(f.name, new Uint8Array(r.result), 2000000, authHash);
     };
 };

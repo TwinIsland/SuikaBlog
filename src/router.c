@@ -7,6 +7,21 @@
 
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
+static int is_authorized(struct mg_http_message *hm)
+{
+  char header_auth_sha256[SHA256_HEX_LEN + 1];
+  for (int i = 0; i < MG_MAX_HTTP_HEADERS; ++i)
+  {
+    if (!mg_strcmp(hm->headers[i].name, mg_str("SuikaToken")))
+    {
+      strncpy(header_auth_sha256, hm->headers[i].value.buf, SHA256_BLOCK_SIZE);
+      break;
+    }
+  }
+  int ret = SHA256_PASS_MATCHED(header_auth_sha256, config.pass_sha256);
+  return ret;
+}
+
 ROUTER(index_page)
 {
 
@@ -119,7 +134,10 @@ ROUTER(post, const int32_t PostID)
 // fontend must take the responsibility to divide files into smaller chunks, see: https://mongoose.ws/documentation/#mg_http_upload
 ROUTER(upload)
 {
-  mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
+  if (!is_authorized(hm))
+    mg_http_reply(c, 401, "", "credential failed");
+  else
+    mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
 }
 
 // Connection event handler function
