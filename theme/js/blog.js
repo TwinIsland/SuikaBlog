@@ -50,7 +50,7 @@ async function typeSentence(sentence, eleRef, delay = 100) {
     const letters = sentence.split("");
     let i = 0;
     while (i < letters.length) {
-        await waitForMs(delay);
+        await new Promise(resolve => setTimeout(resolve, delay));
 
         // Only continue if the current operation is still the latest
         if (currentTypingOperation !== operationId) {
@@ -60,10 +60,6 @@ async function typeSentence(sentence, eleRef, delay = 100) {
         document.querySelector(eleRef).innerText += letters[i];
         i++;
     }
-}
-
-function waitForMs(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function randomInRange(min, max) {
@@ -147,7 +143,7 @@ function cacheData(key, data, exp_hour) {
     const now = new Date().getTime();
     const item = {
         data: data,
-        expiry: now + exp_hour * 60 * 60 * 1000, 
+        expiry: now + exp_hour * 60 * 60 * 1000,
     };
     localStorage.setItem(key, JSON.stringify(item));
 }
@@ -214,11 +210,9 @@ async function updateTOC(container, output) {
                 level = parseInt(openLevel);
 
                 var anchor = titleText.replace(/ /g, "_");
-                toc += '<li><a href="#' + anchor + '">' + titleText
-                    + '</a>';
+                toc += '<li><a href="#' + anchor + '" onclick="event.preventDefault(); document.getElementById(\'' + anchor + '\').scrollIntoView({ behavior: \'smooth\' });">' + titleText + '</a>';
 
-                return '<h' + openLevel + ' id="' + anchor + '">'
-                    + titleText + '</h' + closeLevel + '>';
+                return '<h' + openLevel + ' id="' + anchor + '">' + titleText + '</h' + closeLevel + '>';
             }
         );
 
@@ -232,9 +226,9 @@ async function updateTOC(container, output) {
         setTimeout(() => {
             elementDOM.classList.add('fade-in');
             setTimeout(() => {
-                if (toc === "") 
+                if (toc === "")
                     elementDOM.style.display = "none"
-        
+
                 elementDOM.innerHTML = toc;
                 elementDOM.classList.add('visible');
                 resolve(); // Resolve the promise after the animation completes

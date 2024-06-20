@@ -18,29 +18,29 @@ function getPostIdFromUri() {
 };
 
 function renderArticleTitle(articleSON) {
-    document.querySelector(".scroll-text-decoration").textContent = articleSON.title;
+    document.querySelector(".scroll-text-decoration").textContent = articleSON.Title;
     return `
-        ${articleSON.title}
+        ${articleSON.Title}
     `
 }
 
 function renderArticleMeta(articleJSON) {
     return `
-        ${formatTimestamp(articleJSON.date)} • ${articleJSON.viewCount} Views
+        ${formatTimestamp(articleJSON.CreateDate)} • ${articleJSON.Views} Views
     `
 }
 
 function renderArticleBody(articleJSON) {
     return `
-        ${(new showdown.Converter({ "noHeaderId": true })).makeHtml(articleJSON.content)}
+        ${(new showdown.Converter({ "noHeaderId": true })).makeHtml(articleJSON.Content)}
     `
 }
 
 function renderLikeCount(articleJSON) {
-    return `${articleJSON.likeCount}`
+    return `${articleJSON.UpVoted}`
 }
 
-fetchDataWithCache('http://localhost:3000/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()}`, 1)
+fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()}`, 1)
     .then(data => {
         const renderPromises = [
             renderWrapper(document.getElementById("article-title"), renderArticleTitle(data)),

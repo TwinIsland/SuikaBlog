@@ -56,11 +56,6 @@ const handleLocation = async () => {
     // Set page content
     document.getElementById("page-content").innerHTML = html;
 
-    // Remove old script
-    const oldScript = document.querySelector('.route-script');
-    if (oldScript) {
-        oldScript.parentNode.removeChild(oldScript);
-    }
 
     // Load JSR files
     await Promise.all(route.jsr.map(url => {
