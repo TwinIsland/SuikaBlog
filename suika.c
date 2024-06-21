@@ -52,6 +52,8 @@ void exit_handler()
     db_close();
     // upload plugins
     unload_plugins();
+    // free caches
+    free_Cache(cache);
 
     printf("\nbye\n");
     exit(1);
@@ -79,10 +81,11 @@ int main()
     ret = init_config();
     PRINT_LOG("loading config", ret, ERR_IS_CRITICAL);
 
-
     // loading uploading directory
-    if (access(config.upload_dir, F_OK)) {
-        if (mkdir(config.upload_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+    if (access(config.upload_dir, F_OK))
+    {
+        if (mkdir(config.upload_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))
+        {
             ret.status = FAILED;
             ret.msg = strerror(errno);
         }
@@ -112,6 +115,10 @@ int main()
     // initialize the plugins
     ret = init_plugins();
     PRINT_LOG("init: plugins", ret, ERR_IS_IGN);
+
+    // initialize router cache
+    init_router_cache();
+    PRINT_OK_LOG("init: cache system");
 
 #ifdef TEST
 // do something

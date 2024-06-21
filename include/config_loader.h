@@ -23,6 +23,7 @@ typedef struct
     int index_post_n;
     int max_file_size;
     char *upload_dir;
+    int cache_n;
     char pass_sha256[SHA256_HEX_LEN+1];
 } configuration;
 

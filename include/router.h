@@ -2,6 +2,7 @@
 #define ROUTER_H_
 
 #include "sha256.h"
+#include "cache.h"
 
 void server_fn(struct mg_connection *c, int ev, void *ev_data);
 
@@ -16,7 +17,7 @@ struct user
 #define USE_ROUTER(router_name, ...) router_##router_name(c, ev, ev_data, hm, opts, ##__VA_ARGS__)
 
 // print router error
-#define ROUTER_ERR(router_name, ret, body)     \
+#define ROUTER_ERR(router_name, ret, body, code)   \
   do                                               \
   {                                                \
     body = strdup("failed");                       \
@@ -24,8 +25,11 @@ struct user
     printf("/api/" router_name ": %s\n", ret.msg); \
     printf("\033[0m");                             \
     body = strdup("failed");                       \
+    code = 501;                                    \
   } while (0)
 
-#define MAGIC_NUM 114514
+// Cache
+extern Cache *cache;
+void init_router_cache();
 
 #endif /* !ROUTER_H_ */

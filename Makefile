@@ -44,12 +44,6 @@ test:
 clean:
 	rm -rf $(OUTDIR)
 
-gzip:
-	find ./theme/ \( -name '*.js' -o -name '*.css' -o -name '*.html' \) -exec gzip {} \;
-
-gunzip:
-	find ./theme/ \( -name '*.js.gz' -o -name '*.css.gz' -o -name '*.html.gz' \) -exec gunzip {} \;
-
 run:
 	make clean
 	make all

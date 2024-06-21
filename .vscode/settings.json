@@ -22,6 +22,7 @@
         "blog_init.h": "c",
         "config_loader.h": "c",
         "utils.h": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "cache.h": "c"
     }
 }

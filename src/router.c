@@ -5,6 +5,15 @@
 #include "models.h"
 #include "config_loader.h"
 
+#include "cache.h"
+
+Cache *cache;
+
+void init_router_cache()
+{
+  cache = initialize_Cache();
+}
+
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
 static int is_authorized(struct mg_http_message *hm)
@@ -24,7 +33,6 @@ static int is_authorized(struct mg_http_message *hm)
 
 ROUTER(index_page)
 {
-
   // Cache all image request
   char uri[hm->uri.len + 1];
   strncpy(uri, hm->uri.buf, hm->uri.len);
@@ -47,72 +55,88 @@ ROUTER(index_page)
 
 ROUTER(tags)
 {
-  Tags tags;
   char *body;
+  int code = 200;
+
+  if ((body = Cache_lookup(cache, "tags")))
+  {
+    mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+    return;
+  }
+
+  Tags tags;
   Result ret = get_all_tags(&tags);
 
   if (ret.status == FAILED)
-    ROUTER_ERR("tags", ret, body);
+    ROUTER_ERR("tags", ret, body, code);
   else
     body = tags_to_json(&tags);
 
   free_tags(&tags);
-  mg_http_reply(c, 200, "Content-Type: application/json\r\n", body);
-  free(body);
+  mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+  Cache_add(cache, "tags", body, 1);
 }
 
 ROUTER(archieves)
 {
-  Archieves archieves = {.data = NULL};
-  char *body = "";
-  Result ret = get_archieves(&archieves);
+  char *body;
+  int code = 200;
 
-  if (ret.status == FAILED)
+  if ((body = Cache_lookup(cache, "archieves")))
   {
-    ROUTER_ERR("post", ret, body);
+    mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
     return;
   }
 
-  if (archieves.data)
-  {
-    body = archieves_to_json(&archieves);
-    free_archieves(&archieves);
-    mg_http_reply(c, 200, "Content-Type: application/json\r\n", body);
-    free(body);
-  }
+  Archieves archieves = {.data = NULL};
+  Result ret = get_archieves(&archieves);
+
+  if (ret.status == FAILED)
+    ROUTER_ERR("post", ret, body, code);
+
   else
-  {
-    body = mg_mprintf("{%m: %m}", MG_ESC("error"), MG_ESC("Post not found"));
-    mg_http_reply(c, 404, "Content-Type: application/json\r\n", body);
-    free(body);
-  }
+    body = archieves_to_json(&archieves);
+
+  free_archieves(&archieves);
+  mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+  Cache_add(cache, "archieves", body, 1);
 }
 
 ROUTER(index)
 {
-  IndexData index_data = {.CoverArticleInfo.PostID = -1};
   char *body;
+  int code = 200;
+
+  if ((body = Cache_lookup(cache, "index")))
+  {
+    mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+    return;
+  }
+
+  IndexData index_data = {.CoverArticleInfo.PostID = -1};
   Result ret = get_index(&index_data);
 
   if (ret.status == FAILED)
-    ROUTER_ERR("index", ret, body);
+    ROUTER_ERR("index", ret, body, code);
   else
     body = indexData_to_json(&index_data);
 
   free_indexData(&index_data);
-  mg_http_reply(c, 200, "Content-Type: application/json\r\n", body);
-  free(body);
+  mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+  Cache_add(cache, "index", body, 1);
 }
 
 ROUTER(post, const int32_t PostID)
 {
   Post post = {.PostID = -1};
-  char *body = "";
+  char *body;
+  int code = 200;
   Result ret = get_post(PostID, &post);
 
   if (ret.status == FAILED)
   {
-    ROUTER_ERR("post", ret, body);
+    ROUTER_ERR("post", ret, body, code);
+    mg_http_reply(c, code, "", body);
     return;
   }
 

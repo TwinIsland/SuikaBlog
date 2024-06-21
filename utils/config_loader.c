@@ -31,6 +31,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->max_file_size = atoi(value);
     else if (MATCH("blog", "upload_dir"))
         pconfig->upload_dir = strdup(value);
+    else if (MATCH("blog", "cache_n"))
+        pconfig->cache_n = atoi(value);
 
     else
         return 0; // raise error is no such entry
@@ -63,7 +65,7 @@ Result load_passcode_to_config()
             .msg = "Failed to open file for reading",
         };
 
-    fgets(config.pass_sha256, SHA256_HEX_LEN+1, file);
+    fgets(config.pass_sha256, SHA256_HEX_LEN + 1, file);
 
     if (strlen(config.pass_sha256) != SHA256_HEX_LEN)
     {

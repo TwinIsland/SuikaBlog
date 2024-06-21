@@ -25,13 +25,6 @@ then, start the server by:
 make run
 ```
 
-## Gzip (Optional)
-gzip is off by default, and you need to enable it manually by running:
-```bash
-make gzip       # turn on gzip feature
-make gunzip     # turn off gzip feature
-```
-
 ## Test/Debug
 **Backend:**
 ```bash

@@ -89,6 +89,7 @@ char *notice_to_json(Notice *notice)
     char *json = mg_mprintf("{%m: %m, %m: %m}",
                             MG_ESC("title"), MG_ESC(notice->title),
                             MG_ESC("content"), MG_ESC(notice->content));
+
     return json;
 }
 
