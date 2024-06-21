@@ -1,6 +1,7 @@
 #ifndef ROUTER_H_
 #define ROUTER_H_
 
+#include "mongoose.h"
 #include "sha256.h"
 #include "cache.h"
 
@@ -17,15 +18,15 @@ struct user
 #define USE_ROUTER(router_name, ...) router_##router_name(c, ev, ev_data, hm, opts, ##__VA_ARGS__)
 
 // print router error
-#define ROUTER_ERR(router_name, ret, body, code)   \
+#define ROUTER_ERR_reply(c, router_name, ret)      \
   do                                               \
   {                                                \
-    body = strdup("failed");                       \
+    char __body[64];                               \
     printf("\033[0;33m");                          \
     printf("/api/" router_name ": %s\n", ret.msg); \
     printf("\033[0m");                             \
-    body = strdup("failed");                       \
-    code = 501;                                    \
+    sprintf(__body, "Failed: %s", ret.msg);        \
+    mg_http_reply(c, 501, "", __body);             \
   } while (0)
 
 // Cache

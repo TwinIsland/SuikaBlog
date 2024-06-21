@@ -1,5 +1,6 @@
 #include "cache.h"
 #include "config_loader.h"
+#include "utils.h"
 
 Cache *initialize_Cache()
 {
@@ -17,7 +18,7 @@ char *Cache_lookup(Cache *cache, const char *key)
     {
         if (strcmp(current->key, key) == 0)
         {
-            printf("cache hit\n");
+            debug("%s: cache hit", current->key);
             return current->value;
         }
         current = current->next;

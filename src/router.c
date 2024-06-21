@@ -1,4 +1,3 @@
-#include "mongoose.h"
 #include "router.h"
 #include "utils.h"
 #include "crud.h"
@@ -68,13 +67,17 @@ ROUTER(tags)
   Result ret = get_all_tags(&tags);
 
   if (ret.status == FAILED)
-    ROUTER_ERR("tags", ret, body, code);
+  {
+    free_tags(&tags);
+    ROUTER_ERR_reply(c, "tags", ret);
+    return;
+  }
   else
     body = tags_to_json(&tags);
 
   free_tags(&tags);
   mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
-  Cache_add(cache, "tags", body, 1);
+  Cache_add(cache, "tags", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(archieves)
@@ -92,14 +95,17 @@ ROUTER(archieves)
   Result ret = get_archieves(&archieves);
 
   if (ret.status == FAILED)
-    ROUTER_ERR("post", ret, body, code);
-
+  {
+    free_archieves(&archieves);
+    ROUTER_ERR_reply(c, "archieves", ret);
+    return;
+  }
   else
     body = archieves_to_json(&archieves);
 
   free_archieves(&archieves);
   mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
-  Cache_add(cache, "archieves", body, 1);
+  Cache_add(cache, "archieves", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(index)
@@ -117,26 +123,29 @@ ROUTER(index)
   Result ret = get_index(&index_data);
 
   if (ret.status == FAILED)
-    ROUTER_ERR("index", ret, body, code);
+  {
+    free_indexData(&index_data);
+    ROUTER_ERR_reply(c, "index", ret);
+    return;
+  }
   else
     body = indexData_to_json(&index_data);
 
   free_indexData(&index_data);
   mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
-  Cache_add(cache, "index", body, 1);
+  Cache_add(cache, "index", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(post, const int32_t PostID)
 {
   Post post = {.PostID = -1};
   char *body;
-  int code = 200;
   Result ret = get_post(PostID, &post);
 
   if (ret.status == FAILED)
   {
-    ROUTER_ERR("post", ret, body, code);
-    mg_http_reply(c, code, "", body);
+    free_post(&post);
+    ROUTER_ERR_reply(c, "post", ret);
     return;
   }
 

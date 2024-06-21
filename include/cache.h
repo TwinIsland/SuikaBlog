@@ -11,6 +11,9 @@
 
 #define CACHE_KEY_MAX_SIZE 32
 
+#define ALWAYS_IN_CACHE 1
+#define STANDARD_CACHE 0
+
 typedef struct CacheEntry
 {
     char key[CACHE_KEY_MAX_SIZE+1]; 

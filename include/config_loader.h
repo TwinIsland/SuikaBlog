@@ -17,6 +17,7 @@ typedef struct
     char *admin_email;
     char *key_file;
     int server_port;
+    char *server_ip;
     char *db_name;
     char *ipc_path;
     int ipc_size;

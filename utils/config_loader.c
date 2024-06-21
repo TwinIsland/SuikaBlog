@@ -19,6 +19,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->key_file = strdup(value);
     else if (MATCH("server", "port"))
         pconfig->server_port = atoi(value);
+    else if (MATCH("server", "ip"))
+        pconfig->server_ip = strdup(value);
     else if (MATCH("database", "db_name"))
         pconfig->db_name = strdup(value);
     else if (MATCH("ipc", "ipc_path"))
@@ -93,6 +95,8 @@ void destory_config()
         free(config.db_name);
     if (config.ipc_path)
         free(config.ipc_path);
+    if (config.server_ip)
+        free(config.server_ip);
     if (config.key_file)
         free(config.key_file);
     if (config.upload_dir)

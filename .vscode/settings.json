@@ -23,6 +23,8 @@
         "config_loader.h": "c",
         "utils.h": "c",
         "*.tcc": "c",
-        "cache.h": "c"
+        "cache.h": "c",
+        "mongoose.h": "c",
+        "system_error": "c"
     }
 }

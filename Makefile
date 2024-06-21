@@ -11,6 +11,10 @@ LIB_OUT=$(LIBDIR)/liblibrary.a
 SRCDIR=./src
 UTILSDIR=./utils
 
+ifeq ($(RELEASE), 1)
+	CFLAGS+=-O3
+endif
+
 ifeq ($(DEBUG), 1)
 	CFLAGS+=-DDEBUG -g
 endif
@@ -34,6 +38,9 @@ $(OUTDIR):
 
 $(OUT): $(SRC) $(LIB_OUT)
 	$(CC) -export-dynamic $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+release:
+	$(MAKE) RELEASE=1
 
 debug:
 	$(MAKE) DEBUG=1
