@@ -72,7 +72,7 @@ static void populate_postInfo_from_stmt(sqlite3_stmt *stmt, PostInfo *postInfo)
     const unsigned char *excerpts = sqlite3_column_text(stmt, 3);
     postInfo->Excerpts = excerpts ? strdup((char *)excerpts) : NULL;
 
-    postInfo->IsPage = sqlite3_column_int(stmt, 5); 
+    postInfo->IsPage = sqlite3_column_int(stmt, 5);
     postInfo->CreateDate = (time_t)sqlite3_column_int64(stmt, 6);
     postInfo->DateModified = (time_t)sqlite3_column_int64(stmt, 7);
     postInfo->UpVoted = sqlite3_column_int(stmt, 8);
@@ -117,7 +117,7 @@ Result get_post(const int32_t PostID, Post *ret)
     };
 }
 
-Result create_post(const char *title, const char *excerpt, const char *banner , const char *content, int isPage, int *ret)
+Result create_post(const char *title, const char *excerpt, const char *banner, const char *content, int isPage, int *ret)
 {
     if (db == NULL)
         return UNINITIALIZE_ERR;
@@ -135,7 +135,8 @@ Result create_post(const char *title, const char *excerpt, const char *banner , 
     sqlite3_bind_int(stmt, 5, isPage);
 
     rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE) {
+    if (rc != SQLITE_DONE)
+    {
         sqlite3_finalize(stmt);
         return (Result){FAILED, sqlite3_errmsg(db)};
     }
@@ -157,7 +158,6 @@ Result delete_post_by_id(long long int post_id)
     const char *sql = "DELETE FROM Posts WHERE PostID = ?;";
     sqlite3_stmt *stmt;
 
-    // Prepare the SQL statement
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
@@ -168,23 +168,32 @@ Result delete_post_by_id(long long int post_id)
         };
     }
 
-    // Bind the post_id to the statement
     sqlite3_bind_int64(stmt, 1, post_id);
 
-    // Execute the statement
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE)
     {
         debug("Execution failed: %s\n", sqlite3_errmsg(db));
-        sqlite3_finalize(stmt); // Finalize the statement to prevent memory leaks
+        sqlite3_finalize(stmt);
         return (Result){
             .status = FAILED,
             .msg = "sql query failed at execution",
         };
     }
 
-    // Finalize the statement to prevent memory leaks
+    // Check if any row was deleted
+    int changes = sqlite3_changes(db);
+    if (changes == 0)
+    {
+        sqlite3_finalize(stmt);
+        return (Result){
+            .status = FAILED,
+            .msg = "post id not found",
+        };
+    }
+
     sqlite3_finalize(stmt);
+    sqlite3_exec(db, "COMMIT;", NULL, NULL, NULL);
 
     return (Result){
         .status = OK,

@@ -8,16 +8,11 @@
 
 Cache *cache;
 
-void init_router_cache()
-{
-  cache = initialize_Cache();
-}
-
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
 static int is_authorized(struct mg_http_message *hm)
 {
-  char header_auth_sha256[SHA256_HEX_LEN + 1];
+  char header_auth_sha256[SHA256_HEX_LEN + 1] = {0};
   for (int i = 0; i < MG_MAX_HTTP_HEADERS; ++i)
   {
     if (!mg_strcmp(hm->headers[i].name, mg_str("SuikaToken")))
@@ -57,7 +52,7 @@ ROUTER(tags)
   char *body;
   int code = 200;
 
-  if ((body = Cache_lookup(cache, "tags")))
+  if ((body = Cache_lookup("tags")))
   {
     mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
     return;
@@ -77,7 +72,7 @@ ROUTER(tags)
 
   free_tags(&tags);
   mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
-  Cache_add(cache, "tags", body, ALWAYS_IN_CACHE);
+  Cache_add("tags", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(archieves)
@@ -85,7 +80,7 @@ ROUTER(archieves)
   char *body;
   int code = 200;
 
-  if ((body = Cache_lookup(cache, "archieves")))
+  if ((body = Cache_lookup("archieves")))
   {
     mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
     return;
@@ -105,7 +100,7 @@ ROUTER(archieves)
 
   free_archieves(&archieves);
   mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
-  Cache_add(cache, "archieves", body, ALWAYS_IN_CACHE);
+  Cache_add("archieves", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(index)
@@ -113,7 +108,7 @@ ROUTER(index)
   char *body;
   int code = 200;
 
-  if ((body = Cache_lookup(cache, "index")))
+  if ((body = Cache_lookup("index")))
   {
     mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
     return;
@@ -133,7 +128,7 @@ ROUTER(index)
 
   free_indexData(&index_data);
   mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
-  Cache_add(cache, "index", body, ALWAYS_IN_CACHE);
+  Cache_add("index", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(post, const int32_t PostID)
@@ -168,7 +163,7 @@ ROUTER(post, const int32_t PostID)
 ROUTER(upload)
 {
   if (!is_authorized(hm))
-    mg_http_reply(c, 401, "", "credential failed");
+    mg_http_reply(c, 403, "", "");
   else
     mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
 }
@@ -183,7 +178,7 @@ ROUTER(create_post)
 
   struct mg_str data = hm->body;
 
-  Post post;
+  Post post = {.PostID = -1};
   size_t ofs = 0;
   struct mg_str key, val;
 
@@ -191,28 +186,28 @@ ROUTER(create_post)
 
   while ((ofs = mg_json_next(data, ofs, &key, &val)) > 0)
   {
-    debug("%.*s -> %.*s\n", (int)key.len, key.buf, (int)val.len, val.buf);
-    if (mg_strcmp(key, mg_str("title")) == 0)
+    // printf("%.*s -> %.*s\n", (int)key.len, key.buf, (int)val.len, val.buf);
+    if (mg_strcmp(key, mg_str("\"title\"")) == 0)
     {
       post.Title = strndup(val.buf, val.len);
       field_n++;
     }
-    else if (mg_strcmp(key, mg_str("excerpts")) == 0)
+    else if (mg_strcmp(key, mg_str("\"excerpts\"")) == 0)
     {
       post.Excerpts = strndup(val.buf, val.len);
       field_n++;
     }
-    else if (mg_strcmp(key, mg_str("banner")) == 0)
+    else if (mg_strcmp(key, mg_str("\"banner\"")) == 0)
     {
       post.Banner = strndup(val.buf, val.len);
       field_n++;
     }
-    else if (mg_strcmp(key, mg_str("content")) == 0)
+    else if (mg_strcmp(key, mg_str("\"content\"")) == 0)
     {
       post.Content = strndup(val.buf, val.len);
       field_n++;
     }
-    else if (mg_strcmp(key, mg_str("is_page")) == 0)
+    else if (mg_strcmp(key, mg_str("\"is_page\"")) == 0)
     {
       mg_str_to_num(val, 10, (void *)&post.IsPage, sizeof(post.IsPage));
       field_n++;
@@ -230,11 +225,31 @@ ROUTER(create_post)
       return;
     }
     mg_http_reply(c, 200, "", "%d", ret_postid);
+    Cache_set_out_of_date("index");
   }
   else
-    mg_http_reply(c, 501, "", "");
+    mg_http_reply(c, 400, "", "");
 
   free_post(&post);
+}
+
+ROUTER(delete_post)
+{
+  struct mg_str id = mg_http_var(hm->query, mg_str("id"));
+  int postid;
+  if (!mg_str_to_num(id, 10, (void *)&postid, sizeof(postid)))
+  {
+    mg_http_reply(c, 400, "", "");
+    return;
+  }
+  Result ret;
+  if (ret = delete_post_by_id(postid), ret.status == FAILED)
+    ROUTER_ERR_reply(c, "delete_post", ret);
+  else
+  {
+    mg_http_reply(c, 200, "", ret.msg);
+    Cache_set_out_of_date("index");
+  }
 }
 
 // Connection event handler function
@@ -263,6 +278,10 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(index);
       else if (mg_match(hm->uri, mg_str("/api/upload"), NULL))
         USE_ROUTER(upload);
+      else if (mg_match(hm->uri, mg_str("/api/write"), NULL))
+        USE_ROUTER(create_post);
+      else if (mg_match(hm->uri, mg_str("/api/delete"), NULL))
+        USE_ROUTER(delete_post);
       else
         goto default_router;
     }

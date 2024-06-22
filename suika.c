@@ -53,7 +53,7 @@ void exit_handler()
     // upload plugins
     unload_plugins();
     // free caches
-    free_Cache(cache);
+    free_Cache();
 
     printf("\nbye\n");
     exit(1);
@@ -116,8 +116,8 @@ int main()
     ret = init_plugins();
     PRINT_LOG("init: plugins", ret, ERR_IS_IGN);
 
-    // initialize router cache
-    init_router_cache();
+    // initialize cache system
+    initialize_Cache();
     PRINT_OK_LOG("init: cache system");
 
 #ifdef TEST

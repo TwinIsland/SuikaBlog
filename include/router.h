@@ -31,6 +31,5 @@ struct user
 
 // Cache
 extern Cache *cache;
-void init_router_cache();
 
 #endif /* !ROUTER_H_ */
