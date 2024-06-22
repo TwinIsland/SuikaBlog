@@ -6,15 +6,26 @@ void free_post(Post *post)
 {
     if (post != NULL)
     {
-        free(post->Title);
-        free(post->Banner);
-        free(post->Excerpts);
-        free(post->Content);
-
-        post->Title = NULL;
-        post->Banner = NULL;
-        post->Excerpts = NULL;
-        post->Content = NULL;
+        if (post->Title != NULL)
+        {
+            free(post->Title);
+            post->Title = NULL;
+        }
+        if (post->Banner != NULL)
+        {
+            free(post->Banner);
+            post->Banner = NULL;
+        }
+        if (post->Excerpts != NULL)
+        {
+            free(post->Excerpts);
+            post->Excerpts = NULL;
+        }
+        if (post->Content != NULL)
+        {
+            free(post->Content);
+            post->Content = NULL;
+        }
     }
 }
 

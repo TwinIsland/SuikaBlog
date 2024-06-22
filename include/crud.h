@@ -29,7 +29,7 @@ Result init_db();
 Result init_plugins();
 
 // Post
-Result create_post(const char *title, const char *excerpt, const char *content, int isPage, int *ret);
+Result create_post(const char *title, const char *excerpt, const char *banner, const char *content, int isPage, int *ret);
 Result get_post(const int32_t PostID, Post *ret);
 Result delete_post_by_id(long long int post_id);
 

@@ -117,12 +117,12 @@ Result get_post(const int32_t PostID, Post *ret)
     };
 }
 
-Result create_post(const char *title, const char *excerpt, const char *content, int isPage, int *ret)
+Result create_post(const char *title, const char *excerpt, const char *banner , const char *content, int isPage, int *ret)
 {
     if (db == NULL)
         return UNINITIALIZE_ERR;
 
-    const char *sql = "INSERT INTO Posts (Title, Excerpt, Content, IsPage) VALUES (?, ?, ?, ?);";
+    const char *sql = "INSERT INTO Posts (Title, Excerpt, Banner, Content, IsPage) VALUES (?, ?, ?, ?, ?);";
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -130,8 +130,9 @@ Result create_post(const char *title, const char *excerpt, const char *content, 
 
     sqlite3_bind_text(stmt, 1, title, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, excerpt, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, content, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 4, isPage);
+    sqlite3_bind_text(stmt, 3, banner, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, content, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 5, isPage);
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE) {

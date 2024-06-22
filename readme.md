@@ -2,8 +2,11 @@
 Ultimate Blog System Engineered for Ultimate Speed and Efficiency⚡
 
 ## Features
-+ Designed for speed and efficiency. We've meticulously included only the necessary libraries, ensuring a lean and powerful experience.
-+ Managing dependencies becomes a thing of the past. Simply compress the entire folder into a zip file, and you're fully prepared for easy delivery and backup. Enjoy a hassle-free experience that lets you focus on what truly matters.
++ **Designed for Speed and Efficiency**: Enjoy a low memory footprint and minimal CPU usage. We've carefully handled memory and included only the essential libraries to ensure a lean and powerful experience.
+  
++ **Powerful and Extensible**: Equipped with everything you need for blogging, including a built-in FIFO cache and a highly efficient plug-in system. It also supports Python integration for added flexibility and functionality.
+  
++ **Effortless Dependency Management**: Forget about complex dependency management. Simply compress the entire folder into a zip file for easy delivery and backup. Focus on what truly matters without the hassle.
 
 ## Run
 
@@ -102,7 +105,6 @@ erDiagram
 
 ## Thanks
 + [cesanta/mongoose](https://github.com/cesanta/mongoose)
-+ [nothings/stb](https://github.com/nothings/stb)
 + [benhoyt/inih](https://github.com/benhoyt/inih)
 + [SQLite3](https://www.sqlite.)
 + [B-Con/crypto-algorithms](https://github.com/B-Con/crypto-algorithms/)
@@ -110,4 +112,4 @@ erDiagram
 
 ---
 
-Project Of: [LoliLab](https://lolilab.org)
+Project Of: [NyaLab](https://nyalab.cn)

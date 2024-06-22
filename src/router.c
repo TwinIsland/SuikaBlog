@@ -173,6 +173,70 @@ ROUTER(upload)
     mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
 }
 
+ROUTER(create_post)
+{
+  if (!is_authorized(hm))
+  {
+    mg_http_reply(c, 403, "", "");
+    return;
+  }
+
+  struct mg_str data = hm->body;
+
+  Post post;
+  size_t ofs = 0;
+  struct mg_str key, val;
+
+  int field_n = 0;
+
+  while ((ofs = mg_json_next(data, ofs, &key, &val)) > 0)
+  {
+    debug("%.*s -> %.*s\n", (int)key.len, key.buf, (int)val.len, val.buf);
+    if (mg_strcmp(key, mg_str("title")) == 0)
+    {
+      post.Title = strndup(val.buf, val.len);
+      field_n++;
+    }
+    else if (mg_strcmp(key, mg_str("excerpts")) == 0)
+    {
+      post.Excerpts = strndup(val.buf, val.len);
+      field_n++;
+    }
+    else if (mg_strcmp(key, mg_str("banner")) == 0)
+    {
+      post.Banner = strndup(val.buf, val.len);
+      field_n++;
+    }
+    else if (mg_strcmp(key, mg_str("content")) == 0)
+    {
+      post.Content = strndup(val.buf, val.len);
+      field_n++;
+    }
+    else if (mg_strcmp(key, mg_str("is_page")) == 0)
+    {
+      mg_str_to_num(val, 10, (void *)&post.IsPage, sizeof(post.IsPage));
+      field_n++;
+    }
+  }
+
+  if (field_n == 5)
+  {
+    int ret_postid;
+    Result ret = create_post(post.Title, post.Excerpts, post.Banner, post.Content, post.IsPage, &ret_postid);
+    if (ret.status == FAILED)
+    {
+      free_post(&post);
+      ROUTER_ERR_reply(c, "create_post", ret);
+      return;
+    }
+    mg_http_reply(c, 200, "", "%d", ret_postid);
+  }
+  else
+    mg_http_reply(c, 501, "", "");
+
+  free_post(&post);
+}
+
 // Connection event handler function
 void server_fn(struct mg_connection *c, int ev, void *ev_data)
 {
