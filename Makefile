@@ -9,7 +9,6 @@ LIB_OBJ=$(LIB_SRC:.c=.o)
 LIB_OUT=$(LIBDIR)/liblibrary.a
 
 SRCDIR=./src
-UTILSDIR=./utils
 
 ifeq ($(RELEASE), 1)
 	CFLAGS+=-O3
@@ -24,7 +23,7 @@ ifeq ($(TEST), 1)
 endif
 
 # Execution source
-SRC=suika.c $(wildcard $(LIBDIR)/*.c) $(wildcard $(SRCDIR)/*.c) $(wildcard $(UTILSDIR)/*.c)
+SRC=suika.c $(wildcard $(LIBDIR)/*.c) $(wildcard $(SRCDIR)/*.c)
 OUTDIR=bin
 OUT=$(OUTDIR)/suika
 

@@ -25,6 +25,7 @@
         "*.tcc": "c",
         "cache.h": "c",
         "mongoose.h": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "regex.h": "c"
     }
 }
