@@ -58,11 +58,10 @@ ROUTER(index_page)
 ROUTER(tags)
 {
   char *body;
-  int code = 200;
 
   if ((body = Cache_lookup("tags")))
   {
-    mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+    ROUTER_reply(c, "tags", body, JSON_type, OK_CODE);
     return;
   }
 
@@ -72,25 +71,25 @@ ROUTER(tags)
   if (ret.status == FAILED)
   {
     free_tags(&tags);
-    ROUTER_ERR_reply(c, "tags", ret);
+    ROUTER_reply(c, "tags", SERVERSIDE_ERR);
+
     return;
   }
   else
     body = tags_to_json(&tags);
 
   free_tags(&tags);
-  mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+  ROUTER_reply(c, "tags", body, JSON_type, OK_CODE);
   Cache_add("tags", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(archieves)
 {
   char *body;
-  int code = 200;
 
   if ((body = Cache_lookup("archieves")))
   {
-    mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+    ROUTER_reply(c, "archieves", body, JSON_type, OK_CODE);
     return;
   }
 
@@ -100,25 +99,24 @@ ROUTER(archieves)
   if (ret.status == FAILED)
   {
     free_archieves(&archieves);
-    ROUTER_ERR_reply(c, "archieves", ret);
+    ROUTER_reply(c, "archieves", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
     return;
   }
   else
     body = archieves_to_json(&archieves);
 
   free_archieves(&archieves);
-  mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+  ROUTER_reply(c, "archieves", body, JSON_type, OK_CODE);
   Cache_add("archieves", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(index)
 {
   char *body;
-  int code = 200;
 
   if ((body = Cache_lookup("index")))
   {
-    mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+    ROUTER_reply(c, "index", body, JSON_type, OK_CODE);
     return;
   }
 
@@ -128,42 +126,39 @@ ROUTER(index)
   if (ret.status == FAILED)
   {
     free_indexData(&index_data);
-    ROUTER_ERR_reply(c, "index", ret);
+    ROUTER_reply(c, "index", ret.msg, JSON_type, SERVERSIDE_ERR_CODE);
     return;
   }
   else
     body = indexData_to_json(&index_data);
 
   free_indexData(&index_data);
-  mg_http_reply(c, code, "Content-Type: application/json\r\n", body);
+  ROUTER_reply(c, "index", body, JSON_type, OK_CODE);
   Cache_add("index", body, ALWAYS_IN_CACHE);
 }
 
 ROUTER(post, const int32_t PostID)
 {
   Post post = {.PostID = -1};
-  char *body;
   Result ret = get_post(PostID, &post);
 
   if (ret.status == FAILED)
   {
     free_post(&post);
-    ROUTER_ERR_reply(c, "post", ret);
+    ROUTER_reply(c, "post", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
     return;
   }
 
   if (post.PostID != -1)
   {
-    body = post_to_json(&post);
+    char *body = post_to_json(&post);
     free_post(&post);
-    mg_http_reply(c, 200, "Content-Type: application/json\r\n", body);
+    ROUTER_reply(c, "post", body, JSON_type, OK_CODE);
     free(body);
   }
   else
   {
-    body = mg_mprintf("{%m: %m}", MG_ESC("error"), MG_ESC("Post not found"));
-    mg_http_reply(c, 404, "Content-Type: application/json\r\n", body);
-    free(body);
+    ROUTER_reply(c, "post", NOFOUND_ERR);
   }
 }
 
@@ -171,7 +166,7 @@ ROUTER(post, const int32_t PostID)
 ROUTER(upload)
 {
   if (!is_authorized(hm))
-    ROUTER_UNAUTH_reply(c, "upload");
+    ROUTER_reply(c, "upload", UNAUTH_ERR);
   else
     mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
 }
@@ -180,7 +175,7 @@ ROUTER(create_post)
 {
   if (!is_authorized(hm))
   {
-    ROUTER_UNAUTH_reply(c, "create_post");
+    ROUTER_reply(c, "create_post", UNAUTH_ERR);
     return;
   }
 
@@ -227,18 +222,20 @@ ROUTER(create_post)
   if (field_n == 5)
   {
     int ret_postid;
+    char ret_postid_str[16];
     Result ret = create_post(post.Title, post.Excerpts, post.Banner, post.Content, post.IsPage, &ret_postid);
     if (ret.status == FAILED)
     {
       free_post(&post);
-      ROUTER_ERR_reply(c, "create_post", ret);
+      ROUTER_reply(c, "create_post", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
       return;
     }
-    mg_http_reply(c, 200, "", "%d", ret_postid);
+    sprintf(ret_postid_str, "%d", ret_postid);
+    ROUTER_reply(c, "create_post", ret_postid_str, STRING_type, OK_CODE);
     remove_cache("index");
   }
   else
-    ROUTER_INVALID_reply(c, "create_post");
+    ROUTER_reply(c, "create_post", BADREQ_ERR);
 
   free_post(&post);
 }
@@ -247,7 +244,7 @@ ROUTER(delete_post)
 {
   if (!is_authorized(hm))
   {
-    ROUTER_UNAUTH_reply(c, "delete_post");
+    ROUTER_reply(c, "delete_post", UNAUTH_ERR);
     return;
   }
 
@@ -255,15 +252,15 @@ ROUTER(delete_post)
   int postid;
   if (!mg_str_to_num(id, 10, (void *)&postid, sizeof(postid)))
   {
-    ROUTER_INVALID_reply(c, "delte post");
+    ROUTER_reply(c, "delete_post", BADREQ_ERR);
     return;
   }
   Result ret;
   if (ret = delete_post_by_id(postid), ret.status == FAILED)
-    ROUTER_ERR_reply(c, "delete_post", ret);
+    ROUTER_reply(c, "delete_post", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
   else
   {
-    mg_http_reply(c, 200, "", ret.msg);
+    ROUTER_reply(c, "delete_post", ret.msg, STRING_type, OK_CODE);
     remove_cache("index");
   }
 }

@@ -179,9 +179,14 @@ async function fetchDataWithCache(url, name, exp_hour = 1) {
                 return response.json();
             })
             .then(data => {
-                cacheData(url, data, exp_hour);
-                return data;
+                if (data.status === false) {
+                    navigateTo(`/err?code=${data.code}&msg=${encodeURIComponent(data.content)}`);
+                    throw new Error('Error in response data');
+                }
+                cacheData(url, data.content, exp_hour);
+                return data.content;
             });
+
     }
 }
 
@@ -311,4 +316,15 @@ async function sha256(password) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
+}
+
+function getUrlParams() {
+    const params = {};
+    const queryString = window.location.search.slice(1);
+    const pairs = queryString.split("&");
+    pairs.forEach(pair => {
+        const [key, value] = pair.split("=");
+        params[key] = decodeURIComponent(value);
+    });
+    return params;
 }

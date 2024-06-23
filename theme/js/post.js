@@ -31,7 +31,6 @@ function renderArticleMeta(articleJSON) {
 }
 
 function renderArticleBody(articleJSON) {
-    console.log(articleJSON.Content)
     return `
         ${converter.makeHtml(articleJSON.Content)}
     `

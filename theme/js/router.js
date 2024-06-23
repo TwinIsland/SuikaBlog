@@ -9,7 +9,6 @@ const routes = {
     404: { html: "/pages/404.html", js: null, css: [], jsr: [] },
     "/": { html: "/pages/index.html", js: "/js/index.js", css: [], jsr: [] },
     "/about": { html: "/pages/about.html", js: "/js/about.js", css: ["/css/article.css"], jsr: ["/js/qrcode.min.js"] },
-    "/err": { html: "/pages/503.html", js: null, css: [], jsr: [] },
     "/upload": { html: "pages/upload.html", js: "/js/upload.js", css: [], jsr: [] },
     "/admin": { html: "pages/admin.html", js: "/js/admin.js", css: [], jsr: [] },
 };
@@ -35,6 +34,16 @@ const handleLocation = async () => {
             js: "/js/post.js",
             css: ["/css/article.css", "/css/prism.css"],
             jsr: ["/js/qrcode.min.js", "/js/prism.js", "/js/showdown.min.js"]
+        };
+    }
+
+    // Handle error page
+    if (path.match(/\/err/)) {
+        route = {
+            html: "/pages/error.html",
+            js: "/js/error.js",
+            css: [],
+            jsr: []
         };
     }
 
