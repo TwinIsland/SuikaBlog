@@ -1,5 +1,4 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include <stdio.h>
 
@@ -14,7 +13,7 @@ extern void exit_handler();
 #define PRINT_OK(info, ...)               \
     do                                    \
     {                                     \
-        printf("\033[0;32m");            \
+        printf("\033[0;32m");             \
         printf("OK: ");                   \
         printf("\033[0m");                \
         printf(info "\n", ##__VA_ARGS__); \
@@ -45,32 +44,32 @@ extern void exit_handler();
 
 // * info   --> ok/fail:[ret.msg]
 #define PRINT_LOG(info, ret, is_err_critical, ...) \
-    do                                                           \
-    {                                                            \
-        printf("\033[0;34m");                                    \
-        printf("* ");                                            \
-        printf("\033[0m");                                       \
-        printf(info, ##__VA_ARGS__);                             \
-        if (ret.status == OK)                                    \
-        {                                                        \
-            printf(" \033[0;32m");                               \
-            printf("\t--> ok\n");                                \
-            printf("\033[0m");                                   \
-        }                                                        \
-        else                                                     \
-        {                                                        \
-            printf("\033[0;31m");                                \
-            printf("\t--> fail: %s\n", ret.msg);                 \
-            printf("\033[0m");                                   \
-            if (is_err_critical)                                 \
-            {                                                    \
-                if (exit_handler != NULL)                        \
-                {                                                \
-                    exit_handler();                              \
-                }                                                \
-                exit(1);                                         \
-            }                                                    \
-        }                                                        \
+    do                                             \
+    {                                              \
+        printf("\033[0;34m");                      \
+        printf("* ");                              \
+        printf("\033[0m");                         \
+        printf(info, ##__VA_ARGS__);               \
+        if (ret.status == OK)                      \
+        {                                          \
+            printf(" \033[0;32m");                 \
+            printf("\t--> ok\n");                  \
+            printf("\033[0m");                     \
+        }                                          \
+        else                                       \
+        {                                          \
+            printf("\033[0;31m");                  \
+            printf("\t--> fail: %s\n", ret.msg);   \
+            printf("\033[0m");                     \
+            if (is_err_critical)                   \
+            {                                      \
+                if (exit_handler != NULL)          \
+                {                                  \
+                    exit_handler();                \
+                }                                  \
+                exit(1);                           \
+            }                                      \
+        }                                          \
     } while (0);
 
 #ifdef DEBUG
@@ -91,6 +90,3 @@ char *get_sha256_hashed(const char *keypass);
 
 // file system
 int check_file_with_exts(const char *path, const char **exts);
-
-
-#endif

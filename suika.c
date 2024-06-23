@@ -6,13 +6,14 @@
 
 #include "mongoose.h"
 #include "result.h"
-#include "config_loader.h"
-#include "blog_init.h"
+#include "config.h"
+#include "install.h"
 #include "utils.h"
 #include "crud.h"
 #include "models.h"
 #include "router.h"
 #include "suika_state.h"
+#include "db.h"
 
 #define PLUGIN_LOADER_ALLOWED
 #include "plugin.h"
@@ -22,7 +23,7 @@
 static struct mg_mgr mgr;
 
 // initialize system state
-SUIKA_STATE SYSTEM_STATE = (SUIKA_STATE){
+SUIKA_STATE SYSTEM_STATE = (SUIKA_STATE) {
     .is_db_first_initialize = false,
 };
 
@@ -44,16 +45,11 @@ print_welcome:
 
 void exit_handler()
 {
-    // clean config
-    destory_config();
-    // clean server
-    mg_mgr_free(&mgr);
-    // close db
-    db_close();
-    // upload plugins
-    unload_plugins();
-    // free caches
-    free_Cache();
+    destory_config();  // clean config
+    mg_mgr_free(&mgr); // clean server
+    db_close();        // close db
+    unload_plugins();  // unload plugins
+    free_Cache();      // free caches
 
     printf("\nbye\n");
     exit(1);
@@ -90,7 +86,7 @@ int main()
             ret.msg = strerror(errno);
         }
     }
-    PRINT_LOG("loading upload dir", ret, ERR_IS_CRITICAL);
+    PRINT_LOG("init: upload system", ret, ERR_IS_CRITICAL);
 
     // checking necessary files
     if (access(config.key_file, F_OK) || access(config.db_name, F_OK))
@@ -113,8 +109,8 @@ int main()
     PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, config.db_name);
 
     // initialize the plugins
-    ret = init_plugins();
-    PRINT_LOG("init: plugins", ret, ERR_IS_IGN);
+    load_plugins();
+    PRINT_OK_LOG("init: plugins");
 
     // initialize cache system
     initialize_Cache();

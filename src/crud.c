@@ -4,40 +4,11 @@
 
 #include "crud.h"
 #include "utils.h"
-#include "config_loader.h"
+#include "config.h"
+#include "db.h"
 
 #define PLUGIN_LOADER_ALLOWED
 #include "plugin.h"
-
-static sqlite3 *db = NULL;
-
-Result init_db()
-{
-    int rc = sqlite3_open(config.db_name, &db);
-    if (rc != SQLITE_OK)
-    {
-        debug("Can't open database: %s\n", sqlite3_errmsg(db));
-        return (Result){
-            .status = FAILED,
-            .msg = "Can't open database",
-        };
-    }
-    return (Result){
-        .status = OK,
-    };
-}
-
-Result init_plugins()
-{
-    if (db == NULL)
-        return (Result){
-            .status = FAILED,
-            .msg = "please initialize db first",
-        };
-
-    load_plugins();
-    return plugins_bind(db);
-}
 
 static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx)
 {
@@ -341,14 +312,4 @@ Result get_index(IndexData *ret)
     ret->Notice.content = strdup("Welcome to the SuikaBlog System!");
 
     return (Result){.status = OK, .ptr = ret};
-}
-
-// Close the database connection
-void db_close(void)
-{
-    if (db != NULL)
-    {
-        sqlite3_close(db);
-        db = NULL;
-    }
 }

@@ -1,9 +1,9 @@
 #include <sqlite3.h>
 #include <unistd.h>
 
-#include "blog_init.h"
+#include "install.h"
 #include "utils.h"
-#include "config_loader.h"
+#include "config.h"
 
 static Result initialize_pass(const char *key_file, const char *keypass)
 {

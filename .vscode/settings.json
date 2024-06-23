@@ -26,6 +26,9 @@
         "cache.h": "c",
         "mongoose.h": "c",
         "system_error": "c",
-        "regex.h": "c"
+        "regex.h": "c",
+        "config.h": "c",
+        "install.h": "c",
+        "string.h": "c"
     }
 }

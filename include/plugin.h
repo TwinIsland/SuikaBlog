@@ -1,32 +1,38 @@
-#ifndef PLUGIN_H
-#define PLUGIN_H
+#pragma once
 
 #include <stdio.h>
 
 #include "result.h"
 #include "suika_state.h"
+#include "mongoose.h"
 
-#define PLUGIN_MANAGER_VERSION 1
+#define PLUGIN_MANAGER_VERSION 2
 
 #ifdef PLUGIN_LOADER_ALLOWED
-Result plugins_bind(sqlite3 *db);
 void load_plugins();
 void unload_plugins();
 #endif
 
+#ifndef PLUGIN_LOADER_ALLOWED
 typedef struct
 {
     char *name;
     int version;
     void *handler;
     void (*cleanup_func)();
-    void (*after_binding_func)();
+    void (*router_callback)(struct mg_connection *c, struct mg_http_message *hm);   // TODO
 } Plugin;
 
-void register_plugin(Plugin plugin);
+// external helper functions
 
-// Define interface for plugins
-Result upsert_info_entry(char *key, char *value);
-Result fetch_info_value_by_key(char *key, char **value);
+// check if http request is authorized
+extern int is_authorized(struct mg_http_message *hm);
 
-#endif // PLUGIN_H
+#define plugin_printf(__fmt, ...) printf("%s: " __fmt, MODULE_NAME, ##__VA_ARGS__)
+
+// return the plugin id, -1 if failed
+int register_plugin(Plugin plugin);
+
+Result push_data(const char *key, const char *value);
+Result get_data(const char *key);
+#endif

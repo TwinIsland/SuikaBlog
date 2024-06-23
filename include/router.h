@@ -1,16 +1,10 @@
-#ifndef ROUTER_H_
-#define ROUTER_H_
+#pragma once
 
 #include "mongoose.h"
 #include "sha256.h"
 #include "cache.h"
 
 void server_fn(struct mg_connection *c, int ev, void *ev_data);
-
-struct user
-{
-  const char *name, *pass, *token;
-};
 
 #define JSON_type 0
 #define STRING_type 1
@@ -34,11 +28,11 @@ struct user
       printf("/api/%s: %s\n", router_name, content);                                         \
       printf("\033[0m");                                                                     \
     }                                                                                        \
-    if (content_type == STRING_type)                                                           \
+    if (content_type == STRING_type)                                                         \
       mg_http_reply(c, code, "Content-Type: application/json\r\n", "{ %m:%s, %m:\"%s\" }\n", \
                     MG_ESC("status"), code == 200 ? "true" : "false",                        \
                     MG_ESC("content"), content != NULL ? content : "");                      \
-    else if (content_type == JSON_type)                                                    \
+    else if (content_type == JSON_type)                                                      \
       mg_http_reply(c, code, "Content-Type: application/json\r\n", "{ %m:%s, %m:%s }\n",     \
                     MG_ESC("status"), code == 200 ? "true" : "false",                        \
                     MG_ESC("content"), content != NULL ? content : "\"\"");                  \
@@ -58,5 +52,3 @@ struct user
 
 // Cache
 extern Cache *cache;
-
-#endif /* !ROUTER_H_ */

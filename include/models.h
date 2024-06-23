@@ -1,11 +1,10 @@
-#ifndef MODELS_H
-#define MODELS_H
+#pragma once
 
 #include <stdint.h>
 #include <time.h>
 #include <mongoose.h>
 
-#include "config_loader.h"
+#include "config.h"
 
 typedef struct
 {
@@ -50,7 +49,7 @@ typedef struct
 {
     int year;
     size_t articleCount;
-    char **ArticleTitles; 
+    char **ArticleTitles;
 } Archieve;
 
 typedef struct
@@ -66,7 +65,6 @@ typedef struct
     Tag *data;
     size_t size;
 } Tags;
-
 
 typedef struct
 {
@@ -89,5 +87,3 @@ char *post_to_json(Post *post);
 char *postInfo_to_json(PostInfo *post_info);
 char *archieves_to_json(Archieves *archieves);
 char *indexData_to_json(IndexData *index_data);
-
-#endif // MODELS_H

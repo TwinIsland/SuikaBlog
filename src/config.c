@@ -1,4 +1,4 @@
-#include "config_loader.h"
+#include "config.h"
 
 #include "sha256.h"
 
@@ -21,6 +21,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->server_port = atoi(value);
     else if (MATCH("server", "ip"))
         pconfig->server_ip = strdup(value);
+    else if (MATCH("server", "plugin_dir"))
+        pconfig->plugin_dir = strdup(value);
     else if (MATCH("database", "db_name"))
         pconfig->db_name = strdup(value);
     else if (MATCH("ipc", "ipc_path"))
@@ -97,6 +99,8 @@ void destory_config()
         free(config.ipc_path);
     if (config.server_ip)
         free(config.server_ip);
+    if (config.plugin_dir)
+        free(config.plugin_dir);
     if (config.key_file)
         free(config.key_file);
     if (config.upload_dir)

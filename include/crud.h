@@ -1,5 +1,4 @@
-#ifndef CRUD_H
-#define CRUD_H
+#pragma once
 
 #include "sqlite3.h"
 #include "result.h"
@@ -22,12 +21,6 @@
         .msg = "uninitialized database connection", \
     }
 
-// Initializes the database connection
-Result init_db();
-
-// Plugin initialize function
-Result init_plugins();
-
 // Post
 Result create_post(const char *title, const char *excerpt, const char *banner, const char *content, int isPage, int *ret);
 Result get_post(const int32_t PostID, Post *ret);
@@ -44,5 +37,3 @@ Result get_index(IndexData *ret);
 
 // Close database
 void db_close(void);
-
-#endif // CRUD_H

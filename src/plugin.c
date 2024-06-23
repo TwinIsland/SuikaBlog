@@ -2,33 +2,21 @@
 #include <dirent.h>
 #include <string.h>
 
+#include "config.h"
 #include "plugin.h"
 #include "utils.h"
 #include "sqlite3.h"
-
-static sqlite3 *db = NULL;
+#include "db.h"
 
 static Plugin plugins[10];
 static int plugin_count = 0;
 
-void register_plugin(Plugin plugin)
-{
-    if (plugin.version != PLUGIN_MANAGER_VERSION) {
-        PRINT_ERR("%s version mistached", plugin.name);
-    }
-    if (plugin_count < (sizeof(plugins) / sizeof(Plugin)))
-    {
-        plugins[plugin_count++] = plugin;
-    }
-    else
-    {
-        debug("Max plugins reached.\n");
-    }
-}
-
+/*
+    PlugIn Loader
+*/
 void load_plugins()
 {
-    const char *plugins_dir = "./plugin"; // Directory where plugins are stored
+    const char *plugins_dir = config.plugin_dir;
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(plugins_dir)) != NULL)
@@ -36,9 +24,7 @@ void load_plugins()
         while ((ent = readdir(dir)) != NULL)
         {
             if (!strstr(ent->d_name, ".suika"))
-            {
                 continue;
-            }
 
             char plugin_path[512];
             snprintf(plugin_path, sizeof(plugin_path), "%s/%s", plugins_dir, ent->d_name);
@@ -59,47 +45,53 @@ void load_plugins()
                 dlclose(handler);
                 continue;
             }
-            register_plugin_func(handler);
+            else
+            {
+                register_plugin_func(handler);
+            }
         }
         closedir(dir);
     }
     else
-    {
         PRINT_ERR("Could not open plugins directory");
-    }
-}
-
-Result plugins_bind(sqlite3 *_db)
-{
-    db = _db;
-
-    for (int i = 0; i < plugin_count; i++)
-    {
-        if (plugins[i].after_binding_func)
-        {
-            plugins[i].after_binding_func();
-            PRINT_OK_LOG("init: %s", plugins[i].name);
-        }
-    }
-
-    return (Result){.status = db != NULL ? OK : FAILED};
 }
 
 void unload_plugins()
 {
     for (int i = 0; i < plugin_count; ++i)
     {
-        if (plugins[i].cleanup_func) {
+        if (plugins[i].cleanup_func)
+        {
             debug("clean up %s", plugins[i].name);
             plugins[i].cleanup_func();
         }
-            
+
         dlclose(plugins[i].handler);
     }
     plugin_count = 0;
 }
 
-Result upsert_info_entry(char *key, char *value)
+/*
+    Plugin Utils
+*/
+
+int register_plugin(Plugin plugin)
+{
+    if (plugin.version != PLUGIN_MANAGER_VERSION)
+    {
+        PRINT_ERR("%s version mistached", plugin.name);
+        return -1;
+    }
+    if (plugin_count < (sizeof(plugins) / sizeof(Plugin)))
+    {
+        plugins[plugin_count] = plugin;
+        return plugin_count++;
+    }
+    else
+        return -1;
+}
+
+Result push_data(const char *key, const char *value)
 {
     if (db == NULL)
         return (Result){
@@ -114,10 +106,7 @@ Result upsert_info_entry(char *key, char *value)
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
-    {
-        debug("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
         return (Result){.status = FAILED, .msg = "Failed to prepare statement"};
-    }
 
     sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, value, -1, SQLITE_STATIC);
@@ -134,8 +123,9 @@ Result upsert_info_entry(char *key, char *value)
     return (Result){.status = OK};
 }
 
-Result fetch_info_value_by_key(char *key, char **value)
+Result get_data(const char *key)
 {
+    char *value;
     if (db == NULL)
         return (Result){
             .status = FAILED,
@@ -145,17 +135,14 @@ Result fetch_info_value_by_key(char *key, char **value)
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
-    {
-        debug("Failed to prepare statement: %s\n", sqlite3_errmsg(db));
         return (Result){.status = FAILED, .msg = "Failed to prepare statement"};
-    }
 
     sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const unsigned char *val = sqlite3_column_text(stmt, 0);
-        *value = val ? strdup((const char *)val) : NULL;
+        value = val ? strdup((const char *)val) : NULL;
     }
     else
     {

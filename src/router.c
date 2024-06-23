@@ -2,7 +2,7 @@
 #include "utils.h"
 #include "crud.h"
 #include "models.h"
-#include "config_loader.h"
+#include "config.h"
 
 #include "cache.h"
 
@@ -10,7 +10,7 @@ Cache *cache;
 
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
-static int is_authorized(struct mg_http_message *hm)
+int is_authorized(struct mg_http_message *hm)
 {
   char header_auth_sha256[SHA256_HEX_LEN + 1] = {0};
   for (int i = 0; i < MG_MAX_HTTP_HEADERS; ++i)

@@ -1,12 +1,10 @@
-#ifndef CACHE_H
-#define CACHE_H
+#pragma once
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <time.h>
 #include <mongoose.h>
-#include "config_loader.h"
 #include "models.h"
 
 #define CACHE_KEY_MAX_SIZE 32
@@ -16,7 +14,7 @@
 
 typedef struct CacheEntry
 {
-    char key[CACHE_KEY_MAX_SIZE+1]; 
+    char key[CACHE_KEY_MAX_SIZE + 1];
     char *value;
     int always_in_flag;
     struct CacheEntry *next;
@@ -38,5 +36,3 @@ void update_cache(const char *key, const char *new_value);
 void remove_cache(const char *key);
 
 extern Cache *cache;
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef BLOG_INIT_H
-#define BLOG_INIT_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,9 +12,7 @@
 #define DB_INI_SCRIPT_PATH "assets/db_ini.sql"
 
 /*
-    initialize blog via asking input for pass key and db 
+    initialize blog via asking input for pass key and db
 
  */
 void initialize_blog();
-
-#endif

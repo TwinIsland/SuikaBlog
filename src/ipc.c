@@ -1,4 +1,5 @@
 #include "ipc.h"
+#include "config.h"
 
 static int ipc_fd = -1;
 static char *ipc_memory = NULL;
@@ -6,11 +7,11 @@ static char *ipc_memory = NULL;
 static char *IPC_FILE_PATH;
 static int IPC_SIZE;
 
-int init_ipc(configuration *config)
+int init_ipc()
 {
 
-    IPC_FILE_PATH = config->ipc_path;
-    IPC_SIZE = config->ipc_size;
+    IPC_FILE_PATH = config.ipc_path;
+    IPC_SIZE = config.ipc_size;
 
     ipc_fd = open(IPC_FILE_PATH, O_RDWR | O_CREAT | O_TRUNC, (mode_t)0600);
     if (ipc_fd == -1)

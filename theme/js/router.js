@@ -21,7 +21,7 @@ const handleLocation = async () => {
     if (window.currentCleanup) {
         const cleaner_name = window.currentCleanup();
         window.currentCleanup = null;
-        console.log("clean: " + cleaner_name)
+        console.log("clean: " + cleaner_name);
     }
 
     const path = window.location.pathname;
@@ -66,7 +66,6 @@ const handleLocation = async () => {
     // Set page content
     document.getElementById("page-content").innerHTML = html;
 
-
     // Load JSR files
     await Promise.all(route.jsr.map(url => {
         return new Promise((resolve, reject) => {
@@ -98,5 +97,8 @@ function navigateTo(page) {
     window.history.pushState({}, '', page);
     handleLocation();
 }
+
+// Listen for popstate event
+window.addEventListener('popstate', handleLocation);
 
 handleLocation();

@@ -1,5 +1,4 @@
-#ifndef RESULT_H
-#define RESULT_H
+#pragma once
 
 enum status_t
 {
@@ -13,5 +12,3 @@ typedef struct Result_t
     const char *msg;
     void *ptr;
 } Result;
-
-#endif

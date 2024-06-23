@@ -1,5 +1,4 @@
-#ifndef CONFIG_LOADER_H
-#define CONFIG_LOADER_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +17,7 @@ typedef struct
     char *key_file;
     int server_port;
     char *server_ip;
+    char *plugin_dir;
     char *db_name;
     char *ipc_path;
     int ipc_size;
@@ -25,7 +25,7 @@ typedef struct
     int max_file_size;
     char *upload_dir;
     int cache_n;
-    char pass_sha256[SHA256_HEX_LEN+1];
+    char pass_sha256[SHA256_HEX_LEN + 1];
 } configuration;
 
 extern configuration config;
@@ -38,5 +38,3 @@ void destory_config();
 
 // load the local passcode to the config
 Result load_passcode_to_config();
-
-#endif

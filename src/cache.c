@@ -1,5 +1,5 @@
 #include "cache.h"
-#include "config_loader.h"
+#include "config.h"
 #include "utils.h"
 
 void initialize_Cache()

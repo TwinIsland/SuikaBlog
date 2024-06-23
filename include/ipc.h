@@ -1,5 +1,4 @@
-#ifndef IPC_LIB_H
-#define IPC_LIB_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,8 +7,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "config_loader.h"
-
 typedef enum ipc_status_t
 {
     IPC_INCOMPLETE = '0',
@@ -17,10 +14,8 @@ typedef enum ipc_status_t
     IPC_READ = '2',
 } ipc_status;
 
-int init_ipc(configuration *config);
+int init_ipc();
 void send_ipc(const char *message);
 void read_ipc(void);
 void reset_ipc(void);
 void cleanup_ipc(void);
-
-#endif // IPC_LIB_H
