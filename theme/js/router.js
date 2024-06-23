@@ -11,6 +11,7 @@ const routes = {
     "/about": { html: "/pages/about.html", js: "/js/about.js", css: ["/css/article.css"], jsr: ["/js/qrcode.min.js"] },
     "/err": { html: "/pages/503.html", js: null, css: [], jsr: [] },
     "/upload": { html: "pages/upload.html", js: "/js/upload.js", css: [], jsr: [] },
+    "/admin": { html: "pages/admin.html", js: "/js/admin.js", css: [], jsr: [] },
 };
 
 const loadedCSS = {};
@@ -80,7 +81,6 @@ const handleLocation = async () => {
         console.log("load js: " + route.js);
         const script = document.createElement("script");
         script.src = route.js;
-        script.className = 'route-script';
         document.body.appendChild(script);
     }
 };

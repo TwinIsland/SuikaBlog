@@ -29,6 +29,9 @@ struct user
     mg_http_reply(c, 501, "", __body);             \
   } while (0)
 
+#define ROUTER_UNAUTH_reply(c, router_name) mg_http_reply(c, 401, "", "premission denied")
+#define ROUTER_INVALID_reply(c, router_name) mg_http_reply(c, 400, "", "bad request")
+
 // Cache
 extern Cache *cache;
 

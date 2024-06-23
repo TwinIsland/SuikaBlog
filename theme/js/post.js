@@ -31,8 +31,9 @@ function renderArticleMeta(articleJSON) {
 }
 
 function renderArticleBody(articleJSON) {
+    console.log(articleJSON.Content)
     return `
-        ${(new showdown.Converter({ "noHeaderId": true })).makeHtml(articleJSON.Content)}
+        ${converter.makeHtml(articleJSON.Content)}
     `
 }
 

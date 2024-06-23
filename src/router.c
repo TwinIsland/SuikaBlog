@@ -25,6 +25,14 @@ static int is_authorized(struct mg_http_message *hm)
   return ret;
 }
 
+static char *mg_str_without_paren(struct mg_str src)
+{
+  char *ret = malloc(src.len - 1);
+  strncpy(ret, src.buf + 1, src.len - 2);
+  ret[src.len - 2] = '\0';
+  return ret;
+}
+
 ROUTER(index_page)
 {
   // Cache all image request
@@ -163,7 +171,7 @@ ROUTER(post, const int32_t PostID)
 ROUTER(upload)
 {
   if (!is_authorized(hm))
-    mg_http_reply(c, 403, "", "");
+    ROUTER_UNAUTH_reply(c, "upload");
   else
     mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
 }
@@ -172,7 +180,7 @@ ROUTER(create_post)
 {
   if (!is_authorized(hm))
   {
-    mg_http_reply(c, 403, "", "");
+    ROUTER_UNAUTH_reply(c, "create_post");
     return;
   }
 
@@ -186,25 +194,27 @@ ROUTER(create_post)
 
   while ((ofs = mg_json_next(data, ofs, &key, &val)) > 0)
   {
-    // printf("%.*s -> %.*s\n", (int)key.len, key.buf, (int)val.len, val.buf);
+    debug("%.*s -> %.*s\n", (int)key.len, key.buf, (int)val.len, val.buf);
     if (mg_strcmp(key, mg_str("\"title\"")) == 0)
     {
-      post.Title = strndup(val.buf, val.len);
+      post.Title = mg_str_without_paren(val);
       field_n++;
     }
     else if (mg_strcmp(key, mg_str("\"excerpts\"")) == 0)
     {
-      post.Excerpts = strndup(val.buf, val.len);
+      post.Excerpts = mg_str_without_paren(val);
       field_n++;
     }
     else if (mg_strcmp(key, mg_str("\"banner\"")) == 0)
     {
-      post.Banner = strndup(val.buf, val.len);
+      post.Banner = mg_str_without_paren(val);
       field_n++;
     }
     else if (mg_strcmp(key, mg_str("\"content\"")) == 0)
     {
-      post.Content = strndup(val.buf, val.len);
+      post.Content = mg_str_without_paren(val);
+      mg_json_unescape(mg_str(post.Content), post.Content, strlen(post.Content));
+
       field_n++;
     }
     else if (mg_strcmp(key, mg_str("\"is_page\"")) == 0)
@@ -225,21 +235,27 @@ ROUTER(create_post)
       return;
     }
     mg_http_reply(c, 200, "", "%d", ret_postid);
-    Cache_set_out_of_date("index");
+    remove_cache("index");
   }
   else
-    mg_http_reply(c, 400, "", "");
+    ROUTER_INVALID_reply(c, "create_post");
 
   free_post(&post);
 }
 
 ROUTER(delete_post)
 {
+  if (!is_authorized(hm))
+  {
+    ROUTER_UNAUTH_reply(c, "delete_post");
+    return;
+  }
+
   struct mg_str id = mg_http_var(hm->query, mg_str("id"));
   int postid;
   if (!mg_str_to_num(id, 10, (void *)&postid, sizeof(postid)))
   {
-    mg_http_reply(c, 400, "", "");
+    ROUTER_INVALID_reply(c, "delte post");
     return;
   }
   Result ret;
@@ -248,7 +264,7 @@ ROUTER(delete_post)
   else
   {
     mg_http_reply(c, 200, "", ret.msg);
-    Cache_set_out_of_date("index");
+    remove_cache("index");
   }
 }
 

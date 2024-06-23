@@ -144,6 +144,7 @@ Result create_post(const char *title, const char *excerpt, const char *banner, c
     long long int post_id = sqlite3_last_insert_rowid(db);
     *ret = post_id;
     sqlite3_finalize(stmt);
+
     return (Result){OK, "Post created successfully"};
 }
 

@@ -2,15 +2,6 @@ var setStatus = function (text) {
     document.getElementById('el3').innerText = text;
 };
 
-async function sha256(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-}
-
 var button = document.getElementById('el2');
 button.onclick = function (ev) {
     document.getElementById('el1').click();
