@@ -49,16 +49,20 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
             renderWrapper(document.getElementById("likeCount"), renderLikeCount(data))
         ];
 
-            return Promise.all(renderPromises);
-        })
+        return Promise.all(renderPromises);
+    })
     .then(() => {
         Prism.highlightAll();
         registerLikeButton();
         return updateTOC(".article", "#toc-body");
     })
     .catch(error => {
-        console.error('There was a problem with your fetch operation:', error);
-        navigateTo("/err");
+        console.log(error.code)
+        if (error.code && error.msg) {
+            navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
+        } else {
+            navigateTo("/err");
+        }
     });
 
 

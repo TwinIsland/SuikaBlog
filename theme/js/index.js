@@ -65,6 +65,10 @@ fetchDataWithCache('/api/index', "index")
     return Promise.all(renderPromises)
   })
   .catch(error => {
-    console.error('There was a problem with your fetch operation:', error);
-    navigateTo("/err");
+    if (error.code && error.msg) {
+      navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
+    } else {
+      navigateTo("/err");
+    }
+    throw error
   });

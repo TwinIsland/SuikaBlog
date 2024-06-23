@@ -127,8 +127,8 @@ function renderWrapper(elementDOM, newHTML) {
                 elementDOM.innerHTML = newHTML;
                 elementDOM.classList.add('visible');
                 resolve();
-            }, 230);
-        }, 150);
+            }, 180);
+        }, 100);
     });
 }
 
@@ -167,26 +167,21 @@ async function fetchDataWithCache(url, name, exp_hour = 1) {
     if (cachedData) {
         return Promise.resolve(cachedData);
     } else {
-        console.log(`load data: ${name}`)
+        console.log(`load data: ${name}`);
         return fetch(url, { signal: AbortSignal.timeout(5000) })
-            .then(response => {
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        navigateTo("/404");
-                    }
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+            .then(async response => {
+                return response.json().then(data => ({
+                    status: response.status,
+                    data: data
+                }));
             })
-            .then(data => {
+            .then(({ status, data }) => {
                 if (data.status === false) {
-                    navigateTo(`/err?code=${data.code}&msg=${encodeURIComponent(data.content)}`);
-                    throw new Error('Error in response data');
+                    return Promise.reject({ code: status, msg: data.content });
                 }
                 cacheData(url, data.content, exp_hour);
                 return data.content;
-            });
-
+            })
     }
 }
 
@@ -327,4 +322,13 @@ function getUrlParams() {
         params[key] = decodeURIComponent(value);
     });
     return params;
+}
+
+function updateErrorMessage() {
+    const params = getUrlParams();
+    const errorCode = params.code || "503";
+    const errorMessage = params.msg || "Service Unavailable(ᗜ˰ᗜ)";
+
+    document.getElementById("error-code").textContent = errorCode;
+    document.getElementById("error-message").textContent = errorMessage;
 }
