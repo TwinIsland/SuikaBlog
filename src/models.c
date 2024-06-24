@@ -68,17 +68,21 @@ void free_archieves(Archieves *archieves)
     free(archieves->data);
 }
 
+void free_PostInfos(PostInfos *post_infos)
+{
+    for (int i = 0; i < post_infos->size; ++i)
+        free_postInfo(&post_infos->data[i]);
+    free(post_infos->data);
+}
+
 void free_indexData(IndexData *indexData)
 {
     if (indexData == NULL)
         return;
 
     free_postInfo(&indexData->CoverArticleInfo);
+    free_PostInfos(&indexData->NormalArticleInfos);
 
-    for (int i = 0; i < indexData->NormalArticleInfos.size; ++i)
-        free_postInfo(&indexData->NormalArticleInfos.data[i]);
-
-    free(indexData->NormalArticleInfos.data);
     free(indexData->Notice.content);
     free(indexData->Notice.title);
 
@@ -242,31 +246,20 @@ char *archieves_to_json(Archieves *archieves)
     return json;
 }
 
-char *indexData_to_json(IndexData *index_data)
+char *postInfos_to_json(PostInfos *post_infos)
 {
-    // Convert components to JSON strings
-    char *tags_str = tags_to_json(&index_data->Tags);
-    char *coverArticleInfo_str = postInfo_to_json(&index_data->CoverArticleInfo);
-    char *archieves_str = archieves_to_json(&index_data->Archieves);
-    char *notice_str = notice_to_json(&index_data->Notice);
-
-    // Calculate initial buffer size
-    size_t buffer_size = strlen(tags_str) + strlen(coverArticleInfo_str) +
-                         strlen(archieves_str) + strlen(notice_str) + 512; // extra space for JSON formatting
-
+    size_t buffer_size = 512; // Initial buffer size
     char *json = malloc(buffer_size);
-
-    // Compose the final JSON string
-    size_t index = mg_snprintf(json, buffer_size, "{%m: %s, %m: %s, %m: %s, %m: %s, %m: [",
-                               MG_ESC("cover_article"), coverArticleInfo_str,
-                               MG_ESC("tags"), tags_str,
-                               MG_ESC("notice"), notice_str,
-                               MG_ESC("archives"), archieves_str,
-                               MG_ESC("normal_article"));
-
-    for (size_t i = 0; i < index_data->NormalArticleInfos.size; ++i)
+    if (!json)
     {
-        char *post_info_str = postInfo_to_json(&index_data->NormalArticleInfos.data[i]);
+        return NULL;
+    }
+
+    size_t index = mg_snprintf(json, buffer_size, "[");
+
+    for (size_t i = 0; i < post_infos->size; ++i)
+    {
+        char *post_info_str = postInfo_to_json(&post_infos->data[i]);
         size_t needed_size = strlen(post_info_str) + 10; // Additional space for commas and potential padding
 
         if (buffer_size - index < needed_size)
@@ -276,27 +269,61 @@ char *indexData_to_json(IndexData *index_data)
             if (!new_json)
             {
                 free(json);
-                free(tags_str);
-                free(coverArticleInfo_str);
-                free(archieves_str);
-                free(notice_str);
                 free(post_info_str);
                 return NULL;
             }
             json = new_json;
         }
         index += mg_snprintf(json + index, buffer_size - index, "%s%s",
-                             post_info_str, i < index_data->NormalArticleInfos.size - 1 ? ", " : "");
+                             post_info_str, i < post_infos->size - 1 ? ", " : "");
 
         free(post_info_str);
     }
-    mg_snprintf(json + index, buffer_size - index, "]}");
+    mg_snprintf(json + index, buffer_size - index, "]");
+
+    return json;
+}
+
+char *indexData_to_json(IndexData *index_data)
+{
+    // Convert components to JSON strings
+    char *tags_str = tags_to_json(&index_data->Tags);
+    char *coverArticleInfo_str = postInfo_to_json(&index_data->CoverArticleInfo);
+    char *archieves_str = archieves_to_json(&index_data->Archieves);
+    char *notice_str = notice_to_json(&index_data->Notice);
+    char *normalArticleInfos_str = postInfos_to_json(&index_data->NormalArticleInfos);
+
+    if (!tags_str || !coverArticleInfo_str || !archieves_str || !notice_str || !normalArticleInfos_str)
+    {
+        free(tags_str);
+        free(coverArticleInfo_str);
+        free(archieves_str);
+        free(notice_str);
+        free(normalArticleInfos_str);
+        return NULL;
+    }
+
+    // Calculate initial buffer size
+    size_t buffer_size = strlen(tags_str) + strlen(coverArticleInfo_str) +
+                         strlen(archieves_str) + strlen(notice_str) +
+                         strlen(normalArticleInfos_str) + 512; // extra space for JSON formatting
+
+    char *json = malloc(buffer_size);
+
+    // Compose the final JSON string
+    mg_snprintf(json, buffer_size, "{%m: %s, %m: %s, %m: %s, %m: %s, %m: %s}",
+                MG_ESC("cover_article"), coverArticleInfo_str,
+                MG_ESC("tags"), tags_str,
+                MG_ESC("notice"), notice_str,
+                MG_ESC("archives"), archieves_str,
+                MG_ESC("normal_article"), normalArticleInfos_str);
 
     // Free intermediate JSON strings
     free(tags_str);
     free(coverArticleInfo_str);
     free(archieves_str);
     free(notice_str);
+    free(normalArticleInfos_str);
 
     return json;
 }

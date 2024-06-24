@@ -22,6 +22,7 @@ typedef struct
     char *ipc_path;
     int ipc_size;
     int index_post_n;
+    int index_update_n;
     int max_file_size;
     char *upload_dir;
     int cache_n;

@@ -313,3 +313,35 @@ Result get_index(IndexData *ret)
 
     return (Result){.status = OK, .ptr = ret};
 }
+
+Result get_PostInfos_from_n(int n, PostInfos *ret)
+{
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
+    const char *sql = "SELECT * FROM Posts WHERE IsPage=0 ORDER BY CreateDate DESC LIMIT ? OFFSET ?";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    sqlite3_bind_int(stmt, 1, config.index_update_n);
+    sqlite3_bind_int(stmt, 2, n);
+
+    ret->data = malloc(sizeof(PostInfo) * config.index_update_n);
+    ret->size = 0;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW && ret->size < config.index_update_n)
+    {
+        populate_postInfo_from_stmt(stmt, &ret->data[ret->size++]);
+    }
+
+    sqlite3_finalize(stmt);
+
+    if (ret->size < config.index_post_n)
+    {
+        ret->data = realloc(ret->data, sizeof(PostInfo) * ret->size);
+    }
+
+    return (Result){.status = OK, .ptr = ret};
+}

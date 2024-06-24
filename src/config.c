@@ -31,6 +31,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->ipc_size = atoi(value);
     else if (MATCH("blog", "index_post_n"))
         pconfig->index_post_n = atoi(value);
+    else if (MATCH("blog", "index_update_n"))
+        pconfig->index_update_n = atoi(value);
     else if (MATCH("blog", "max_file_size"))
         pconfig->max_file_size = atoi(value);
     else if (MATCH("blog", "upload_dir"))

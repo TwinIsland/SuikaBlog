@@ -162,7 +162,7 @@ function getCachedData(key) {
     return item.data;
 }
 
-async function fetchDataWithCache(url, name, exp_hour = 1) {
+async function fetchDataWithCache(url, name, cached_flag = false, exp_hour = 1) {
     const cachedData = getCachedData(url);
     if (cachedData) {
         return Promise.resolve(cachedData);
@@ -179,7 +179,8 @@ async function fetchDataWithCache(url, name, exp_hour = 1) {
                 if (data.status === false) {
                     return Promise.reject({ code: status, msg: data.content });
                 }
-                cacheData(url, data.content, exp_hour);
+                if (cached_flag)
+                    cacheData(url, data.content, exp_hour);
                 return data.content;
             })
     }
@@ -332,3 +333,44 @@ function updateErrorMessage() {
     document.getElementById("error-code").textContent = errorCode;
     document.getElementById("error-message").textContent = errorMessage;
 }
+
+var isFetching = false;
+var postOffset = 0;
+var isLoadAll = false
+
+function fetchMoreArticles() {
+    if (isFetching || isLoadAll) return;
+    isFetching = true;
+
+    const articleContainer = document.createElement('div');
+    articleContainer.id = `ext-normal-article-${postOffset}`;
+    const loadingBlock = document.createElement('div');
+    loadingBlock.classList.add('loading-block');
+    loadingBlock.style.height = '230px';
+    articleContainer.appendChild(loadingBlock);
+    document.getElementById('normal-article-container').appendChild(articleContainer);
+
+    fetchDataWithCache(`/api/postInfos?from=${postOffset}`, `postinfos-${postOffset}`)
+        .then(data => {
+            if (data.length === 0)
+                isLoadAll = true;
+
+            const renderPromises = [
+                renderWrapper(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data)),
+            ];
+            postOffset += data.length; // Update postOffset with the number of fetched articles
+            return Promise.all(renderPromises);
+        })
+        .catch(error => {
+            if (error.code && error.msg) {
+                navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
+            } else {
+                navigateTo("/err");
+            }
+            throw error;
+        })
+        .finally(() => {
+            isFetching = false;
+        });
+}
+

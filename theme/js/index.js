@@ -4,6 +4,8 @@
 
 */
 
+
+
 function renderCoverArticle(coverArticleJSON) {
   return `
   <a href="/post/${coverArticleJSON.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
@@ -51,8 +53,14 @@ function renderArchives(archivesJSON) {
   `).join('')
 }
 
+function index_scroll_handler() {
+  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2 && !isFetching) {
+    fetchMoreArticles(postOffset);
+  }
+}
+
 // END RENDERING HELPERS
-fetchDataWithCache('/api/index', "index")
+fetchDataWithCache('/api/index', "index", true)
   .then(data => {
     const renderPromises = [
       renderWrapper(document.getElementById('cover-article-container'), renderCoverArticle(data['cover_article'])),
@@ -62,6 +70,7 @@ fetchDataWithCache('/api/index', "index")
       renderWrapper(document.getElementById('archives-container'), renderArchives(data['archives']))
     ];
 
+    postOffset = data.normal_article.length + 1;
     return Promise.all(renderPromises)
   })
   .catch(error => {
@@ -72,3 +81,11 @@ fetchDataWithCache('/api/index', "index")
     }
     throw error
   });
+
+document.addEventListener('scroll', index_scroll_handler);
+
+// Cleanup function
+window.currentCleanup = function () {
+  document.removeEventListener('scroll', index_scroll_handler);
+  return "/index listeners";
+}

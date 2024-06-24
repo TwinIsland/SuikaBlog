@@ -126,7 +126,7 @@ ROUTER(index)
   if (ret.status == FAILED)
   {
     free_indexData(&index_data);
-    ROUTER_reply(c, "index", ret.msg, JSON_type, SERVERSIDE_ERR_CODE);
+    ROUTER_reply(c, "index", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
     return;
   }
   else
@@ -135,6 +135,32 @@ ROUTER(index)
   free_indexData(&index_data);
   ROUTER_reply(c, "index", body, JSON_type, OK_CODE);
   Cache_add("index", body, ALWAYS_IN_CACHE);
+}
+
+ROUTER(postInfos)
+{
+  struct mg_str from_str = mg_http_var(hm->query, mg_str("from"));
+  int offset;
+  if (!mg_str_to_num(from_str, 10, &offset, sizeof(offset)))
+  {
+    ROUTER_reply(c, "postInfos", BADREQ_ERR);
+    return;
+  }
+
+  Result ret;
+  PostInfos post_infos;
+
+  if (ret = get_PostInfos_from_n(offset, &post_infos), ret.status == FAILED)
+  {
+    free_PostInfos(&post_infos);
+    ROUTER_reply(c, "postInfos", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
+    return;
+  }
+
+  char *body = postInfos_to_json(&post_infos);
+  free_PostInfos(&post_infos);
+  ROUTER_reply(c, "postInfos", body, JSON_type, OK_CODE);
+  free(body);
 }
 
 ROUTER(post, const int32_t PostID)
@@ -289,6 +315,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(archieves);
       else if (mg_match(hm->uri, mg_str("/api/index"), NULL))
         USE_ROUTER(index);
+      else if (mg_match(hm->uri, mg_str("/api/postInfos#"), NULL))
+        USE_ROUTER(postInfos);
       else if (mg_match(hm->uri, mg_str("/api/upload"), NULL))
         USE_ROUTER(upload);
       else if (mg_match(hm->uri, mg_str("/api/write"), NULL))

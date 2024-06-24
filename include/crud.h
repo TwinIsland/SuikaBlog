@@ -34,6 +34,7 @@ Result get_archieves(Archieves *ret);
 
 // Index
 Result get_index(IndexData *ret);
+Result get_PostInfos_from_n(int n, PostInfos *ret);
 
 // Close database
 void db_close(void);

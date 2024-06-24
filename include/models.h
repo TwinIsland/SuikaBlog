@@ -79,6 +79,7 @@ void free_post(Post *post);
 void free_postInfo(PostInfo *postInfo);
 void free_tags(Tags *tags);
 void free_archieves(Archieves *archieves);
+void free_PostInfos(PostInfos *post_infos);
 void free_indexData(IndexData *indexData);
 
 char *notice_to_json(Notice *notice);
@@ -86,4 +87,5 @@ char *tags_to_json(Tags *tags);
 char *post_to_json(Post *post);
 char *postInfo_to_json(PostInfo *post_info);
 char *archieves_to_json(Archieves *archieves);
+char *postInfos_to_json(PostInfos *post_infos);
 char *indexData_to_json(IndexData *index_data);

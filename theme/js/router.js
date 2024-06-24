@@ -91,6 +91,9 @@ const handleLocation = async () => {
         script.src = route.js;
         document.body.appendChild(script);
     }
+
+    // scroll to top
+    window.scrollTo(0, 0);
 };
 
 function navigateTo(page) {
