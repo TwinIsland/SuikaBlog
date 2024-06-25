@@ -6,7 +6,6 @@ const route = (event) => {
 };
 
 const routes = {
-    404: { html: "/pages/404.html", js: null, css: [], jsr: [] },
     "/": { html: "/pages/index.html", js: "/js/index.js", css: [], jsr: [] },
     "/about": { html: "/pages/about.html", js: "/js/about.js", css: ["/css/article.css"], jsr: ["/js/qrcode.min.js"] },
     "/upload": { html: "pages/upload.html", js: "/js/upload.js", css: [], jsr: [] },
@@ -25,7 +24,7 @@ const handleLocation = async () => {
     }
 
     const path = window.location.pathname;
-    let route = routes[path] || routes[404];
+    let route = routes[path];
 
     // Handle Post
     if (path.match(/^\/post\/\d+$/)) {
@@ -45,6 +44,12 @@ const handleLocation = async () => {
             css: [],
             jsr: []
         };
+    }
+
+    // Handle 404
+    if (!route) {
+        navigateTo("/err?code=404&msg=Resource%20Not%20Found")
+        return
     }
 
     const html = await fetch(route.html).then((data) => data.text());
