@@ -12,11 +12,7 @@ TEST(config_test)
     test_info = "uri_pattern";
 
     if (mg_match(mg_str("/"), mg_str(config.upload_uri_pattern), NULL))
-    {
         TEST_FAILED(test_info, ++test_n, "'config.upload_uri_pattern' cannot match index page or will cause critical safety issue");
-    }
     else
-    {
         TEST_OK(test_info, ++test_n)
-    }
 }
