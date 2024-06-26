@@ -295,8 +295,9 @@ ROUTER(delete_post)
 void server_fn(struct mg_connection *c, int ev, void *ev_data)
 {
   struct mg_http_message *hm = (struct mg_http_message *)ev_data;
-  struct mg_http_serve_opts opts = {.root_dir = "theme", .page404 = "theme/index.html"};
   struct mg_str caps[3]; // router argument buffer
+
+  static struct mg_http_serve_opts opts = {.root_dir = "theme", .page404 = "theme/index.html"};
 
   // we only accept http request
   if (ev == MG_EV_HTTP_MSG)

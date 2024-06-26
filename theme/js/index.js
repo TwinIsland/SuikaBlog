@@ -53,12 +53,6 @@ function renderArchives(archivesJSON) {
   `).join('')
 }
 
-function index_scroll_handler() {
-  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2 && !isFetching) {
-    fetchMoreArticles(postOffset);
-  }
-}
-
 // END RENDERING HELPERS
 fetchDataWithCache('/api/index', "index", true)
   .then(data => {
@@ -73,7 +67,10 @@ fetchDataWithCache('/api/index', "index", true)
     postOffset = data.normal_article.length + 1;
     return Promise.all(renderPromises)
   })
-  .catch(error => {
+  .then(() => {
+    putLoadMoreBtn()
+  })
+  .catch(error => { 
     if (error.code && error.msg) {
       navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
     } else {
@@ -81,11 +78,3 @@ fetchDataWithCache('/api/index', "index", true)
     }
     throw error
   });
-
-document.addEventListener('scroll', index_scroll_handler);
-
-// Cleanup function
-window.currentCleanup = function () {
-  document.removeEventListener('scroll', index_scroll_handler);
-  return "/index listeners";
-}

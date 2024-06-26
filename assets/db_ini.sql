@@ -18,7 +18,6 @@ CREATE TABLE Visitors (
     Email TEXT,
     Website TEXT,
     Banned INTEGER,
-    Ip VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE Comment (

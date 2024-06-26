@@ -17,8 +17,7 @@ CREATE TABLE Visitors (
     Name VARCHAR(64) PRIMARY KEY,
     Email TEXT,
     Website TEXT,
-    Banned INTEGER,
-    Ip VARCHAR(64) NOT NULL
+    Banned INTEGER
 );
 
 CREATE TABLE Comment (
@@ -159,8 +158,8 @@ UPDATE source.blog_comments
 SET mail = 'twisland@outlook.com'
 WHERE author = 'TwinIsland';
 
-INSERT INTO suika.Visitors (name, email, website, ip)
-SELECT DISTINCT author, mail, url, ip
+INSERT INTO suika.Visitors (name, email, website)
+SELECT DISTINCT author, mail, url
 FROM source.blog_comments
 WHERE author IS NOT NULL AND mail IS NOT NULL
 GROUP BY author;

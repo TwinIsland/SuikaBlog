@@ -14,9 +14,33 @@
     <link rel="stylesheet" href="/css/picnic.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
 
-    <script defer rel="preload" src="/js/confetti.browser.min.js"></script>
-    <script defer rel="preload" src="/js/blog.js"></script>
 
+    <script>
+        function loadScript(url, callback) {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = url;
+            script.onload = callback;
+            document.head.appendChild(script);
+        }
+
+        loadScript('/js/confetti.browser.min.js', function () {
+            loadScript('/js/blog.js', function () {
+                loadScript('/js/router.js', function () {
+                    console.log(`
+  _________     .__ __          __________.__                 
+ /   _____/__ __|__|  | _______ \______   \  |   ____   ____  
+ \_____  \|  |  \  |  |/ /\__  \ |    |  _/  |  /  _ \ / ___\ 
+ /        \  |  /  |    <  / __ \|    |   \  |_(  <_> ) /_/  >
+/_______  /____/|__|__|_ \(____  /______  /____/\____/\___  / 
+        \/              \/     \/       \/           /_____/  
+
+Welcome to Suika Blog System!
+                    `)
+                });
+            });
+        });
+    </script>
 </head>
 
 <body>
@@ -26,7 +50,7 @@
                 <span>Hi: </span>
                 <span style="font-style: italic;"><a href="#">Visitor</a></span>
             </div>
-            <div style="text-align: center; padding-bottom: 0;" class="brand one-third third-800">
+            <div style="text-align: center; padding-bottom: 0;" class="logo brand one-third third-800">
                 <a href="/" onclick="route()">
                     贰岛
                 </a>
@@ -57,6 +81,9 @@
                     <label><input style="height: 45px;" placeholder="type something..."></label>
                     <select style="margin-top: 10px;">
                         <option>From All</option>
+                        <div id="search-tags">
+
+                        </div>
                         <option>🦉Study</option>
                         <option>🥳Nichijou</option>
                         <option>🗂️Note</option>
@@ -87,20 +114,40 @@
     </div>
 
     <footer class="footer">
-        <p>贰岛博客</p>
+        <div id="foot-container">
+            <section>
+                <p>©
+                    2024 <span class="logo" style="font-size: 21px;">
+                        贰岛 </span>
+                </p>
+
+                <p>感谢陪伴：<span id="uptime">917 天 3 小时 31 分 9 秒 </span></p>
+            </section>
+            <section>
+                <p>
+                    <a href="/api" class="pjax">API</a>
+                    /
+                    <a href="/friends" class="pjax"> 友链</a>
+                    /
+                    <a href="/achieve" class="pjax"> 归档</a>
+                    /
+                    <a href="https://panel.cirno.me/status/server" target="_blank"> 监控</a>
+                </p>
+                <p>
+                    <a href="https://icp.gov.moe/?keyword=20223222" target="_blank">萌 ICP 备 20223222 号</a>
+                </p>
+            </section>
+        </div>
     </footer>
 
     <div id="suika" style="position: fixed; bottom: 0px; user-select: none; display:flex; z-index: 10;">
         <img src="/img/suika.webp" style="height:100px; width: 100px;" onclick="toggleCloud()">
-        <div id="conversationCloud" style="opacity: 0;"></div>
+        <div id="conversationCloud" style="opacity: 0; z-index: -111;"></div>
     </div>
 
     <a tabindex="-1" class="top pseudo button" id="go">
         ▲Up you go▲
     </a>
-
-    <!-- router register -->
-    <script async src="/js/router.js"></script>
 
     <script>
         document.onkeydown = function (e) {

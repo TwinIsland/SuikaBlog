@@ -1,4 +1,5 @@
 html {
+    line-height: 1.15;
     scrollbar-gutter: stable both-edges;
 }
 
@@ -22,8 +23,11 @@ a {
     min-height: 100vh;
 }
 
-.brand a {
+.logo {
     font-family: LogoFont;
+}
+
+.brand a {
     font-size: 2.25rem;
     padding-bottom: 0.5rem;
 }
@@ -78,7 +82,6 @@ a {
     min-height: 230px;
     color: white;
     border-radius: 10px;
-    margin-bottom: 25px;
     background-position: center;
     background-size: cover;
     padding: 20px 20px 20px 23px;
@@ -87,7 +90,6 @@ a {
 .normal-article h2 {
     font-size: 2.2rem;
     font-weight: 300;
-    font-family: "Lucida Grande", "Corbel", sans-serif;
 }
 
 
@@ -110,23 +112,44 @@ a {
 }
 
 .footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-color: rgb(248, 249, 250);
-    height: 15vh;
-    font-family: LogoFont;
-    font-size: 22px;
+    width: 100%;
+    font-size: 17px;
     user-select: none;
     color: rgba(33, 37, 41, 0.75);
-    margin: 0;
+    padding: 26px;
 }
 
+#foot-container {
+    width: 60%;
+    display: flex;
+    margin: auto;
+    padding: 0 20px;
+}
+
+#foot-container section {
+    flex: 1;
+    line-height: 1.5;
+}
+
+#foot-container section:nth-child(2) {
+    text-align: right;
+}
+
+@media screen and (max-width: 767px) {
+    #foot-container {
+        width: 80%;
+        flex-direction: column;
+    }
+
+    #foot-container section {
+        text-align: left !important;
+    }
+}
 
 #tags-container button {
     font-size: 15px;
     background-color: rgb(128, 125, 126);
-    ;
 }
 
 * {
@@ -208,7 +231,6 @@ a {
 /* msg-box */
 .msg-box {
     position: fixed;
-    font-family: 'Noto Sans SC', sans-serif;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);

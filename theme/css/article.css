@@ -1,3 +1,13 @@
+.yui {
+    font: 400 18px/1.75 "Noto Serif SC", "PingFang SC", "Hiragino Sans GB", "Microsoft Yahei", "WenQuanYi Micro Hei", "Segoe UI Emoji", "Segoe UI Symbol", Helvetica, Arial, -apple-system, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: rgba(0, 0, 0, .86);
+    word-break: break-word;
+}
+
+.yue p {
+    margin: .92em 0;
+}
 
 p.notice {
     padding: .5rem;
@@ -127,24 +137,28 @@ p.notice {
     border-radius: 4px;
     color: rgba(0, 0, 0, .6);
     background: 0 0;
-    transition: .3s cubic-bezier(.25,.46,.45,.94) all;
+    transition: .3s cubic-bezier(.25, .46, .45, .94) all;
     cursor: pointer;
 }
 
 #OwO-logo {
     font-size: 10px;
     font-weight: bold;
-    color: #B98A82; /* Change this color to match your theme */
-    background-color: #f0f0f0; /* Light background to make it pop */
+    color: #B98A82;
+    /* Change this color to match your theme */
+    background-color: #f0f0f0;
+    /* Light background to make it pop */
     border-radius: 1px;
     height: 24px;
-    padding: 5px;    
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+    padding: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Soft shadow for depth */
     transition: transform 0.3s ease;
 }
 
 #OwO-logo:hover {
-    transform: scale(1.1); /* Slight scale on hover for interactive effect */
+    transform: scale(1.1);
+    /* Slight scale on hover for interactive effect */
 }
 
 #copyright {

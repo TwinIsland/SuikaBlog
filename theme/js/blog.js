@@ -97,15 +97,6 @@ function toggleCloud(sayWhat = null) {
     });
 }
 
-toggleCloud("欢迎来到 贰岛博客！")
-
-document.querySelector('.top').addEventListener('click', function (event) {
-    event.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    toggleCloud("↑↑↑↑↑")
-});
-
 function formatTimestamp(timestamp) {
     // Create a Date object from the timestamp
     const date = new Date(timestamp);
@@ -334,11 +325,21 @@ function updateErrorMessage() {
     document.getElementById("error-message").textContent = errorMessage;
 }
 
+function putLoadMoreBtn() {
+    document.getElementById('normal-article-container').innerHTML += `
+    <div style="text-align: center; margin-top:30px" id="reload-btn">
+    <button style="font-size: .75em;" onclick="fetchMoreArticles()">Load More</button>
+    <div>
+    `
+}
+
 var isFetching = false;
 var postOffset = 0;
 var isLoadAll = false
 
 function fetchMoreArticles() {
+    document.getElementById("reload-btn").remove();
+
     if (isFetching || isLoadAll) return;
     isFetching = true;
 
@@ -361,6 +362,9 @@ function fetchMoreArticles() {
             postOffset += data.length; // Update postOffset with the number of fetched articles
             return Promise.all(renderPromises);
         })
+        .then(() => {{
+            if (!isLoadAll) putLoadMoreBtn()
+        }})
         .catch(error => {
             if (error.code && error.msg) {
                 navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
@@ -374,3 +378,15 @@ function fetchMoreArticles() {
         });
 }
 
+/*
+Start Up Script
+
+*/
+toggleCloud("欢迎来到 贰岛博客！")
+
+document.querySelector('.top').addEventListener('click', function (event) {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    toggleCloud("↑↑↑↑↑")
+});
