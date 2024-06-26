@@ -3145,27 +3145,18 @@ struct mg_str mg_http_get_header_var(struct mg_str s, struct mg_str v) {
 }
 
 long mg_http_upload(struct mg_connection *c, struct mg_http_message *hm,
-                    struct mg_fs *fs, const char *dir, size_t max_size) {
-  char buf[20] = "0", file[MG_PATH_MAX], path[MG_PATH_MAX];
+                    struct mg_fs *fs, const char *path, size_t max_size) {
+  char buf[20] = "0";
   long res = 0, offset;
   mg_http_get_var(&hm->query, "offset", buf, sizeof(buf));
-  mg_http_get_var(&hm->query, "file", file, sizeof(file));
   offset = strtol(buf, NULL, 0);
-  mg_snprintf(path, sizeof(path), "%s%c%s", dir, MG_DIRSEP, file);
   if (hm->body.len == 0) {
     mg_http_reply(c, 200, "", "%ld", res);  // Nothing to write
-  } else if (file[0] == '\0') {
-    mg_http_reply(c, 400, "", "file required");
-    res = -1;
-  } else if (mg_path_is_sane(mg_str(file)) == false) {
-    mg_http_reply(c, 400, "", "%s: invalid file", file);
-    res = -2;
   } else if (offset < 0) {
     mg_http_reply(c, 400, "", "offset required");
     res = -3;
   } else if ((size_t) offset + hm->body.len > max_size) {
-    mg_http_reply(c, 400, "", "%s: over max size of %lu", path,
-                  (unsigned long) max_size);
+    mg_http_reply(c, 400, "", "over max size of %lu", (unsigned long) max_size);
     res = -4;
   } else {
     struct mg_fd *fd;

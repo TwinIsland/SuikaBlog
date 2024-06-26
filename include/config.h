@@ -25,6 +25,7 @@ typedef struct
     int index_update_n;
     int max_file_size;
     char *upload_dir;
+    char *upload_uri_pattern;
     int cache_n;
     char pass_sha256[SHA256_HEX_LEN + 1];
 } configuration;

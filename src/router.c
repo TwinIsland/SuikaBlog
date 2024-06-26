@@ -10,6 +10,13 @@ Cache *cache;
 
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
 
+static struct upload_session_t
+{
+  int is_working;
+  int upload_size;
+  char *tmp_upload_path;
+} upload_session;
+
 int is_authorized(struct mg_http_message *hm)
 {
   char header_auth_sha256[SHA256_HEX_LEN + 1] = {0};
@@ -33,26 +40,25 @@ static char *mg_str_without_paren(struct mg_str src)
   return ret;
 }
 
-ROUTER(index_page)
+ROUTER(serve_static, struct mg_http_serve_opts *opts)
 {
   // Cache all image request
   char uri[hm->uri.len + 1];
   strncpy(uri, hm->uri.buf, hm->uri.len);
   uri[hm->uri.len] = '\0';
 
-  debug("request: %s", uri);
-
+  debug("request: %s \t serve: %s", uri, opts->root_dir);
 #ifndef DEBUG
   if (check_file_with_exts(uri, cached_exts))
   {
     debug("cache file: %s", uri);
-    opts.extra_headers = "Cache-Control: max-age=259200\n";
+    opts->extra_headers = "Cache-Control: max-age=259200\n";
   }
 #else
   (void)cached_exts; // disable warning
 #endif
 
-  mg_http_serve_dir(c, hm, &opts); // Serve static files
+  mg_http_serve_dir(c, hm, opts); // Serve static files
 }
 
 ROUTER(tags)
@@ -188,13 +194,87 @@ ROUTER(post, const int32_t PostID)
   }
 }
 
-// fontend must take the responsibility to divide files into smaller chunks, see: https://mongoose.ws/documentation/#mg_http_upload
+/*
+  This router does not follow the standard response format, which is an exception because it
+  involves modifying a lot of mongoose.
+
+*/
 ROUTER(upload)
 {
   if (!is_authorized(hm))
-    ROUTER_reply(c, "upload", UNAUTH_ERR);
-  else
-    mg_http_upload(c, hm, &mg_fs_posix, config.upload_dir, config.max_file_size);
+  {
+    mg_http_reply(c, 401, "", "unauthorized");
+    return;
+  }
+
+  if (!upload_session.is_working)
+  {
+    char tmp_name[RANDOM_UPLOAD_SUFX_LENGTH + 1];
+    mg_random_str(tmp_name, sizeof(tmp_name));
+    upload_session.tmp_upload_path = create_upload_directory(tmp_name, config.upload_dir);
+    if (!upload_session.tmp_upload_path)
+    {
+      mg_http_reply(c, 501, "", "fail to create dir");
+      return;
+    }
+    upload_session.is_working = 1;
+  }
+
+  upload_session.upload_size = mg_http_upload(c, hm, &mg_fs_posix, upload_session.tmp_upload_path, config.max_file_size);
+
+  debug("uploading: %d", upload_session.upload_size);
+  if (upload_session.upload_size < 0)
+  {
+    debug("upload failed");
+    unlink(upload_session.tmp_upload_path);
+    free(upload_session.tmp_upload_path);
+    upload_session.tmp_upload_path = NULL;
+    upload_session.is_working = 0;
+    return;
+  }
+}
+
+ROUTER(upload_finalizer)
+{
+  if (!is_authorized(hm))
+  {
+    ROUTER_reply(c, "upload_finalizer", UNAUTH_ERR);
+    return;
+  }
+
+  debug("processing upload finalizer");
+  if (!upload_session.is_working)
+  {
+    ROUTER_reply(c, "", "already finalized", STRING_type, OK_CODE);
+    return;
+  }
+
+  char file[MG_PATH_MAX];
+  int ret = mg_http_get_var(&hm->query, "file", file, sizeof(file));
+
+  if (ret <= 0)
+  {
+    ROUTER_reply(c, "upload_finalizer", BADREQ_ERR);
+    return;
+  }
+
+  char *new_upload_path = create_upload_directory(file, config.upload_dir);
+
+  ret = rename(upload_session.tmp_upload_path, new_upload_path);
+
+  free(upload_session.tmp_upload_path);
+  upload_session.tmp_upload_path = NULL;
+  upload_session.is_working = 0;
+
+  if (ret != 0)
+  {
+    ROUTER_reply(c, "upload_finalizer", "finalizer error", STRING_type, SERVERSIDE_ERR_CODE);
+    free(new_upload_path);
+    return;
+  }
+
+  ROUTER_reply(c, "upload_finalizer", new_upload_path, STRING_type, OK_CODE);
+  free(new_upload_path);
 }
 
 ROUTER(create_post)
@@ -297,7 +377,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
   struct mg_http_message *hm = (struct mg_http_message *)ev_data;
   struct mg_str caps[3]; // router argument buffer
 
-  static struct mg_http_serve_opts opts = {.root_dir = "theme", .page404 = "theme/index.html"};
+  static struct mg_http_serve_opts theme_opts = {.root_dir = "theme", .page404 = "theme/index.html"};
+  static struct mg_http_serve_opts upload_opts = {.root_dir = "./"};
 
   // we only accept http request
   if (ev == MG_EV_HTTP_MSG)
@@ -318,17 +399,24 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(index);
       else if (mg_match(hm->uri, mg_str("/api/postInfos#"), NULL))
         USE_ROUTER(postInfos);
-      else if (mg_match(hm->uri, mg_str("/api/upload"), NULL))
-        USE_ROUTER(upload);
       else if (mg_match(hm->uri, mg_str("/api/write"), NULL))
         USE_ROUTER(create_post);
       else if (mg_match(hm->uri, mg_str("/api/delete"), NULL))
         USE_ROUTER(delete_post);
+      else if (mg_match(hm->uri, mg_str("/api/upload/finalizer#"), NULL))
+        USE_ROUTER(upload_finalizer);
+      else if (mg_match(hm->uri, mg_str("/api/upload"), NULL))
+        USE_ROUTER(upload);
       else
         goto default_router;
     }
     else
-    default_router:
-      USE_ROUTER(index_page);
+    {
+      if (mg_match(hm->uri, mg_str(config.upload_uri_pattern), NULL))
+        USE_ROUTER(serve_static, &upload_opts);
+      else
+      default_router:
+        USE_ROUTER(serve_static, &theme_opts);
+    }
   }
 }

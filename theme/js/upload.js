@@ -8,29 +8,62 @@ button.onclick = function (ev) {
 };
 
 var sendFileData = function (name, data, chunkSize, authHash) {
-    var sendChunk = function (offset) {
+    var offset = 0;
+    var totalSize = data.length;
+
+    var sendNextChunk = function () {
         var chunk = data.subarray(offset, offset + chunkSize) || '';
         var opts = {
             method: 'POST',
-            headers: {'SuikaToken': authHash},
+            headers: { 'SuikaToken': authHash },
             body: chunk
         };
-        var url = '/api/upload?offset=' + offset + '&file=' + encodeURIComponent(name);
-        var ok;
+        var url = '/api/upload?offset=' + offset;
+
         setStatus(
             'Uploading ' + name + ', bytes ' + offset + '..' +
-            (offset + chunk.length) + ' of ' + data.length);
+            (offset + chunk.length) + ' of ' + totalSize);
+
         fetch(url, opts)
             .then(function (res) {
-                if (res.ok && chunk.length > 0) sendChunk(offset + chunk.length);
-                ok = res.ok;
-                return res.text();
+                if (res.ok && chunk.length > 0) {
+                    offset += chunk.length;
+                    if (offset < totalSize) {
+                        sendNextChunk();
+                    } else {
+                        finalizeUpload(authHash, name);
+                    }
+                } else {
+                    res.text().then(function (text) {
+                        setStatus('Error: ' + text);
+                    });
+                }
             })
-            .then(function (text) {
-                if (!ok) setStatus('Error: ' + text);
+            .catch(function (error) {
+                setStatus('Error: ' + error.message);
             });
     };
-    sendChunk(0);
+
+    sendNextChunk();
+};
+
+var finalizeUpload = function (authHash, name) {
+    var url = '/api/upload/finalizer?file=' + encodeURIComponent(name);
+    fetch(url, {
+        method: 'POST',
+        headers: { 'SuikaToken': authHash }
+    })
+        .then(res => res.json())
+        .then(response => {
+            if (response.status) {
+                setStatus('Upload successful! File available at: ' + response.content);
+            } else {
+                setStatus('Upload failed: ' + response.content);
+            }
+        })
+        .catch(error => {
+            setStatus('Error finalizing upload: ' + error.message);
+        });
 };
 
 var input = document.getElementById('el1');

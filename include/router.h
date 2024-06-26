@@ -10,14 +10,21 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data);
 #define STRING_type 1
 
 #define ROUTER(router_name, ...) void router_##router_name(struct mg_connection *c, int ev, void *ev_data, \
-                                                           struct mg_http_message *hm, struct mg_http_serve_opts opts, ##__VA_ARGS__)
+                                                           struct mg_http_message *hm, ##__VA_ARGS__)
 
-#define USE_ROUTER(router_name, ...) router_##router_name(c, ev, ev_data, hm, opts, ##__VA_ARGS__)
+#define USE_ROUTER(router_name, ...) router_##router_name(c, ev, ev_data, hm, ##__VA_ARGS__)
 
 // standard router reply function, can be called by
 // 1. ROUTER_reply(c, router_name, content, content_type, code)
 // 2. ROUTER_reply(c, router_name, ERR_TYPE)
 #define ROUTER_reply(...) ROUTER_reply_(__VA_ARGS__)
+
+// standard router reply int function, can be called by
+// ROUTER_reply(c, router_name, int_response)
+#define ROUTER_reply_int(c, router_name, int_response)                              \
+  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{ %m:%d, %m:%d }\n", \
+                MG_ESC("status"), 200,                                              \
+                MG_ESC("content"), int_response);
 
 #define ROUTER_reply_(c, router_name, content, content_type, code)                           \
   do                                                                                         \
@@ -49,6 +56,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data);
 #define BADREQ_ERR "bad request", STRING_type, BADREQ_ERR_code
 #define NOFOUND_ERR "no found", STRING_type, NOFOUND_CODE
 #define RESPONSE_OK "ok", STRING_type, OK_CODE
+
+#define SID_LENGTH 6
 
 // Cache
 extern Cache *cache;

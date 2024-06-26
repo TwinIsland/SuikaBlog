@@ -14,6 +14,7 @@
 #include "router.h"
 #include "suika_state.h"
 #include "db.h"
+#include "test.h"
 
 #define PLUGIN_LOADER_ALLOWED
 #include "plugin.h"
@@ -23,7 +24,7 @@
 static struct mg_mgr mgr;
 
 // initialize system state
-SUIKA_STATE SYSTEM_STATE = (SUIKA_STATE) {
+SUIKA_STATE SYSTEM_STATE = (SUIKA_STATE){
     .is_db_first_initialize = false,
 };
 
@@ -117,8 +118,12 @@ int main()
     PRINT_OK_LOG("init: cache system");
 
 #ifdef TEST
-// do something
+    // do something
+    debug("%s\n", get_upload_directory("my file.txt", config.upload_dir));
 #endif
+
+    // do start up checks
+    RUN_TEST(config_test);
 
     // start the server
     sprintf(server_addr, "http://%s:%d", config.server_ip, config.server_port);

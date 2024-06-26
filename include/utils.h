@@ -42,6 +42,19 @@ extern void exit_handler();
         printf("\033[0m");           \
     } while (0);
 
+// * info   --> fail
+#define PRINT_FAIL_LOG(info, msg, ...)   \
+    do                                   \
+    {                                    \
+        printf("\033[0;34m");            \
+        printf("* ");                    \
+        printf("\033[0m");               \
+        printf(info, ##__VA_ARGS__);     \
+        printf(" \033[0;31m");           \
+        printf("\t--> fail: %s\n", msg); \
+        printf("\033[0m");               \
+    } while (0);
+
 // * info   --> ok/fail:[ret.msg]
 #define PRINT_LOG(info, ret, is_err_critical, ...) \
     do                                             \
@@ -90,3 +103,9 @@ char *get_sha256_hashed(const char *keypass);
 
 // file system
 int check_file_with_exts(const char *path, const char **exts);
+int create_directory(const char *path); // create a folder in path, can be nested
+
+// uploadfile path
+#define RANDOM_UPLOAD_SUFX_LENGTH 6
+
+char *create_upload_directory(const char *filename, const char *upload_dir);

@@ -37,6 +37,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->max_file_size = atoi(value);
     else if (MATCH("blog", "upload_dir"))
         pconfig->upload_dir = strdup(value);
+    else if (MATCH("blog", "upload_uri_pattern"))
+        pconfig->upload_uri_pattern = strdup(value);
     else if (MATCH("blog", "cache_n"))
         pconfig->cache_n = atoi(value);
 
@@ -107,4 +109,6 @@ void destory_config()
         free(config.key_file);
     if (config.upload_dir)
         free(config.upload_dir);
+    if (config.upload_uri_pattern)
+        free(config.upload_uri_pattern);
 }
