@@ -17,7 +17,7 @@ CREATE TABLE Visitors (
     Name VARCHAR(64) PRIMARY KEY,
     Email TEXT,
     Website TEXT,
-    Banned INTEGER,
+    Banned INTEGER
 );
 
 CREATE TABLE Comment (
