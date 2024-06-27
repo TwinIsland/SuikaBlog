@@ -17,7 +17,7 @@ async function submitPost(event) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'SuikaToken': suikaToken
+            'Suika-Token': suikaToken
         },
         body: JSON.stringify(postData)
     })
