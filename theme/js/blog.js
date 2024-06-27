@@ -362,9 +362,11 @@ function fetchMoreArticles() {
             postOffset += data.length; // Update postOffset with the number of fetched articles
             return Promise.all(renderPromises);
         })
-        .then(() => {{
-            if (!isLoadAll) putLoadMoreBtn()
-        }})
+        .then(() => {
+            {
+                if (!isLoadAll) putLoadMoreBtn()
+            }
+        })
         .catch(error => {
             if (error.code && error.msg) {
                 navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
@@ -376,6 +378,21 @@ function fetchMoreArticles() {
         .finally(() => {
             isFetching = false;
         });
+}
+
+function loadJsr(url, callback) {
+    if (!loadedJS[url]) {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url;
+        script.async = true
+        script.onload = callback;
+        document.head.appendChild(script);
+        loadedJS[url] = true;
+        console.log(`load jsr: ${url}`)
+    } else {
+        callback()
+    }
 }
 
 /*

@@ -54,7 +54,20 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
     .then(() => {
         Prism.highlightAll();
         registerLikeButton();
-        updateTOC("#article-body", "#toc-body")
+        updateTOC("#article-body", "#toc-body");
+
+        loadJsr('https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js', function () {
+            loadJsr('https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js', function () {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: true },
+                    ],
+                    throwOnError: false
+                });
+            })
+        })
+
     })
     .catch(error => {
         console.error(error)

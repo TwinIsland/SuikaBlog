@@ -31,7 +31,7 @@ const handleLocation = async () => {
         route = {
             html: "/pages/post.html",
             js: "/js/post.js",
-            css: ["/css/article.css", "/css/prism.css", "/css/zoom.css"],
+            css: ["/css/article.css", "/css/prism.css", "/css/zoom.css", "https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.css"],
             jsr: ["/js/qrcode.min.js", "/js/prism.js", "/js/showdown.min.js", "/js/zoom-vanilla.min.js"]
         };
     }
@@ -77,7 +77,7 @@ const handleLocation = async () => {
             if (!loadedJS[url]) {
                 const script = document.createElement("script");
                 script.src = url;
-                script.async = true;
+                // script.async = true;
                 script.onload = resolve;
                 script.onerror = reject;
                 document.body.appendChild(script);
