@@ -13,8 +13,7 @@
 
     <link rel="stylesheet" href="/css/picnic.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/style.css" type="text/css" />
-
-
+    
     <script>
         function loadScript(url, callback) {
             var script = document.createElement('script');
@@ -142,7 +141,7 @@ Welcome to Suika Blog System!
 
     <div id="suika" style="position: fixed; bottom: 0px; user-select: none; display:flex; z-index: 10;">
         <img src="/img/suika.webp" style="height:100px; width: 100px;" onclick="toggleCloud()">
-        <div id="conversationCloud" style="opacity: 0; z-index: -111;"></div>
+        <div id="conversationCloud" style="opacity: 0; pointer-events: none;"></div>
     </div>
 
     <a tabindex="-1" class="top pseudo button" id="go">

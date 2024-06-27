@@ -1,6 +1,8 @@
-html {
+html,
+body {
     line-height: 1.15;
     scrollbar-gutter: stable both-edges;
+    min-height: 100vh;
 }
 
 a {
@@ -20,7 +22,6 @@ a {
     width: 100%;
     padding: 0 30px;
     max-width: 1320px;
-    min-height: 100vh;
 }
 
 .logo {
@@ -134,17 +135,6 @@ a {
 
 #foot-container section:nth-child(2) {
     text-align: right;
-}
-
-@media screen and (max-width: 767px) {
-    #foot-container {
-        width: 80%;
-        flex-direction: column;
-    }
-
-    #foot-container section {
-        text-align: left !important;
-    }
 }
 
 #tags-container button {
@@ -276,9 +266,61 @@ a {
     display: none;
 }
 
-/* Hide the element on screens smaller than 800px */
-@media (max-width: 800px) {
+#reload-btn {
+    height: 60px;
+}
+
+.nice-btn {
+    font-size: 16px;
+    font-weight: 200;
+    letter-spacing: 1px;
+    padding: 13px 20px 13px;
+    outline: 0;
+    border: 1px solid black;
+    cursor: pointer;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation
+}
+
+.nice-btn:after {
+    content: "";
+    background-color: #B98A82;
+    width: 100%;
+    z-index: -1;
+    position: absolute;
+    height: 100%;
+    top: 7px;
+    left: 7px;
+    transition: 0.2s;
+}
+
+.nice-btn:hover:after {
+    top: 0px;
+    left: 0px;
+}
+
+@media screen and (max-width: 767px) {
+    #foot-container {
+        width: 90%;
+        flex-direction: column;
+    }
+
+    #foot-container section {
+        text-align: left !important;
+    }
+
+    #suika {
+        display: none !important;
+    }
+
     #go {
         display: none !important;
+    }
+
+    .nice-btn {
+        padding: 13px 50px 13px;
     }
 }

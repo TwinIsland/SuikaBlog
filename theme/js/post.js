@@ -54,9 +54,10 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
     .then(() => {
         Prism.highlightAll();
         registerLikeButton();
-        updateTOC("#article-body", "#toc-body");
+        updateTOC("#article-body", "#toc-body")
     })
     .catch(error => {
+        console.error(error)
         console.log(error.code)
         if (error.code && error.msg) {
             navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);

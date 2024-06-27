@@ -328,7 +328,7 @@ function updateErrorMessage() {
 function putLoadMoreBtn() {
     document.getElementById('normal-article-container').innerHTML += `
     <div style="text-align: center; margin-top:30px" id="reload-btn">
-    <button style="font-size: .75em;" onclick="fetchMoreArticles()">Load More</button>
+    <button class="nice-btn" style="font-size: .75em;" onclick="fetchMoreArticles()">Load More</button>
     <div>
     `
 }
