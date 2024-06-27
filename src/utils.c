@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "sha256.h"
 #include "mongoose.h"
-#include "config.h"
 
 static void bytes_to_hex(const BYTE *bytes, size_t len, char *hex_str)
 {

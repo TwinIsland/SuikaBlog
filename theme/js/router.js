@@ -94,7 +94,14 @@ const handleLocation = async () => {
         console.log("load js: " + route.js);
         const script = document.createElement("script");
         script.src = route.js;
+        script.className = 'route-script';
         document.body.appendChild(script);
+    }
+
+    // Remove old script
+    const oldScript = document.querySelector('.route-script');
+    if (oldScript) {
+        oldScript.parentNode.removeChild(oldScript);
     }
 
     // scroll to top
