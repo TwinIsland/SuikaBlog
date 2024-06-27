@@ -25,9 +25,10 @@ typedef struct
     int index_update_n;
     int max_file_size;
     char *upload_dir;
-    char *upload_uri_pattern;
+    char *upload_uri;
     int cache_n;
     char pass_sha256[SHA256_HEX_LEN + 1];
+    char *upload_uri_pattern;
 } configuration;
 
 extern configuration config;
@@ -40,3 +41,6 @@ void destory_config();
 
 // load the local passcode to the config
 Result load_passcode_to_config();
+
+// update the upload uri pattern via upload_uri
+Result load_upload_uri_pattern_to_config();

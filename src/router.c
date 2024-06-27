@@ -40,14 +40,14 @@ static char *mg_str_without_paren(struct mg_str src)
   return ret;
 }
 
-ROUTER(serve_static, struct mg_http_serve_opts *opts)
+ROUTER(serve_dir, struct mg_http_serve_opts *opts)
 {
   // Cache all image request
   char uri[hm->uri.len + 1];
   strncpy(uri, hm->uri.buf, hm->uri.len);
   uri[hm->uri.len] = '\0';
 
-  debug("request: %s \t serve: %s", uri, opts->root_dir);
+  debug("request: %s", uri);
 #ifndef DEBUG
   if (check_file_with_exts(uri, cached_exts))
   {
@@ -59,6 +59,51 @@ ROUTER(serve_static, struct mg_http_serve_opts *opts)
 #endif
 
   mg_http_serve_dir(c, hm, opts); // Serve static files
+}
+
+ROUTER(serve_file, struct mg_http_serve_opts *opts)
+{
+  size_t upload_uri_len = strlen(config.upload_uri);
+
+  if (hm->uri.len == upload_uri_len + 1)
+  {
+    mg_http_serve_file(c, hm, "", opts);
+    return;
+  }
+
+  char uri[hm->uri.len + 1];
+  strncpy(uri, hm->uri.buf, hm->uri.len);
+  uri[hm->uri.len] = '\0';
+
+#ifndef DEBUG
+  if (check_file_with_exts(uri, cached_exts))
+  {
+    debug("cache file: %s", uri);
+    opts->extra_headers = "Cache-Control: max-age=259200\n";
+  }
+#else
+  (void)cached_exts; // disable warning
+#endif
+
+  size_t upload_dir_len = strlen(config.upload_dir);
+  size_t uri_len = strlen(uri);
+
+  char file_path_raw[upload_dir_len + uri_len + 2];
+  sprintf(file_path_raw, "%s/%s", config.upload_dir, uri + upload_uri_len + 1);
+
+  // Prepare file_path
+  char file_path[upload_dir_len + uri_len + 2];
+  if (mg_url_decode(file_path_raw, strlen(file_path_raw), file_path, sizeof(file_path) - 1, 0) < 0)
+  {
+    ROUTER_reply(c, "serve_file", BADREQ_ERR);
+    return;
+  }
+
+  // Ensure null-termination
+  file_path[sizeof(file_path) - 1] = '\0';
+  debug("serve file: %s", file_path);
+
+  mg_http_serve_file(c, hm, file_path, opts);
 }
 
 ROUTER(tags)
@@ -378,7 +423,7 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
   struct mg_str caps[3]; // router argument buffer
 
   static struct mg_http_serve_opts theme_opts = {.root_dir = "theme", .page404 = "theme/index.html"};
-  static struct mg_http_serve_opts upload_opts = {.root_dir = "./"};
+  static struct mg_http_serve_opts upload_opts = {};
 
   // we only accept http request
   if (ev == MG_EV_HTTP_MSG)
@@ -413,10 +458,10 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
     else
     {
       if (mg_match(hm->uri, mg_str(config.upload_uri_pattern), NULL))
-        USE_ROUTER(serve_static, &upload_opts);
+        USE_ROUTER(serve_file, &upload_opts);
       else
       default_router:
-        USE_ROUTER(serve_static, &theme_opts);
+        USE_ROUTER(serve_dir, &theme_opts);
     }
   }
 }

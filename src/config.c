@@ -37,8 +37,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->max_file_size = atoi(value);
     else if (MATCH("blog", "upload_dir"))
         pconfig->upload_dir = strdup(value);
-    else if (MATCH("blog", "upload_uri_pattern"))
-        pconfig->upload_uri_pattern = strdup(value);
+    else if (MATCH("blog", "upload_uri"))
+        pconfig->upload_uri = strdup(value);
     else if (MATCH("blog", "cache_n"))
         pconfig->cache_n = atoi(value);
 
@@ -91,6 +91,17 @@ Result load_passcode_to_config()
     };
 }
 
+Result load_upload_uri_pattern_to_config()
+{
+    config.upload_uri_pattern = malloc(strlen(config.upload_dir) + 3);
+    sprintf(config.upload_uri_pattern, "%s/#", config.upload_uri);
+
+    return (Result){
+        .status = OK,
+        .msg = "upload pattern loaded successfully",
+    };
+}
+
 void destory_config()
 {
     if (config.admin_email)
@@ -109,6 +120,8 @@ void destory_config()
         free(config.key_file);
     if (config.upload_dir)
         free(config.upload_dir);
+    if (config.upload_uri)
+        free(config.upload_uri);
     if (config.upload_uri_pattern)
         free(config.upload_uri_pattern);
 }

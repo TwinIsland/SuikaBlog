@@ -105,6 +105,9 @@ int main()
     ret = load_passcode_to_config();
     PRINT_LOG("init: keypass", ret, ERR_IS_CRITICAL);
 
+    ret = load_upload_uri_pattern_to_config();
+    PRINT_LOG("init: upload pattern", ret, ERR_IS_CRITICAL);
+
     // initialize the database
     ret = init_db();
     PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, config.db_name);
@@ -119,7 +122,6 @@ int main()
 
 #ifdef TEST
     // do something
-    debug("%s\n", get_upload_directory("my file.txt", config.upload_dir));
 #endif
 
     // do start up checks
