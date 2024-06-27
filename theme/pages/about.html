@@ -1,6 +1,6 @@
 <link id="stylesheet_noto"
-href="https://fonts.googleapis.com/css?family=Noto+Serif+SC:300,400,700&amp;display=swap&amp;subset=chinese-simplified"
-rel="stylesheet">
+    href="https://fonts.googleapis.com/css?family=Noto+Serif+SC:300,400,700&amp;display=swap&amp;subset=chinese-simplified"
+    rel="stylesheet">
 
 <div id="banner" style="background-image: url(../img/banner.webp);">
     <div class="scroll-text-decoration">
@@ -16,7 +16,7 @@ rel="stylesheet">
 </div>
 
 <div class="flex four" style="margin-top: 24px;">
-    <div class="article full three-fourth-800 yui">
+    <div class="full three-fourth-800 yui" id="article-body">
         <h1>欢迎 Welcome!</h1>
         <p class="notice">Hello World!!</p>
         <p> 人比较懒，平时没事喜欢宅在家里看番、打电动、刷贴吧。游戏比较喜欢 RPG，解密，以及各种街机音游。平时还有一大爱好是捡垃圾玩 HIFI。目前在玉米地UIUC 的 CS
@@ -106,53 +106,55 @@ rel="stylesheet">
         </table>
 
     </div>
-    <div class="sidebar">
-        <div id="toc" style="min-height: 180px;">
-            <h2 class="sidebar-title">TOC</h2>
-            <div id="toc-body">
-                <div class="loading-block" style="height: 190px;"></div>
+    <div class="none fourth-800">
+        <div class="sidebar">
+            <div id="toc" style="min-height: 180px;">
+                <h2 class="sidebar-title">TOC</h2>
+                <div id="toc-body">
+                    <div class="loading-block" style="height: 190px;"></div>
+                </div>
             </div>
-        </div>
-        <h2 class="sidebar-title">Endore</h2>
-        <div id="like" class="like-button">
+            <h2 class="sidebar-title">Endore</h2>
+            <div id="like" class="like-button">
 
-            <svg class="like-icon" 
-                viewBox="0 0 128 128" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 64px;">
-                <g>
-                    <polygon id="like-icon-inner" style="fill: #bbb"
-                        points="114,34 114,24 104,24 104,14 74,14 74,24 64,24 54,24 54,14 24,14 24,24 14,24 14,34 4,34 4,64 14,64    14,74 24,74 24,84 34,84 34,94 44,94 44,104 54,104 54,114 64,114 124,54 124,34  " />
-                </g>
-                <g>
-                    <rect style="fill: #FFFFFF;" height="10" width="10" x="24" y="34" />
-                </g>
-                <g>
+                <svg class="like-icon" viewBox="0 0 128 128" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 64px;">
                     <g>
-                        <rect style="fill: #9B0270;" height="10" width="10" x="64" y="104" />
+                        <polygon id="like-icon-inner" style="fill: #bbb"
+                            points="114,34 114,24 104,24 104,14 74,14 74,24 64,24 54,24 54,14 24,14 24,24 14,24 14,34 4,34 4,64 14,64    14,74 24,74 24,84 34,84 34,94 44,94 44,104 54,104 54,114 64,114 124,54 124,34  " />
                     </g>
                     <g>
-                        <rect style="fill: #9B0270;" height="10" width="10" x="74" y="94" />
+                        <rect style="fill: #FFFFFF;" height="10" width="10" x="24" y="34" />
                     </g>
                     <g>
-                        <rect style="fill: #9B0270;" height="10" width="10" x="84" y="84" />
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="64" y="104" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="74" y="94" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="84" y="84" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="94" y="74" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="104" y="64" />
+                        </g>
+                        <g>
+                            <rect style="fill: #9B0270;" height="10" width="10" x="114" y="54" />
+                        </g>
                     </g>
-                    <g>
-                        <rect style="fill: #9B0270;" height="10" width="10" x="94" y="74" />
-                    </g>
-                    <g>
-                        <rect style="fill: #9B0270;" height="10" width="10" x="104" y="64" />
-                    </g>
-                    <g>
-                        <rect style="fill: #9B0270;" height="10" width="10" x="114" y="54" />
-                    </g>
-                </g>
-            </svg>
-            <div>
-                <p class="like-text">Love x <span id="likeCount">1029</span></p>
-                <p class="like-text" style="display: none;">00:0<span id="likeCounter">5</span></p>
+                </svg>
+                <div>
+                    <p class="like-text">Love x <span id="likeCount">1029</span></p>
+                    <p class="like-text" style="display: none;">00:0<span id="likeCounter">5</span></p>
+                </div>
             </div>
+            <h2 class="sidebar-title">Share</h2>
+            <div id="page-qr"></div>
         </div>
-        <h2 class="sidebar-title">Share</h2>
-        <div id="page-qr"></div>
     </div>
+
 </div>

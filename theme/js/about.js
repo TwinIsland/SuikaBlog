@@ -1,7 +1,7 @@
 
 document.addEventListener('scroll', textScrollHandler);
 
-updateTOC(".article", "#toc-body")
+updateTOC("#article-body", "#toc-body")
 registerLikeButton();
 
 new QRCode(document.getElementById("page-qr"), {

@@ -40,7 +40,7 @@ function renderLikeCount(articleJSON) {
     return `${articleJSON.UpVoted}`
 }
 
-fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()}`, 1)
+fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()}`)
     .then(data => {
         const renderPromises = [
             renderWrapper(document.getElementById("article-title"), renderArticleTitle(data)),
@@ -54,7 +54,7 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
     .then(() => {
         Prism.highlightAll();
         registerLikeButton();
-        return updateTOC(".article", "#toc-body");
+        updateTOC("#article-body", "#toc-body");
     })
     .catch(error => {
         console.log(error.code)
