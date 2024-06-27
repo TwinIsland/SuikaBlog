@@ -22,7 +22,7 @@ int is_authorized(struct mg_http_message *hm)
   char header_auth_sha256[SHA256_HEX_LEN + 1] = {0};
   for (int i = 0; i < MG_MAX_HTTP_HEADERS; ++i)
   {
-    if (!mg_strcmp(hm->headers[i].name, mg_str("SuikaToken")))
+    if (!mg_strcmp(hm->headers[i].name, mg_str("Suika-Token")))
     {
       strncpy(header_auth_sha256, hm->headers[i].value.buf, SHA256_BLOCK_SIZE);
       break;

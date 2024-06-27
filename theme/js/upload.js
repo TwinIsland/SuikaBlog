@@ -15,7 +15,7 @@ var sendFileData = function (name, data, chunkSize, authHash) {
         var chunk = data.subarray(offset, offset + chunkSize) || '';
         var opts = {
             method: 'POST',
-            headers: { 'SuikaToken': authHash },
+            headers: { 'Suika-Token': authHash },
             body: chunk
         };
         var url = '/api/upload?offset=' + offset;
@@ -51,7 +51,7 @@ var finalizeUpload = function (authHash, name) {
     var url = '/api/upload/finalizer?file=' + encodeURIComponent(name);
     fetch(url, {
         method: 'POST',
-        headers: { 'SuikaToken': authHash }
+        headers: { 'Suika-Token': authHash }
     })
         .then(res => res.json())
         .then(response => {
