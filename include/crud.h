@@ -36,5 +36,9 @@ Result get_archieves(Archieves *ret);
 Result get_index(IndexData *ret);
 Result get_PostInfos_from_n(int n, PostInfos *ret);
 
+// Info
+Result get_info(const char *key, char **value);
+Result push_info(const char *key, const char *value);
+
 // Close database
 void db_close(void);

@@ -6,6 +6,9 @@
 
 #include "cache.h"
 
+#define PLUGIN_LOADER_ALLOWED
+#include "plugin.h"
+
 Cache *cache;
 
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
@@ -459,6 +462,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
     {
       if (mg_match(hm->uri, mg_str(config.upload_uri_pattern), NULL))
         USE_ROUTER(serve_file, &upload_opts);
+      else if (match_plugins_router(c, hm))
+        debug("use plugin router");
       else
       default_router:
         USE_ROUTER(serve_dir, &theme_opts);

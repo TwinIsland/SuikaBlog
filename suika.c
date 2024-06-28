@@ -25,7 +25,7 @@ static struct mg_mgr mgr;
 
 // initialize system state
 SUIKA_STATE SYSTEM_STATE = (SUIKA_STATE){
-    .is_db_first_initialize = false,
+    .is_blog_first_init = false,
 };
 
 void print_logo()
@@ -97,8 +97,8 @@ int main()
         PRINT_LOG("loading system files", ret, ERR_IS_IGN);
 
         initialize_blog();
-        printf("initialize end, please restart the program...\n");
-        exit(1);
+        printf("initialize end, please restart...\n\n");
+        exit(0);
     }
 
     // update passcode to config struct

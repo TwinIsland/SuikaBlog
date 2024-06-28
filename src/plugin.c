@@ -56,6 +56,24 @@ void load_plugins()
         PRINT_ERR("Could not open plugins directory");
 }
 
+int match_plugins_router(struct mg_connection *c, struct mg_http_message *hm)
+{
+    int match_flag = 0;
+    char plugin_uri_pattern[64];
+    struct mg_str caps[1];
+
+    for (int i = 0; i < plugin_count; ++i)
+    {
+        sprintf(plugin_uri_pattern, "/plugin/%s/#", plugins[i].name);
+        if (plugins[i].router_callback && mg_match(hm->uri, mg_str(plugin_uri_pattern), caps))
+        {
+            plugins[i].router_callback(c, caps[0]);
+            match_flag = 1;
+        }
+    }
+    return match_flag;
+}
+
 void unload_plugins()
 {
     for (int i = 0; i < plugin_count; ++i)
@@ -89,72 +107,4 @@ int register_plugin(Plugin plugin)
     }
     else
         return -1;
-}
-
-Result push_data(const char *key, const char *value)
-{
-    if (db == NULL)
-        return (Result){
-            .status = FAILED,
-            .msg = "uninitialized database connection",
-        };
-
-    // Modified SQL to perform an upsert: update the Value if the Key already exists
-    const char *sql = "INSERT INTO Info (Key, Value) VALUES (?, ?) "
-                      "ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value";
-
-    sqlite3_stmt *stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
-        return (Result){.status = FAILED, .msg = "Failed to prepare statement"};
-
-    sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, value, -1, SQLITE_STATIC);
-
-    if (sqlite3_step(stmt) != SQLITE_DONE)
-    {
-        debug("Failed to execute statement: %s\n", sqlite3_errmsg(db));
-        sqlite3_finalize(stmt);
-        return (Result){.status = FAILED, .msg = "Failed to prepare statement"};
-    }
-
-    sqlite3_finalize(stmt);
-
-    return (Result){.status = OK};
-}
-
-Result get_data(const char *key)
-{
-    char *value;
-    if (db == NULL)
-        return (Result){
-            .status = FAILED,
-            .msg = "uninitialized database connection",
-        };
-    const char *sql = "SELECT Value FROM Info WHERE Key = ?";
-    sqlite3_stmt *stmt;
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
-        return (Result){.status = FAILED, .msg = "Failed to prepare statement"};
-
-    sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
-
-    if (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        const unsigned char *val = sqlite3_column_text(stmt, 0);
-        value = val ? strdup((const char *)val) : NULL;
-    }
-    else
-    {
-        debug("Key not found or failed to retrieve value: %s\n", sqlite3_errmsg(db));
-        sqlite3_finalize(stmt);
-        return (Result){.status = FAILED, .msg = "Failed to prepare statement"};
-    }
-
-    sqlite3_finalize(stmt);
-
-    return (Result){
-        .status = OK,
-        .ptr = value,
-    };
 }

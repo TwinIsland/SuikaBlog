@@ -29,6 +29,64 @@ static void cp_stmt_str(char **dist, sqlite3_stmt *stmt, int idx)
     strncpy(*dist, src, srcLen);
 }
 
+Result push_info(const char *key, const char *value)
+{
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
+    // Modified SQL to perform an upsert: update the Value if the Key already exists
+    const char *sql = "INSERT INTO Info (Key, Value) VALUES (?, ?) "
+                      "ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value";
+
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, value, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        debug("Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return PREPARATION_ERR;
+    }
+
+    sqlite3_finalize(stmt);
+
+    return (Result){.status = OK};
+}
+
+Result get_info(const char *key, char **value)
+{
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
+    const char *sql = "SELECT Value FROM Info WHERE Key = ?";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    sqlite3_bind_text(stmt, 1, key, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        const unsigned char *val = sqlite3_column_text(stmt, 0);
+        *value = val ? strdup((const char *)val) : NULL;
+    }
+    else
+    {
+        fprintf(stderr, "Key not found or failed to retrieve value: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return PREPARATION_ERR;
+    }
+
+    sqlite3_finalize(stmt);
+    return (Result){.status = OK};
+}
+
 // SQL query should be like: SELECT * FROM Posts...
 static void populate_postInfo_from_stmt(sqlite3_stmt *stmt, PostInfo *postInfo)
 {
@@ -122,10 +180,7 @@ Result create_post(const char *title, const char *excerpt, const char *banner, c
 Result delete_post_by_id(long long int post_id)
 {
     if (db == NULL)
-        return (Result){
-            .status = FAILED,
-            .msg = "uninitialized database connection",
-        };
+        return UNINITIALIZE_ERR;
 
     const char *sql = "DELETE FROM Posts WHERE PostID = ?;";
     sqlite3_stmt *stmt;
@@ -175,6 +230,9 @@ Result delete_post_by_id(long long int post_id)
 
 Result get_all_tags(Tags *ret)
 {
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
     const char *sqlTags = "SELECT Name FROM Meta WHERE Type = 'tag'";
     sqlite3_stmt *stmt;
 
@@ -209,6 +267,9 @@ Result get_all_tags(Tags *ret)
 
 Result get_archieves(Archieves *ret)
 {
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
     const char *sqlYearCounts = "SELECT strftime('%Y', CreateDate) AS Year, COUNT(*) FROM Posts GROUP BY Year ORDER BY Year DESC";
     sqlite3_stmt *stmtYearCounts;
 
