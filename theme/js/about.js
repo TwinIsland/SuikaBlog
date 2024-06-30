@@ -1,6 +1,4 @@
 
-document.addEventListener('scroll', textScrollHandler);
-
 updateTOC("#article-body", "#toc-body")
 registerLikeButton();
 

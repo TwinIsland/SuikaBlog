@@ -26,7 +26,7 @@ function renderArticleTitle(articleSON) {
 
 function renderArticleMeta(articleJSON) {
     return `
-        ${formatTimestamp(articleJSON.CreateDate)} • ${articleJSON.Views} Views
+        ${articleJSON.CreateDate} • ${articleJSON.Views} Views
     `
 }
 

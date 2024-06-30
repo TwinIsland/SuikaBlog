@@ -102,8 +102,8 @@ static void populate_postInfo_from_stmt(sqlite3_stmt *stmt, PostInfo *postInfo)
     postInfo->Excerpts = excerpts ? strdup((char *)excerpts) : NULL;
 
     postInfo->IsPage = sqlite3_column_int(stmt, 5);
-    postInfo->CreateDate = (time_t)sqlite3_column_int64(stmt, 6);
-    postInfo->DateModified = (time_t)sqlite3_column_int64(stmt, 7);
+    strcpy(postInfo->CreateDate, (char *)sqlite3_column_text(stmt, 6));
+    strcpy(postInfo->DateModified, (char *)sqlite3_column_text(stmt, 7));
     postInfo->UpVoted = sqlite3_column_int(stmt, 8);
     postInfo->Views = sqlite3_column_int(stmt, 9);
 }
@@ -133,8 +133,8 @@ Result get_post(const int32_t PostID, Post *ret)
         cp_stmt_str(&ret->Content, stmt, 4);
 
         ret->IsPage = sqlite3_column_int(stmt, 5);
-        ret->CreateDate = (time_t)sqlite3_column_int(stmt, 6);
-        ret->DateModified = (time_t)sqlite3_column_int(stmt, 7);
+        strcpy(ret->CreateDate, (char *)sqlite3_column_text(stmt, 6));
+        strcpy(ret->DateModified, (char *)sqlite3_column_text(stmt, 7));
         ret->UpVoted = sqlite3_column_int(stmt, 8);
         ret->Views = sqlite3_column_int(stmt, 9);
     }

@@ -97,17 +97,12 @@ function toggleCloud(sayWhat = null) {
     });
 }
 
-function formatTimestamp(timestamp) {
-    // Create a Date object from the timestamp
-    const date = new Date(timestamp);
-
-    // Get the month, day, and year from the Date object
-    const month = date.toLocaleString('default', { month: 'short' }).toUpperCase();
-    const day = ("0" + date.getDate()).slice(-2); // Ensure the day is two digits
-    const year = date.getFullYear();
-
-    // Combine the components into the desired format
-    return `${month} ${day}, ${year}`;
+function formatTimestamp(seconds) {
+    const days = Math.floor(seconds / (3600 * 24));
+    const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${days}天${hours}小时${minutes}分${secs}秒`;
 }
 
 function renderWrapper(elementDOM, newHTML) {
@@ -395,6 +390,14 @@ function loadJsr(url, callback) {
     }
 }
 
+function updateUptime(startTimestamp) {
+    const uptimeElement = document.getElementById('uptime');
+    const now = Math.floor(Date.now() / 1000);
+    const elapsed = now - startTimestamp;
+    uptimeElement.innerText = formatTimestamp(elapsed);
+}
+
+
 /*
 Start Up Script
 
@@ -407,3 +410,19 @@ document.querySelector('.top').addEventListener('click', function (event) {
 
     toggleCloud("↑↑↑↑↑")
 });
+
+fetch('/plugin/Birthday/get')
+.then(response => response.json())
+    .then(data => {
+        if (data && data.birthday !== undefined && data.birthday !== -1) {
+            const startTimestamp = data.birthday;
+            updateUptime(startTimestamp);
+            setInterval(() => updateUptime(startTimestamp), 1000);
+        } else {
+            document.getElementById('uptime').innerText = 'Failed to fetch uptime';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching uptime:', error);
+        document.getElementById('uptime').innerText = 'Failed to fetch uptime';
+    });

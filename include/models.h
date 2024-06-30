@@ -14,8 +14,8 @@ typedef struct
     char *Excerpts;
     char *Content;
     int32_t IsPage;
-    time_t CreateDate;
-    time_t DateModified;
+    char CreateDate[20];
+    char DateModified[20];
     int32_t UpVoted;
     int32_t Views;
 } Post;
@@ -27,8 +27,8 @@ typedef struct
     char *Banner;
     char *Excerpts;
     int32_t IsPage;
-    time_t CreateDate;
-    time_t DateModified;
+    char CreateDate[20];
+    char DateModified[20];
     int32_t UpVoted;
     int32_t Views;
 } PostInfo;

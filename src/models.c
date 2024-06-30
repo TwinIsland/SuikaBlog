@@ -90,13 +90,14 @@ void free_indexData(IndexData *indexData)
     free_archieves(&indexData->Archieves);
 }
 
-char *format_time(time_t t)
+char *format_time(time_t t, char *timestamp_buf)
 {
-    struct tm tm_info;
-    char buffer[26];
-    localtime_r(&t, &tm_info);
-    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", &tm_info);
-    return strdup(buffer);
+    printf("Raw time_t value: %ld\n", t);
+
+    struct tm *tm_info;
+    tm_info = localtime(&t);
+    strftime(timestamp_buf, 20, "%Y-%m-%d", tm_info);
+    return timestamp_buf;
 }
 
 char *notice_to_json(Notice *notice)
@@ -156,9 +157,6 @@ char *tags_to_json(Tags *tags)
 
 char *post_to_json(Post *post)
 {
-    char *createDate = format_time(post->CreateDate);
-    char *dateModified = format_time(post->DateModified);
-
     char *json = mg_mprintf("{%m: %d, %m: %m, %m: %m, %m: %m, %m: %m, %m: %d, %m: %m, %m: %m, %m: %d, %m: %d}",
                             MG_ESC("PostID"), post->PostID,
                             MG_ESC("Title"), MG_ESC(post->Title),
@@ -166,21 +164,16 @@ char *post_to_json(Post *post)
                             MG_ESC("Excerpts"), MG_ESC(post->Excerpts),
                             MG_ESC("Content"), MG_ESC(post->Content),
                             MG_ESC("IsPage"), post->IsPage,
-                            MG_ESC("CreateDate"), MG_ESC(createDate),
-                            MG_ESC("DateModified"), MG_ESC(dateModified),
+                            MG_ESC("CreateDate"), MG_ESC(post->CreateDate),
+                            MG_ESC("DateModified"), MG_ESC(post->DateModified),
                             MG_ESC("UpVoted"), post->UpVoted,
                             MG_ESC("Views"), post->Views);
-
-    free(createDate);
-    free(dateModified);
 
     return json;
 }
 
 char *postInfo_to_json(PostInfo *post_info)
 {
-    char *createDate = format_time(post_info->CreateDate);
-    char *dateModified = format_time(post_info->DateModified);
 
     char *json = mg_mprintf("{%m: %d, %m: %m, %m: %m, %m: %m, %m: %d, %m: %m, %m: %m, %m: %d, %m: %d}",
                             MG_ESC("PostID"), post_info->PostID,
@@ -188,13 +181,10 @@ char *postInfo_to_json(PostInfo *post_info)
                             MG_ESC("Banner"), MG_ESC(post_info->Banner),
                             MG_ESC("Excerpts"), MG_ESC(post_info->Excerpts),
                             MG_ESC("IsPage"), post_info->IsPage,
-                            MG_ESC("CreateDate"), MG_ESC(createDate),
-                            MG_ESC("DateModified"), MG_ESC(dateModified),
+                            MG_ESC("CreateDate"), MG_ESC(post_info->CreateDate),
+                            MG_ESC("DateModified"), MG_ESC(post_info->DateModified),
                             MG_ESC("UpVoted"), post_info->UpVoted,
                             MG_ESC("Views"), post_info->Views);
-
-    free(createDate);
-    free(dateModified);
 
     return json;
 }

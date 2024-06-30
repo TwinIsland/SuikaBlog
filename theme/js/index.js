@@ -22,7 +22,7 @@ function renderNormalArticle(normalArticlesJSON, coverArticalJSON) {
     <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${coverArticalJSON.Banner === "" ? '/img/banner.webp' : '/img/banner.webp'}')";>
         <h2 class="inline-text" style="padding: 10px 0 10px 0;">${coverArticalJSON.Title}</h2>
         <div style="margin-bottom: 45px;">
-            <span>${formatTimestamp(coverArticalJSON.CreateDate)}</span>
+            <span>${coverArticalJSON.CreateDate}</span>
             <span style="color: rgb(255,193,7);">${coverArticalJSON.Views} Views</span>
         </div>
         <div>
@@ -38,7 +38,7 @@ function renderNormalArticle(normalArticlesJSON, coverArticalJSON) {
     <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${normalArticleJSON.Banner === "" ? '/img/banner.webp' : '/img/banner.webp'}')";>
         <h2 class="inline-text" style="padding: 10px 0 10px 0;">${normalArticleJSON.Title}</h2>
         <div style="margin-bottom: 45px;">
-            <span>${formatTimestamp(normalArticleJSON.CreateDate)}</span>
+            <span>${normalArticleJSON.CreateDate}</span>
             <span style="color: rgb(255,193,7);">${normalArticleJSON.Views} Views</span>
         </div>
         <div>
