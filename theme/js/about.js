@@ -12,6 +12,12 @@ new QRCode(document.getElementById("page-qr"), {
 	correctLevel : QRCode.CorrectLevel.H
 });
 
+confetti({
+	particleCount: 100,
+	spread: 70,
+	origin: { y: 0.6 }
+  });
+  
 // Cleanup function
 window.currentCleanup = function () {
     document.removeEventListener('scroll', textScrollHandler);

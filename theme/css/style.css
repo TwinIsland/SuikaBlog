@@ -1,19 +1,24 @@
+@font-face {
+    font-family: LogoFont;
+    src: url(.././font/logo_font.ttf);
+}
+
+@font-face {
+    font-family: MiSans;
+    src: url(.././font/MiSans-Regular.ttf);
+}
+
 html,
 body {
     line-height: 1.15;
     scrollbar-gutter: stable both-edges;
     min-height: 100vh;
+    font-family: MiSans;
 }
 
 a {
     color: #B98A82;
     text-decoration: underline;
-}
-
-
-@font-face {
-    font-family: LogoFont;
-    src: url(.././font/logo_font.ttf);
 }
 
 .container {
@@ -22,6 +27,7 @@ a {
     width: 100%;
     padding: 0 30px;
     max-width: 1320px;
+    min-height: 75vh;
 }
 
 .logo {
@@ -59,25 +65,31 @@ a {
 .cover-article {
     position: relative;
     border-radius: 10px;
-    padding: 20px 20px 24px 35px;
+    padding: 40px 20px 24px 35px;
     height: 310px;
     background-position: center;
     background-attachment: fixed;
     background-size: cover;
     background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgb(166 59 59 / 50%)), url(../img/banner.webp);
     color: white;
-    text-overflow: ellipsis;
     margin-bottom: 1.5rem;
     overflow: hidden;
 }
 
 
 #cover-article-container h1 {
-    font-size: 3rem;
+    font-size: 4rem;
     font-weight: 300;
     font-style: italic;
+    padding-top: 20px;
+    min-height: 154px
 }
 
+#cover-article-container p {
+    font-size: 25px;
+    height: 92px;
+    overflow: hidden
+}
 
 .normal-article {
     min-height: 230px;
@@ -112,7 +124,7 @@ a {
     align-self: flex-start;
 }
 
-.footer {
+footer {
     background-color: rgb(248, 249, 250);
     width: 100%;
     font-size: 17px;
@@ -134,8 +146,8 @@ a {
 }
 
 #foot-container a {
-    text-decoration: none!important;
-    color: rgba(33, 37, 41, 0.75)!important;
+    text-decoration: none !important;
+    color: rgba(33, 37, 41, 0.75) !important;
 }
 
 #tags-container button {
@@ -166,7 +178,6 @@ a {
 .inline-text {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 @keyframes swingCloud {
@@ -303,7 +314,11 @@ a {
     left: 0px;
 }
 
-@media screen and (max-width: 767px) {
+th {
+    background-color: #c05340;
+}
+
+@media screen and (max-width: 800px) {
     #foot-container {
         width: 90%;
         flex-direction: column;
@@ -323,5 +338,9 @@ a {
 
     .nice-btn {
         padding: 13px 50px 13px;
+    }
+
+    .footer-desktop {
+        display: none;
     }
 }

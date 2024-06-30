@@ -357,7 +357,7 @@ function fetchMoreArticles() {
                 isLoadAll = true;
 
             const renderPromises = [
-                renderWrapper(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data)),
+                renderWrapper(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data, null)),
             ];
             postOffset += data.length; // Update postOffset with the number of fetched articles
             return Promise.all(renderPromises);
