@@ -75,6 +75,15 @@ typedef struct
     PostInfos NormalArticleInfos;
 } IndexData;
 
+typedef struct {
+    int32_t CommentID;
+    int32_t PostID;
+    char *AuthorName;
+    char *CreateDate;
+    char *Content;
+    int32_t UpVoted;
+} Comment;
+
 void free_post(Post *post);
 void free_postInfo(PostInfo *postInfo);
 void free_tags(Tags *tags);

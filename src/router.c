@@ -419,6 +419,14 @@ ROUTER(delete_post)
   }
 }
 
+ROUTER(auth)
+{
+  if (is_authorized(hm))
+    ROUTER_reply(c, "auth", RESPONSE_OK);
+  else
+    ROUTER_reply(c, "auth", UNAUTH_ERR);
+}
+
 // Connection event handler function
 void server_fn(struct mg_connection *c, int ev, void *ev_data)
 {
@@ -455,6 +463,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(upload_finalizer);
       else if (mg_match(hm->uri, mg_str("/api/upload"), NULL))
         USE_ROUTER(upload);
+      else if (mg_match(hm->uri, mg_str("/api/auth"), NULL))
+        USE_ROUTER(auth);
       else
         goto default_router;
     }
