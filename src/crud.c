@@ -139,11 +139,30 @@ Result get_post(const int32_t PostID, Post *ret)
         ret->Views = sqlite3_column_int(stmt, 9);
     }
 
+    increase_view_count(PostID);
+
     sqlite3_finalize(stmt);
     return (Result){
         .status = OK,
         .ptr = ret,
     };
+}
+
+void increase_view_count(const int32_t PostID)
+{
+    if (db == NULL)
+        return;
+
+    const char *sql = "UPDATE Posts SET Views = Views + 1 WHERE PostID = ?";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return;
+
+    sqlite3_bind_int(stmt, 1, PostID);
+
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
 }
 
 Result create_post(const char *title, const char *excerpt, const char *banner, const char *content, int isPage, int *ret)
@@ -177,7 +196,7 @@ Result create_post(const char *title, const char *excerpt, const char *banner, c
     return (Result){OK, "Post created successfully"};
 }
 
-Result delete_post_by_id(long long int post_id)
+Result delete_post_by_id(const int32_t PostID)
 {
     if (db == NULL)
         return UNINITIALIZE_ERR;
@@ -195,7 +214,7 @@ Result delete_post_by_id(long long int post_id)
         };
     }
 
-    sqlite3_bind_int64(stmt, 1, post_id);
+    sqlite3_bind_int64(stmt, 1, PostID);
 
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE)
