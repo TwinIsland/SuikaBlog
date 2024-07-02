@@ -106,6 +106,16 @@ function formatTimestamp(seconds) {
 }
 
 function renderWrapper(elementDOM, newHTML) {
+    return new Promise((resolve) => setTimeout(() => {
+        elementDOM.innerHTML = newHTML;
+        elementDOM.classList.add('float-up');
+        resolve();
+    }, 180)
+    );
+}
+
+
+function renderWrapperT2(elementDOM, newHTML) {
     return new Promise((resolve) => {
         setTimeout(() => {
             elementDOM.classList.add('fade-in');
@@ -209,19 +219,10 @@ async function updateTOC(container, output) {
 
     let elementDOM = document.querySelector(output)
 
-    await new Promise((resolve) => {
-        setTimeout(() => {
-            elementDOM.classList.add('fade-in');
-            setTimeout(() => {
-                if (toc === "")
-                    elementDOM.style.display = "none"
-
-                elementDOM.innerHTML = toc;
-                elementDOM.classList.add('visible');
-                resolve(); // Resolve the promise after the animation completes
-            }, 230);
-        }, 150);
-    });
+    if (toc === "")
+        elementDOM.style.display = "none"
+    else
+        renderWrapperT2(elementDOM, toc)
 };
 
 function registerLikeButton() {
@@ -352,7 +353,7 @@ function fetchMoreArticles() {
                 isLoadAll = true;
 
             const renderPromises = [
-                renderWrapper(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data, null)),
+                renderWrapperT2(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data, null)),
             ];
             postOffset += data.length; // Update postOffset with the number of fetched articles
             return Promise.all(renderPromises);
@@ -426,7 +427,7 @@ document.querySelector('.top').addEventListener('click', function (event) {
 });
 
 fetch('/plugin/Birthday/get')
-.then(response => response.json())
+    .then(response => response.json())
     .then(data => {
         if (data && data.birthday !== undefined && data.birthday !== -1) {
             const startTimestamp = data.birthday;
