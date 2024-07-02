@@ -10,6 +10,8 @@ function renderCoverArticle(coverArticleJSON) {
   return `
   <a href="/post/${coverArticleJSON.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
     <h1 class="inline-text">${coverArticleJSON.Title}</h1>
+    <span>${coverArticleJSON.CreateDate}</span>
+    <span style="color: rgb(255,193,7);">${coverArticleJSON.Views} Views</span>
     <p>${coverArticleJSON.Excerpts}</p>
   </a>
     `
@@ -71,6 +73,19 @@ function renderArchives(archivesJSON) {
   `).join('')
 }
 
+var selected_block_n = 0
+
+function focusOnBlock(index) {
+  document.getElementById(`select-block-${index}`).classList.add("highlight");
+  document.getElementById(`select-block-${selected_block_n}`).classList.remove("highlight");
+  selected_block_n = index;
+}
+
+var blockSwitchIntervalId = setInterval(() => {
+  focusOnBlock((selected_block_n + 1) % 3);
+}, 5000);
+
+
 // END RENDERING HELPERS
 fetchDataWithCache('/api/index', "index", true)
   .then(data => {
@@ -96,3 +111,9 @@ fetchDataWithCache('/api/index', "index", true)
     }
     throw error
   });
+
+// Cleanup function
+window.currentCleanup = function () {
+  clearInterval(blockSwitchIntervalId);
+  return "/index listeners";
+}

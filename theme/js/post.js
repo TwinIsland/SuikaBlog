@@ -56,15 +56,28 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
         registerLikeButton();
         updateTOC("#article-body", "#toc-body");
 
+        document.getElementById("article-body").innerHTML += `
+        <div id="copyright">
+            <h3 style="margin-top: 0; font-weight: bold;">CC BY-ND</h3>      
+            <p style="margin: 0; font-weight: normal; /* Regular font weight */">This license enables reusers to copy and distribute the material in any medium or format in unadapted form only, and only so long as attribution is given to the creator. The license allows for commercial use.</p>
+            <a href="https://creativecommons.org/licenses/by-nd/4.0/" target="_blank">
+                <img src="/img/by-nd.webp" width="117" height="41" style="margin-left: 0; margin-top: 20px;">
+            </a>  
+        </div>
+        `
+
         loadJsr('https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js', function () {
             loadJsr('https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js', function () {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        { left: '$$', right: '$$', display: true },
-                        { left: '$', right: '$', display: true },
-                    ],
-                    throwOnError: false
-                });
+                try {
+                    renderMathInElement(document.getElementById("article-body"), {
+                        delimiters: [
+                            { left: '$$', right: '$$', display: true },
+                            { left: '$', right: '$', display: true },
+                        ],
+                    });
+                } catch (err) {
+                    console.error(err)
+                }
             })
         })
 

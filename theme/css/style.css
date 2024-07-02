@@ -74,6 +74,7 @@ a {
     background-position: center;
     background-attachment: fixed;
     background-size: cover;
+    background-color: black;
     background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgb(166 59 59 / 50%)), url(../img/banner.webp);
     color: white;
     margin-bottom: 1.5rem;
@@ -86,14 +87,14 @@ a {
     font-weight: 300;
     font-style: italic;
     padding-top: 20px;
-    min-height: 154px
 }
 
 #cover-article-container p {
     font-size: 25px;
-    height: 92px;
+    margin-top: 70px;
     overflow: hidden
 }
+
 
 .normal-article {
     min-height: 230px;
@@ -411,4 +412,28 @@ Login Module
     .footer-desktop {
         display: none;
     }
+}
+
+.select-block-container {
+    position: absolute;
+    bottom: 20px;
+    right: 5%;
+    display: flex;
+    gap: 20px;
+}
+
+.select-block {
+    width: 90px;
+    height: 90px;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    opacity: .4;
+    transition: opacity 0.3s ease;
+}
+
+.select-block.highlight {
+    filter: none;
+    opacity: .85;
+    border: 2px solid grey;
 }
