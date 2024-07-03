@@ -6,36 +6,45 @@
 
 
 
-function renderCoverArticle(coverArticleJSON) {
+function renderCoverArticle(coverArticleJSON, normalArticlesJSON) {
+  const coverArticle = coverArticleJSON.length ? coverArticleJSON[0] : normalArticlesJSON[0];
+  if (!coverArticle) return "";
+  
+  function updateSelectBlock(selectBlockId, article) {
+    const selectBlock = document.getElementById(selectBlockId);
+    if (selectBlock && article) {
+      selectBlock.style.backgroundImage = `url(${article.Banner})`;
+      selectBlock.setAttribute("data-postid", article.PostID);
+      selectBlock.setAttribute("data-title", article.Title);
+      selectBlock.setAttribute("data-createdate", article.CreateDate);
+      selectBlock.setAttribute("data-views", article.Views);
+      selectBlock.setAttribute("data-excerpts", article.Excerpts);
+    }
+  }
+
+  if (coverArticleJSON.length >= 1) {
+    updateSelectBlock("select-block-0", coverArticleJSON[0]);
+  }
+  if (coverArticleJSON.length >= 2) {
+    updateSelectBlock("select-block-1", coverArticleJSON[1]);
+  }
+  if (coverArticleJSON.length >= 3) {
+    updateSelectBlock("select-block-2", coverArticleJSON[2]);
+  }
+
   return `
-  <a href="/post/${coverArticleJSON.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
-    <h1 class="inline-text">${coverArticleJSON.Title}</h1>
-    <span>${coverArticleJSON.CreateDate}</span>
-    <span style="color: rgb(255,193,7);">${coverArticleJSON.Views} Views</span>
-    <p>${coverArticleJSON.Excerpts}</p>
+  <a href="/post/${coverArticle.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
+    <h1 class="inline-text">${coverArticle.Title}</h1>
+    <span>${coverArticle.CreateDate}</span>
+    <span style="color: rgb(255,193,7);">${coverArticle.Views} Views</span>
+    <p>${coverArticle.Excerpts}</p>
   </a>
-    `
+  `;
 }
 
-function renderNormalArticle(normalArticlesJSON, coverArticalJSON) {
-  let ret = coverArticalJSON && coverArticalJSON.PostID != -1 ? `
-  <div class="full none-800">
-  <a href="/post/${coverArticalJSON.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
-    <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${coverArticalJSON.Banner === "" ? '/img/banner.webp' : '/img/banner.webp'}')";>
-        <h2 class="inline-text" style="padding: 10px 0 10px 0;">${coverArticalJSON.Title}</h2>
-        <div style="margin-bottom: 45px;">
-            <span>${coverArticalJSON.CreateDate}</span>
-            <span style="color: rgb(255,193,7);">${coverArticalJSON.Views} Views</span>
-        </div>
-        <div>
-            ${coverArticalJSON.Excerpts}
-        </div>
-    </div>
-  </a>
-  </div>
-  ` : ""
 
-  normalArticlesJSON.map(normalArticleJSON => ret += `
+function renderNormalArticle(normalArticlesJSON) {
+  return normalArticlesJSON.map(normalArticleJSON => `
   <a href="/post/${normalArticleJSON.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
     <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${normalArticleJSON.Banner === "" ? '/img/banner.webp' : '/img/banner.webp'}')";>
         <h2 class="inline-text" style="padding: 10px 0 10px 0;">${normalArticleJSON.Title}</h2>
@@ -48,8 +57,7 @@ function renderNormalArticle(normalArticlesJSON, coverArticalJSON) {
         </div>
     </div>
   </a>
-  `)
-  return ret;
+  `).join('')
 }
 
 function renderNotice(noticeJSON) {
@@ -76,9 +84,37 @@ function renderArchives(archivesJSON) {
 var selected_block_n = 0
 
 function focusOnBlock(index) {
-  document.getElementById(`select-block-${index}`).classList.add("highlight");
-  document.getElementById(`select-block-${selected_block_n}`).classList.remove("highlight");
-  selected_block_n = index;
+  if (selected_block_n == index) return;
+
+  const newBlock = document.getElementById(`select-block-${index}`);
+  const oldBlock = document.getElementById(`select-block-${selected_block_n}`);
+  const coverArticleContainer = document.getElementById("cover-article-container");
+
+  if (newBlock) {
+    newBlock.classList.add("highlight");
+    if (oldBlock) {
+      oldBlock.classList.remove("highlight");
+    }
+
+    const postID = newBlock.getAttribute("data-postid");
+    const title = newBlock.getAttribute("data-title");
+    const createDate = newBlock.getAttribute("data-createdate");
+    const views = newBlock.getAttribute("data-views");
+    const excerpts = newBlock.getAttribute("data-excerpts");
+
+    if (coverArticleContainer) {
+      coverArticleContainer.innerHTML = `
+        <a href="/post/${postID}" class="float-up" onclick="route()" style="text-decoration: none; color: inherit;">
+          <h1 class="inline-text">${title}</h1>
+          <span>${createDate}</span>
+          <span style="color: rgb(255,193,7);">${views} Views</span>
+          <p>${excerpts}</p>
+        </a>
+      `;
+    }
+
+    selected_block_n = index;
+  }
 }
 
 var blockSwitchIntervalId = setInterval(() => {
@@ -90,7 +126,7 @@ var blockSwitchIntervalId = setInterval(() => {
 fetchDataWithCache('/api/index', "index", true)
   .then(data => {
     const renderPromises = [
-      renderWrapper(document.getElementById('cover-article-container'), renderCoverArticle(data['cover_article'])),
+      renderWrapper(document.getElementById('cover-article-container'), renderCoverArticle(data['cover_article'], data['normal_article'])),
       renderWrapper(document.getElementById('normal-article-container'), renderNormalArticle(data['normal_article'], data['cover_article'])),
       renderWrapper(document.getElementById('notice-container'), renderNotice(data['notice'])),
       renderWrapper(document.getElementById('tags-container'), renderTags(data['tags'])),

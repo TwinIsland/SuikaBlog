@@ -106,26 +106,14 @@ function formatTimestamp(seconds) {
 }
 
 function renderWrapper(elementDOM, newHTML) {
-    return new Promise((resolve) => setTimeout(() => {
-        elementDOM.innerHTML = newHTML;
-        elementDOM.classList.add('float-up');
-        resolve();
-    }, 180)
-    );
+    elementDOM.innerHTML = newHTML;
+    elementDOM.classList.add('float-up');
 }
 
 
 function renderWrapperT2(elementDOM, newHTML) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            elementDOM.classList.add('fade-in');
-            setTimeout(() => {
-                elementDOM.innerHTML = newHTML;
-                elementDOM.classList.add('visible');
-                resolve();
-            }, 180);
-        }, 100);
-    });
+    elementDOM.innerHTML = newHTML;
+    // elementDOM.classList.add('fade-in');
 }
 
 
@@ -353,7 +341,7 @@ function fetchMoreArticles() {
                 isLoadAll = true;
 
             const renderPromises = [
-                renderWrapperT2(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data, null)),
+                renderWrapperT2(document.getElementById(`ext-normal-article-${postOffset}`), renderNormalArticle(data)),
             ];
             postOffset += data.length; // Update postOffset with the number of fetched articles
             return Promise.all(renderPromises);

@@ -18,7 +18,7 @@ function getPostIdFromUri() {
 };
 
 function renderArticleTitle(articleSON) {
-    document.querySelector(".scroll-text-decoration").textContent = articleSON.Title;
+    document.querySelector(".scroll-text-decoration").textContent = articleSON;    
     return `
         ${articleSON.Title}
     `
@@ -74,6 +74,7 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
                             { left: '$$', right: '$$', display: true },
                             { left: '$', right: '$', display: true },
                         ],
+                        throwOnError: false
                     });
                 } catch (err) {
                     console.error(err)

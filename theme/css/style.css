@@ -81,7 +81,6 @@ a {
     overflow: hidden;
 }
 
-
 #cover-article-container h1 {
     font-size: 3rem;
     font-weight: 300;
@@ -228,9 +227,19 @@ footer {
 }
 
 .fade-in {
-    opacity: 0;
-    transition: opacity 0.1s ease-in-out;
+    animation: fadeIn 1s;
 }
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 
 .visible {
     opacity: 1;
