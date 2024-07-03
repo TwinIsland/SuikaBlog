@@ -174,7 +174,7 @@ ROUTER(index)
     return;
   }
 
-  IndexData index_data = {.CoverArticleInfo.PostID = -1};
+  IndexData index_data;
   Result ret = get_index(&index_data);
 
   if (ret.status == FAILED)

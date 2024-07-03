@@ -23,7 +23,11 @@ def replace_urls_for_upload(content):
 
 conn.create_function("REGEX_REPLACE_UPLOAD", 1, replace_urls_for_upload)
 
-c.execute("UPDATE POSTS SET CONTENT = REGEX_REPLACE_UPLOAD(CONTENT)")
+c.execute("INSERT INTO Meta (Name, Type) VALUES ('selected', 'tag')")
+c.execute("INSERT INTO PostMeta (PostID, MetaName) VALUES ('165', 'selected')")
+c.execute("INSERT INTO PostMeta (PostID, MetaName) VALUES ('166', 'selected')")
+c.execute("INSERT INTO PostMeta (PostID, MetaName) VALUES ('171', 'selected')")
 
+c.execute("")
 conn.commit()
 conn.close()

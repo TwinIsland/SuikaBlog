@@ -6,6 +6,8 @@
 
 #include "config.h"
 
+#define SELECT_ARTICLE_N 3
+
 typedef struct
 {
     int32_t PostID;
@@ -68,14 +70,15 @@ typedef struct
 
 typedef struct
 {
-    PostInfo CoverArticleInfo;
+    PostInfos SelectedArticleInfos;
     Notice Notice;
     Tags Tags;
     Archieves Archieves;
     PostInfos NormalArticleInfos;
 } IndexData;
 
-typedef struct {
+typedef struct
+{
     int32_t CommentID;
     int32_t PostID;
     char *AuthorName;

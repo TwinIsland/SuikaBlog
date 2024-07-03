@@ -343,32 +343,43 @@ Result get_index(IndexData *ret)
     if (db == NULL)
         return UNINITIALIZE_ERR;
 
-    const char *sql = "SELECT * FROM Posts WHERE IsPage=0 ORDER BY CreateDate DESC LIMIT ?";
     sqlite3_stmt *stmt;
 
+    char *sql = "SELECT p.* \
+                FROM Posts AS p\
+                JOIN PostMeta AS pm ON p.PostID = pm.PostID\
+                WHERE p.isPage = 0 AND pm.MetaName = \"selected\"\
+                ORDER BY p.CreateDate DESC \
+                LIMIT ?";
+
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
-    {
         return PREPARATION_ERR;
+
+    sqlite3_bind_int(stmt, 1, SELECT_ARTICLE_N);
+
+    ret->SelectedArticleInfos.data = malloc(sizeof(PostInfo) * SELECT_ARTICLE_N);
+    ret->SelectedArticleInfos.size = 0;
+
+    while (ret->SelectedArticleInfos.size < SELECT_ARTICLE_N && sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        populate_postInfo_from_stmt(stmt, &ret->SelectedArticleInfos.data[ret->SelectedArticleInfos.size++]);
     }
 
-    sqlite3_bind_int(stmt, 1, config.index_post_n + 1); // +1 for cover article
+    sqlite3_finalize(stmt);
+
+    sql = "SELECT * FROM Posts WHERE IsPage=0 ORDER BY CreateDate DESC LIMIT ?";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    sqlite3_bind_int(stmt, 1, config.index_post_n);
 
     ret->NormalArticleInfos.data = malloc(sizeof(PostInfo) * config.index_post_n);
     ret->NormalArticleInfos.size = 0;
 
-    int is_cover_article_row = 1;
-    while (sqlite3_step(stmt) == SQLITE_ROW)
+    while (ret->NormalArticleInfos.size < config.index_post_n && sqlite3_step(stmt) == SQLITE_ROW)
     {
-        if (is_cover_article_row)
-        {
-            is_cover_article_row = 0;
-            populate_postInfo_from_stmt(stmt, &ret->CoverArticleInfo);
-            continue;
-        }
-        if (ret->NormalArticleInfos.size < config.index_post_n)
-        {
-            populate_postInfo_from_stmt(stmt, &ret->NormalArticleInfos.data[ret->NormalArticleInfos.size++]);
-        }
+        populate_postInfo_from_stmt(stmt, &ret->NormalArticleInfos.data[ret->NormalArticleInfos.size++]);
     }
 
     sqlite3_finalize(stmt);

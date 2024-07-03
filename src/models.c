@@ -80,7 +80,7 @@ void free_indexData(IndexData *indexData)
     if (indexData == NULL)
         return;
 
-    free_postInfo(&indexData->CoverArticleInfo);
+    free_PostInfos(&indexData->SelectedArticleInfos);
     free_PostInfos(&indexData->NormalArticleInfos);
 
     free(indexData->Notice.content);
@@ -278,15 +278,15 @@ char *indexData_to_json(IndexData *index_data)
 {
     // Convert components to JSON strings
     char *tags_str = tags_to_json(&index_data->Tags);
-    char *coverArticleInfo_str = postInfo_to_json(&index_data->CoverArticleInfo);
+    char *selectedArticleInfos_str = postInfos_to_json(&index_data->SelectedArticleInfos);
     char *archieves_str = archieves_to_json(&index_data->Archieves);
     char *notice_str = notice_to_json(&index_data->Notice);
     char *normalArticleInfos_str = postInfos_to_json(&index_data->NormalArticleInfos);
 
-    if (!tags_str || !coverArticleInfo_str || !archieves_str || !notice_str || !normalArticleInfos_str)
+    if (!tags_str || !selectedArticleInfos_str || !archieves_str || !notice_str || !normalArticleInfos_str)
     {
         free(tags_str);
-        free(coverArticleInfo_str);
+        free(selectedArticleInfos_str);
         free(archieves_str);
         free(notice_str);
         free(normalArticleInfos_str);
@@ -294,7 +294,7 @@ char *indexData_to_json(IndexData *index_data)
     }
 
     // Calculate initial buffer size
-    size_t buffer_size = strlen(tags_str) + strlen(coverArticleInfo_str) +
+    size_t buffer_size = strlen(tags_str) + strlen(selectedArticleInfos_str) +
                          strlen(archieves_str) + strlen(notice_str) +
                          strlen(normalArticleInfos_str) + 512; // extra space for JSON formatting
 
@@ -302,7 +302,7 @@ char *indexData_to_json(IndexData *index_data)
 
     // Compose the final JSON string
     mg_snprintf(json, buffer_size, "{%m: %s, %m: %s, %m: %s, %m: %s, %m: %s}",
-                MG_ESC("cover_article"), coverArticleInfo_str,
+                MG_ESC("cover_article"), selectedArticleInfos_str,
                 MG_ESC("tags"), tags_str,
                 MG_ESC("notice"), notice_str,
                 MG_ESC("archives"), archieves_str,
@@ -310,7 +310,7 @@ char *indexData_to_json(IndexData *index_data)
 
     // Free intermediate JSON strings
     free(tags_str);
-    free(coverArticleInfo_str);
+    free(selectedArticleInfos_str);
     free(archieves_str);
     free(notice_str);
     free(normalArticleInfos_str);
