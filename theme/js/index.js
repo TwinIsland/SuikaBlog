@@ -142,14 +142,14 @@ Promise.all([
   .then(() => {
     putLoadMoreBtn()
   })
-// .catch(error => {
-//   if (error.code && error.msg) {
-//     navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
-//   } else {
-//     navigateTo("/err");
-//   }
-//   throw error
-// });
+.catch(error => {
+  if (error.code && error.msg) {
+    navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
+  } else {
+    navigateTo("/err");
+  }
+  throw error
+});
 
 // Cleanup function
 window.currentCleanup = function () {
