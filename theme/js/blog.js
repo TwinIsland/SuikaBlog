@@ -401,6 +401,18 @@ function setCookie(name, value, days) {
     }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
 }
+
+function updateSelectBlock(selectBlockId, article) {
+    const selectBlock = document.getElementById(selectBlockId);
+    if (selectBlock && article) {
+        selectBlock.style.backgroundImage = `url(${article.Banner})`;
+        selectBlock.setAttribute("data-postid", article.PostID);
+        selectBlock.setAttribute("data-title", article.Title);
+        selectBlock.setAttribute("data-createdate", article.CreateDate);
+        selectBlock.setAttribute("data-views", article.Views);
+        selectBlock.setAttribute("data-excerpts", article.Excerpts);
+    }
+}
 /*
 Start Up Script
 

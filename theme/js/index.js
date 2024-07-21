@@ -9,27 +9,19 @@
 function renderCoverArticle(coverArticleJSON, normalArticlesJSON) {
   const coverArticle = coverArticleJSON.length ? coverArticleJSON[0] : normalArticlesJSON[0];
   if (!coverArticle) return "";
-  
-  function updateSelectBlock(selectBlockId, article) {
-    const selectBlock = document.getElementById(selectBlockId);
-    if (selectBlock && article) {
-      selectBlock.style.backgroundImage = `url(${article.Banner})`;
-      selectBlock.setAttribute("data-postid", article.PostID);
-      selectBlock.setAttribute("data-title", article.Title);
-      selectBlock.setAttribute("data-createdate", article.CreateDate);
-      selectBlock.setAttribute("data-views", article.Views);
-      selectBlock.setAttribute("data-excerpts", article.Excerpts);
-    }
-  }
 
-  if (coverArticleJSON.length >= 1) {
-    updateSelectBlock("select-block-0", coverArticleJSON[0]);
-  }
-  if (coverArticleJSON.length >= 2) {
-    updateSelectBlock("select-block-1", coverArticleJSON[1]);
-  }
-  if (coverArticleJSON.length >= 3) {
-    updateSelectBlock("select-block-2", coverArticleJSON[2]);
+  if (coverArticleJSON.length == 0) {
+    updateSelectBlock("select-block-0", coverArticle);
+  } else {
+    if (coverArticleJSON.length >= 1) {
+      updateSelectBlock("select-block-0", coverArticleJSON[0]);
+    }
+    if (coverArticleJSON.length >= 2) {
+      updateSelectBlock("select-block-1", coverArticleJSON[1]);
+    }
+    if (coverArticleJSON.length >= 3) {
+      updateSelectBlock("select-block-2", coverArticleJSON[2]);
+    }
   }
 
   return `
@@ -123,8 +115,19 @@ var blockSwitchIntervalId = setInterval(() => {
 
 
 // END RENDERING HELPERS
-fetchDataWithCache('/api/index', "index", true)
-  .then(data => {
+Promise.all([
+  fetchDataWithCache('/api/index', "index", true),
+  fetchDataWithCache('/api/views', "views", false)
+])
+  .then(([data, views]) => {
+    // Merge views data into the articles data
+    data.cover_article.forEach(article => {
+      article.Views = views[article.PostID] || article.Views;
+    });
+    data.normal_article.forEach(article => {
+      article.Views = views[article.PostID] || article.Views;
+    });
+
     const renderPromises = [
       renderWrapper(document.getElementById('cover-article-container'), renderCoverArticle(data['cover_article'], data['normal_article'])),
       renderWrapper(document.getElementById('normal-article-container'), renderNormalArticle(data['normal_article'], data['cover_article'])),
@@ -139,14 +142,14 @@ fetchDataWithCache('/api/index', "index", true)
   .then(() => {
     putLoadMoreBtn()
   })
-  .catch(error => {
-    if (error.code && error.msg) {
-      navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
-    } else {
-      navigateTo("/err");
-    }
-    throw error
-  });
+// .catch(error => {
+//   if (error.code && error.msg) {
+//     navigateTo(`/err?code=${error.code}&msg=${encodeURIComponent(error.msg)}`);
+//   } else {
+//     navigateTo("/err");
+//   }
+//   throw error
+// });
 
 // Cleanup function
 window.currentCleanup = function () {

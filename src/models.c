@@ -55,6 +55,14 @@ void free_tags(Tags *tags)
     free(tags->data);
 }
 
+void free_views(Views *views)
+{
+    if (views == NULL)
+        return;
+
+    free(views->data);
+}
+
 void free_archieves(Archieves *archieves)
 {
     for (size_t i = 0; i < archieves->size; ++i)
@@ -150,6 +158,34 @@ char *tags_to_json(Tags *tags)
     }
 
     json_str[index++] = ']';
+    json_str[index] = '\0';
+
+    return json_str;
+}
+
+char *views_to_json(Views *views)
+{
+    if (views->size == 0)
+    {
+        return strdup("{}");
+    }
+
+    char *json_str = malloc(views->size * 32);
+    json_str[0] = '{';
+
+    size_t index = 1;
+
+    for (size_t i = 0; i < views->size; ++i)
+    {
+        if (i > 0)
+        {
+            json_str[index++] = ',';
+        }
+
+        index += snprintf(json_str + index, 64, "\"%d\":%d", views->data[i].PostID, views->data[i].Views);
+    }
+
+    json_str[index++] = '}';
     json_str[index] = '\0';
 
     return json_str;

@@ -18,7 +18,7 @@ function getPostIdFromUri() {
 };
 
 function renderArticleTitle(articleSON) {
-    document.querySelector(".scroll-text-decoration").textContent = articleSON;    
+    document.querySelector(".scroll-text-decoration").textContent = articleSON.Title;
     return `
         ${articleSON.Title}
     `
@@ -81,7 +81,6 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
                 }
             })
         })
-
     })
     .catch(error => {
         console.error(error)

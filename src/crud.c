@@ -284,6 +284,38 @@ Result get_all_tags(Tags *ret)
     };
 }
 
+Result get_views(Views *ret)
+{
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
+    const char *sqlViews = "SELECT PostID, Views FROM Posts";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sqlViews, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    size_t viewCount = 0;
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+        viewCount++;
+
+    sqlite3_reset(stmt);
+
+    ret->data = malloc(sizeof(View) * viewCount);
+    ret->size = viewCount;
+
+    size_t index = 0;
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        ret->data[index].PostID = sqlite3_column_int(stmt, 0);
+        ret->data[index].Views = sqlite3_column_int(stmt, 1);
+        index++;
+    }
+
+    sqlite3_finalize(stmt);
+    return (Result){.status = OK, .ptr = ret};
+}
+
 Result get_archieves(Archieves *ret)
 {
     if (db == NULL)

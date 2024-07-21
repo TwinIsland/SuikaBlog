@@ -137,6 +137,28 @@ ROUTER(tags)
   Cache_add("tags", body, ALWAYS_IN_CACHE);
 }
 
+ROUTER(views)
+{
+  char *body;
+
+  Views views;
+  Result ret = get_views(&views);
+
+  if (ret.status == FAILED)
+  {
+    free_views(&views);
+    ROUTER_reply(c, "views", SERVERSIDE_ERR);
+
+    return;
+  }
+  else
+    body = views_to_json(&views);
+
+  free_views(&views);
+  ROUTER_reply(c, "views", body, JSON_type, OK_CODE);
+  free(body);
+}
+
 ROUTER(archieves)
 {
   char *body;
@@ -465,6 +487,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(upload);
       else if (mg_match(hm->uri, mg_str("/api/auth"), NULL))
         USE_ROUTER(auth);
+      else if (mg_match(hm->uri, mg_str("/api/views"), NULL))
+        USE_ROUTER(views);
       else
         goto default_router;
     }

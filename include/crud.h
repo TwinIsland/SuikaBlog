@@ -41,5 +41,8 @@ Result get_PostInfos_from_n(int n, PostInfos *ret);
 Result get_info(const char *key, char **value);
 Result push_info(const char *key, const char *value);
 
+// Views
+Result get_views();
+
 // Close database
 void db_close(void);

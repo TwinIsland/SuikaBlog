@@ -37,6 +37,18 @@ typedef struct
 
 typedef struct
 {
+    int32_t PostID;
+    int32_t Views;
+} View;
+
+typedef struct
+{
+    View *data;
+    size_t size;
+} Views;
+
+typedef struct
+{
     PostInfo *data;
     size_t size;
 } PostInfos;
@@ -90,6 +102,7 @@ typedef struct
 void free_post(Post *post);
 void free_postInfo(PostInfo *postInfo);
 void free_tags(Tags *tags);
+void free_views(Views *views);
 void free_archieves(Archieves *archieves);
 void free_PostInfos(PostInfos *post_infos);
 void free_indexData(IndexData *indexData);
@@ -97,6 +110,7 @@ void free_indexData(IndexData *indexData);
 char *notice_to_json(Notice *notice);
 char *tags_to_json(Tags *tags);
 char *post_to_json(Post *post);
+char *views_to_json(Views *views);
 char *postInfo_to_json(PostInfo *post_info);
 char *archieves_to_json(Archieves *archieves);
 char *postInfos_to_json(PostInfos *post_infos);
