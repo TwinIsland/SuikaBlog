@@ -10,7 +10,7 @@ void initialize_Cache()
     cache->size = 0;
 }
 
-char *Cache_lookup(const char *key)
+void *Cache_lookup(const char *key)
 {
     CacheEntry *current = cache->head;
     while (current)
@@ -26,12 +26,13 @@ char *Cache_lookup(const char *key)
 }
 
 // value deallocation will be handled by it
-void Cache_add(const char *key, char *value, int always_in_flag)
+void Cache_add(const char *key, void *value, int always_in_flag, void (*destroyer)(void *value))
 {
     CacheEntry *new_entry = (CacheEntry *)malloc(sizeof(CacheEntry));
     strncpy(new_entry->key, key, CACHE_KEY_MAX_SIZE);
     new_entry->value = value;
     new_entry->always_in_flag = always_in_flag;
+    new_entry->destroyer = destroyer;
     new_entry->next = NULL;
 
     if (cache->size == config.cache_n)
@@ -79,26 +80,35 @@ void Cache_add(const char *key, char *value, int always_in_flag)
 void free_Cache()
 {
     CacheEntry *current = cache->head;
+    printf("free caches\n");
     while (current)
     {
         CacheEntry *next = current->next;
         if (current->value)
-            free(current->value);
+        {
+            if (current->destroyer)
+                current->destroyer(current->value);
+            else
+                free(current->value);
+        }
         free(current);
         current = next;
     }
     free(cache);
 }
 
-void update_cache(const char *key, const char *new_value)
+void update_cache(const char *key, void *new_value)
 {
     CacheEntry *current = cache->head;
     while (current)
     {
         if (strcmp(current->key, key) == 0)
         {
-            free(current->value);
-            current->value = strdup(new_value);
+            if (current->destroyer)
+                current->destroyer(current->value);
+            else
+                free(current);
+            current->value = new_value;
             return;
         }
         current = current->next;
@@ -122,8 +132,10 @@ void remove_cache(const char *key)
             if (current == cache->tail)
                 cache->tail = prev;
 
-            free(current->value);
-            free(current);
+            if (current->destroyer)
+                current->destroyer(current->value);
+            else
+                free(current);
             cache->size--;
             return;
         }

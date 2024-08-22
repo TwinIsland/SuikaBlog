@@ -3,10 +3,10 @@
 #include <stdint.h>
 #include <time.h>
 #include <mongoose.h>
-
 #include "config.h"
 
 #define SELECT_ARTICLE_N 3
+#define VIEW_COUNT_ALIGN 8
 
 typedef struct
 {
@@ -46,6 +46,18 @@ typedef struct
     View *data;
     size_t size;
 } Views;
+
+typedef struct
+{
+    int32_t key; // postid
+    int value;   // offset of the view count string cache
+} ViewsMap;
+
+typedef struct
+{
+    ViewsMap *viewsMap;
+    char *json_str;
+} ViewsCache;
 
 typedef struct
 {
@@ -99,6 +111,8 @@ typedef struct
     int32_t UpVoted;
 } Comment;
 
+void ViewsMap_Destroyer(void *cache);
+
 void free_post(Post *post);
 void free_postInfo(PostInfo *postInfo);
 void free_tags(Tags *tags);
@@ -110,7 +124,7 @@ void free_indexData(IndexData *indexData);
 char *notice_to_json(Notice *notice);
 char *tags_to_json(Tags *tags);
 char *post_to_json(Post *post);
-char *views_to_json(Views *views);
+char *views_to_json(Views *views, ViewsCache *cache);
 char *postInfo_to_json(PostInfo *post_info);
 char *archieves_to_json(Archieves *archieves);
 char *postInfos_to_json(PostInfos *post_infos);

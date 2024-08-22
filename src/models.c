@@ -1,6 +1,8 @@
 #include <stdlib.h>
-
 #include "models.h"
+
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
 
 void free_post(Post *post)
 {
@@ -53,6 +55,13 @@ void free_tags(Tags *tags)
         tags->data[i] = NULL;
     }
     free(tags->data);
+}
+
+void ViewsMap_Destroyer(void *cache)
+{
+    hmfree(((ViewsCache *)cache)->viewsMap);
+    free(((ViewsCache *)cache)->json_str);
+    free((ViewsCache *)cache);
 }
 
 void free_views(Views *views)
@@ -163,17 +172,18 @@ char *tags_to_json(Tags *tags)
     return json_str;
 }
 
-char *views_to_json(Views *views)
+char *views_to_json(Views *views, ViewsCache *cache)
 {
     if (views->size == 0)
     {
         return strdup("{}");
     }
 
-    char *json_str = malloc(views->size * 32);
+    char *json_str = malloc(views->size * 64);
     json_str[0] = '{';
 
     size_t index = 1;
+    cache->viewsMap = NULL;
 
     for (size_t i = 0; i < views->size; ++i)
     {
@@ -182,7 +192,20 @@ char *views_to_json(Views *views)
             json_str[index++] = ',';
         }
 
-        index += snprintf(json_str + index, 64, "\"%d\":%d", views->data[i].PostID, views->data[i].Views);
+        index += snprintf(json_str + index, 64, "\"%d\":", views->data[i].PostID);
+        hmput(cache->viewsMap, views->data[i].PostID, index);
+
+        char view_count_str[VIEW_COUNT_ALIGN + 1];
+        int view_count_length = snprintf(view_count_str, sizeof(view_count_str), "%d", views->data[i].Views);
+
+        if (view_count_length < VIEW_COUNT_ALIGN)
+        {
+            int padding = VIEW_COUNT_ALIGN - view_count_length;
+            memmove(view_count_str + padding, view_count_str, view_count_length + 1);
+            memset(view_count_str, ' ', padding);
+        }
+
+        index += snprintf(json_str + index, VIEW_COUNT_ALIGN + 1, "%s", view_count_str);
     }
 
     json_str[index++] = '}';

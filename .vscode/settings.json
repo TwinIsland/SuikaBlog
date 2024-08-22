@@ -29,6 +29,13 @@
         "regex.h": "c",
         "config.h": "c",
         "install.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "stb_ds.h": "c",
+        "vector": "c",
+        "functional": "c",
+        "limits": "c",
+        "ostream": "c",
+        "streambuf": "c",
+        "tuple": "c"
     }
 }

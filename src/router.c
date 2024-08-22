@@ -9,6 +9,8 @@
 #define PLUGIN_LOADER_ALLOWED
 #include "plugin.h"
 
+#include "stb_ds.h"
+
 Cache *cache;
 
 static const char *cached_exts[] = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".js", ".css", ".ttf", NULL};
@@ -134,13 +136,20 @@ ROUTER(tags)
 
   free_tags(&tags);
   ROUTER_reply(c, "tags", body, JSON_type, OK_CODE);
-  Cache_add("tags", body, ALWAYS_IN_CACHE);
+  Cache_add("tags", body, ALWAYS_IN_CACHE, STR_CACHE_DESTROYER);
 }
 
 ROUTER(views)
 {
-  char *body;
+  ViewsCache *cache;
 
+  if ((cache = Cache_lookup("views")))
+  {
+    ROUTER_reply(c, "views", cache->json_str, JSON_type, OK_CODE);
+    return;
+  }
+
+  char *body;
   Views views;
   Result ret = get_views(&views);
 
@@ -152,11 +161,15 @@ ROUTER(views)
     return;
   }
   else
-    body = views_to_json(&views);
+  {
+    ViewsCache *view_cache = malloc(sizeof(ViewsCache));
+    body = views_to_json(&views, view_cache);
+    view_cache->json_str = body;
+    Cache_add("views", (void *)view_cache, ALWAYS_IN_CACHE, ViewsMap_Destroyer);
+  }
 
   free_views(&views);
   ROUTER_reply(c, "views", body, JSON_type, OK_CODE);
-  free(body);
 }
 
 ROUTER(archieves)
@@ -183,7 +196,7 @@ ROUTER(archieves)
 
   free_archieves(&archieves);
   ROUTER_reply(c, "archieves", body, JSON_type, OK_CODE);
-  Cache_add("archieves", body, ALWAYS_IN_CACHE);
+  Cache_add("archieves", body, ALWAYS_IN_CACHE, STR_CACHE_DESTROYER);
 }
 
 ROUTER(index)
@@ -210,7 +223,7 @@ ROUTER(index)
 
   free_indexData(&index_data);
   ROUTER_reply(c, "index", body, JSON_type, OK_CODE);
-  Cache_add("index", body, ALWAYS_IN_CACHE);
+  Cache_add("index", body, ALWAYS_IN_CACHE, STR_CACHE_DESTROYER);
 }
 
 ROUTER(postInfos)
@@ -257,6 +270,32 @@ ROUTER(post, const int32_t PostID)
     free_post(&post);
     ROUTER_reply(c, "post", body, JSON_type, OK_CODE);
     free(body);
+
+    // update view cache
+    ViewsCache *viewsCache;
+    if ((viewsCache = Cache_lookup("views")))
+    {
+      int start_index = hmget(viewsCache->viewsMap, PostID);
+      if (start_index == 0)
+        return;
+
+      char *view_count_str = malloc(VIEW_COUNT_ALIGN + 1);
+      strncpy(view_count_str, viewsCache->json_str + start_index, VIEW_COUNT_ALIGN);
+      view_count_str[VIEW_COUNT_ALIGN] = '\0';
+
+      int new_view_count = atoi(view_count_str) + 1;
+
+      int view_count_length = snprintf(view_count_str, VIEW_COUNT_ALIGN, "%d", new_view_count);
+      if (view_count_length < VIEW_COUNT_ALIGN)
+      {
+        int padding = VIEW_COUNT_ALIGN - view_count_length;
+        memmove(view_count_str + padding, view_count_str, view_count_length + 1);
+        memset(view_count_str, ' ', padding);
+      }
+
+      strncpy(viewsCache->json_str + start_index, view_count_str, VIEW_COUNT_ALIGN);
+      free(view_count_str);
+    }
   }
   else
   {
