@@ -9,7 +9,7 @@ const routes = {
     "/": { html: "/pages/index.html", js: "/js/index.js", css: [], jsr: [] },
     "/about": { html: "/pages/about.html", js: "/js/about.js", css: ["/css/article.css"], jsr: ["/js/qrcode.min.js"] },
     "/upload": { html: "/pages/upload.html", js: "/js/upload.js", css: [], jsr: [] },
-    "/admin": { html: "/pages/admin.html", js: "/js/admin.js", css: [], jsr: [] },
+    "/admin": { html: "/pages/admin.html", js: "/js/admin.js", css: ["/css/simplemde.min.css"], jsr: ["/js/simplemde.min.js"] },
     "/login": { html: "/pages/login.html", js: "/js/login.js", css: [], jsr: [] }
 };
 

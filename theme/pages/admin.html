@@ -1,27 +1,95 @@
-<form onsubmit="submitPost(event)">
-    <fieldset>
-        <label for="password">Password:</label>
-        <input type="password" id="password" required>
-    </fieldset>
-    <fieldset>
-        <label for="title">Title:</label>
-        <input type="text" id="title" required>
-    </fieldset>
-    <fieldset>
-        <label for="excerpts">Excerpts:</label>
-        <textarea id="excerpts" required></textarea>
-    </fieldset> 
-    <fieldset>
-        <label for="banner">Banner URL:</label>
-        <input type="url" id="banner">
-    </fieldset>
-    <fieldset>
-        <label for="content">Content:</label>
-        <textarea id="content" required></textarea>
-    </fieldset>
-    <fieldset>
-        <label for="is_page">Is Page:</label>
-        <input type="checkbox" id="is_page">
-    </fieldset>
-    <button type="submit">Submit Post</button>
-</form>
+<style>
+    .editor-toolbar {
+        margin-top: 20px;
+    }
+
+    ul {
+        list-style-type: none;
+        padding-left: 10px;
+    }
+
+    .drop_zone {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        color: #ccc;
+        margin: 20px;
+    }
+</style>
+<h3 style="margin-bottom: 10px;">撰写新文章</h3>
+<div class="flex two">
+    <div class="three-fourth">
+        <label><input placeholder="标题"></label>
+        <textarea id="editor" style="margin-top: 20px;"></textarea>
+    </div>
+    <div class="fourth center">
+        <div class="tabs two">
+            <input id='tab-1' type='radio' name='tabgroupB' checked />
+            <label class="pseudo button toggle" for="tab-1">选项</label>
+            <input id='tab-2' type='radio' name='tabgroupB'>
+            <label class="pseudo button toggle" for="tab-2">附件</label>
+            <div class="row">
+                <div>
+                    <h4>发布日期</h4>
+                    <input>
+                    <h4>分类</h4>
+                    <ul>
+                        <li><label>
+                                <input type="checkbox">
+                                <span class="checkable"> 📌Pined</span>
+                            </label>
+                        </li>
+
+                        <li><label>
+                                <input type="checkbox">
+                                <span class="checkable"> 默认</span>
+                            </label>
+                        </li>
+                        <li><label>
+                                <input type="checkbox">
+                                <span class="checkable">日常</span>
+                            </label>
+                        </li>
+                        <li><label>
+                                <input type="checkbox">
+                                <span class="checkable">笔记</span>
+                            </label>
+                        </li>
+                        <li><label>
+                                <input type="checkbox">
+                                <span class="checkable">图片</span>
+                            </label>
+                        </li>
+                    </ul>
+                    <h4>标签</h4>
+                    <input>
+                </div>
+                <div>
+                    <section class="drop_zone" id="drop_zone_container">
+                        <div class="file-ext">
+                            <svg width="106" height="49" viewBox="0 0 106 49" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M33.5234 14.6551C33.3603 14.5022 33.1755 14.3509 32.9649 14.1946L18.0591 3.3291C16.9126 2.51404 16.098 2.35237 14.5384 2.5994L4.69428 4.15855C1.1496 4.71997 -0.456046 6.90528 0.111792 10.4905L5.16139 42.3724C5.73243 45.9778 7.89107 47.5462 11.4763 46.9783L33.3115 43.52C35.1186 43.2337 36.417 42.5319 37.1842 41.4424H34.8083C34.3124 41.7228 33.7068 41.9209 32.9931 42.0339L11.2996 45.4698C8.66644 45.8869 7.07092 44.7276 6.65386 42.0944L1.6171 10.2936C1.21609 7.76167 2.35926 6.06488 5.0127 5.64461L15.0999 4.04696L17.121 16.8078C17.4386 18.8131 18.5925 19.5439 20.4763 19.2456L33.1966 17.2309L33.5234 19.2944V14.6551ZM67.2454 41.4424C67.8539 43.0756 69.3233 44.0931 71.6213 44.4571L93.4565 47.9155C97.0215 48.4801 99.2036 46.8947 99.7714 43.3095L102.909 23.4998C103.166 21.8794 103.021 21.0882 102.189 19.9183L91.3703 4.97845C90.5318 3.84899 89.807 3.44351 88.2474 3.19648L78.4033 1.63733C75.4667 1.17222 73.4513 2.17834 72.5234 4.57577V13.1975L73.5809 6.52119C73.9819 3.98928 75.5934 2.72879 78.2469 3.14906L88.334 4.74671L86.3129 17.5076C85.9953 19.5128 86.8669 20.5645 88.7507 20.8628L101.471 22.8775L98.2789 43.0316C97.8619 45.6648 96.2663 46.824 93.6129 46.4037L71.9194 42.9678C70.584 42.7563 69.6277 42.2417 69.0639 41.4424H67.2454ZM89.1032 19.4237C87.9891 19.2473 87.6141 18.7311 87.7906 17.617L89.7347 5.34229L101.337 21.3614L89.1032 19.4237ZM20.3668 17.7679C19.2528 17.9444 18.7366 17.5693 18.5601 16.4553L16.616 4.18057L32.601 15.8302L20.3668 17.7679Z"
+                                    fill="#168EEA" fill-opacity="0.4"></path>
+                                <path
+                                    d="M42.27 43.3535H64.3774C67.9868 43.3535 69.894 41.4463 69.894 37.8164V17.7598C69.894 16.1191 69.6274 15.3604 68.6226 14.335L55.6001 1.27148C54.5952 0.287109 53.8159 0 52.2368 0H42.27C38.6812 0 36.7534 1.90723 36.7534 5.53711V37.8164C36.7534 41.4668 38.6401 43.3535 42.27 43.3535ZM42.3315 41.8359C39.6655 41.8359 38.271 40.4414 38.271 37.7754V5.57812C38.271 3.01465 39.6655 1.51758 42.3521 1.51758H52.5649V14.4375C52.5649 16.4678 53.5903 17.3701 55.4976 17.3701H68.3765V37.7754C68.3765 40.4414 66.9819 41.8359 64.2954 41.8359H42.3315ZM55.6206 15.8936C54.4927 15.8936 54.0415 15.4424 54.0415 14.3145V1.88672L68.0073 15.8936H55.6206Z"
+                                    fill="#168EEA"></path>
+                            </svg>
+                        </div>
+
+                        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data"
+                            style="margin-top: 10px;">
+                            <input type="file" name="file" id="fileInput" class="tab" required=""
+                                style="font-size: 13px;">
+                            <br>
+                            <button style="margin-top: 20px;">上传</button>
+                        </form>
+                        <p>or, drop the file here</p>
+
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
