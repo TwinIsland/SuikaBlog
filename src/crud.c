@@ -78,7 +78,7 @@ Result get_info(const char *key, char **value)
     }
     else
     {
-        fprintf(stderr, "Key not found or failed to retrieve value: %s\n", sqlite3_errmsg(db));
+        // fprintf(stderr, "Key not found or failed to retrieve value: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         return PREPARATION_ERR;
     }

@@ -52,6 +52,8 @@ __attribute__((unused)) void load_module(void *module_handler)
         char timestamp[20];
         snprintf(timestamp, sizeof(timestamp), "%ld", now);
         push_info("birthday", timestamp);
+        birthday = malloc(20);
+        strcpy(birthday, timestamp);
     }
     else
     {

@@ -163,6 +163,7 @@ ROUTER(views)
   else
   {
     ViewsCache *view_cache = malloc(sizeof(ViewsCache));
+    view_cache->viewsMap = NULL;
     body = views_to_json(&views, view_cache);
     view_cache->json_str = body;
     Cache_add("views", (void *)view_cache, ALWAYS_IN_CACHE, ViewsMap_Destroyer);
