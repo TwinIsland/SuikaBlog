@@ -1,6 +1,8 @@
 # Suika Blog
 Ultimate Blog System Engineered for Ultimate Speed and Efficiency⚡
 
+**demo:** [nyalab.cn](nyalab.cn)
+
 ## Features
 + **Designed for Speed and Efficiency**: Enjoy a low memory footprint and minimal CPU usage. We've carefully handled memory and included only the essential libraries to ensure a lean and powerful experience.
   
