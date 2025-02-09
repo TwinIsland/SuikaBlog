@@ -12,20 +12,6 @@ Ultimate Blog System Engineered for Ultimate Speed and Efficiency⚡
 
 ## Run
 
-install dependencies (via apt):
-
-```bash
-sudo apt update
-sudo apt-get install libsqlite3-dev
-```
-or via yum:
-
-```bash
-sudo yum check-update
-sudo yum install libsqlite3x-devel.x86_64
-```
-
-then, start the server by:
 ```bash
 make run
 ```
