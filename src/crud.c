@@ -165,6 +165,29 @@ void increase_view_count(const int32_t PostID)
     sqlite3_finalize(stmt);
 }
 
+Result increase_like_count_by(const int32_t PostID, const int inc_count)
+{
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
+    if (inc_count > config.max_like_count_per_time)
+        return (Result){.status = FAILED, .msg = "excess max like count per time"};
+
+    const char *sql = "UPDATE Posts SET UpVoted = UpVoted + ? WHERE PostID = ?";
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    sqlite3_bind_int(stmt, 1, inc_count);
+    sqlite3_bind_int(stmt, 2, PostID);
+
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    return (Result){OK, "like count increased"};
+}
+
 Result create_post(const char *title, const char *excerpt, const char *banner, const char *content, int isPage, int *ret)
 {
     if (db == NULL)

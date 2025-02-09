@@ -41,6 +41,8 @@ static int config_loader(void *user, const char *section, const char *name,
         pconfig->upload_uri = strdup(value);
     else if (MATCH("blog", "cache_n"))
         pconfig->cache_n = atoi(value);
+    else if (MATCH("blog", "max_like_count_per_time"))
+        pconfig->max_like_count_per_time = atoi(value);
 
     else
         return 0; // raise error is no such entry

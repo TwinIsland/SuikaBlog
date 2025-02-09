@@ -25,6 +25,8 @@
 Result create_post(const char *title, const char *excerpt, const char *banner, const char *content, int isPage, int *ret);
 Result get_post(const int32_t PostID, Post *ret);
 Result delete_post_by_id(const int32_t PostID);
+Result increase_like_count_by(const int32_t PostID, const int inc_count);
+
 void increase_view_count(const int32_t PostID);
 
 // Tag

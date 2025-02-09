@@ -22,6 +22,7 @@ static struct upload_session_t
   char *tmp_upload_path;
 } upload_session;
 
+// dependencies
 int is_authorized(struct mg_http_message *hm)
 {
   char header_auth_sha256[SHA256_HEX_LEN + 1] = {0};
@@ -37,6 +38,7 @@ int is_authorized(struct mg_http_message *hm)
   return ret;
 }
 
+// tools
 static char *mg_str_without_paren(struct mg_str src)
 {
   char *ret = malloc(src.len - 1);
@@ -251,6 +253,37 @@ ROUTER(postInfos)
   free_PostInfos(&post_infos);
   ROUTER_reply(c, "postInfos", body, JSON_type, OK_CODE);
   free(body);
+}
+
+ROUTER(incLike)
+{
+
+  struct mg_str postId_str = mg_http_var(hm->query, mg_str("postId"));
+  int32_t PostID;
+
+  if (!mg_str_to_num(postId_str, 10, &PostID, sizeof(PostID)))
+  {
+    ROUTER_reply(c, "postInfos", BADREQ_ERR);
+    return;
+  }
+
+  struct mg_str inc_count_str = mg_http_var(hm->query, mg_str("incCount"));
+  int inc_count;
+  if (!mg_str_to_num(inc_count_str, 10, &inc_count, sizeof(inc_count)))
+  {
+    ROUTER_reply(c, "inc_count", BADREQ_ERR);
+    return;
+  }
+
+  Result ret = increase_like_count_by(PostID, inc_count);
+
+  if (ret.status == FAILED)
+  {
+    ROUTER_reply(c, "inc_like", ret.msg, STRING_type, BADREQ_ERR_code);
+    return;
+  }
+
+  ROUTER_reply(c, "inc_like", RESPONSE_OK);
 }
 
 ROUTER(post, const int32_t PostID)
@@ -529,6 +562,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(auth);
       else if (mg_match(hm->uri, mg_str("/api/views"), NULL))
         USE_ROUTER(views);
+      else if (mg_match(hm->uri, mg_str("/api/incLike#"), NULL))
+        USE_ROUTER(incLike);
       else
         goto default_router;
     }

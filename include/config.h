@@ -27,6 +27,7 @@ typedef struct
     char *upload_dir;
     char *upload_uri;
     int cache_n;
+    int max_like_count_per_time;
     char pass_sha256[SHA256_HEX_LEN + 1];
     char *upload_uri_pattern;
 } configuration;
