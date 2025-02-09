@@ -127,7 +127,7 @@ function cacheData(key, data, exp_hour) {
     const now = new Date().getTime();
     const item = {
         data: data,
-        expiry: now + exp_hour * 60 * 60 * 1000,
+        expiry: exp_hour < 0 ? -1 : now + exp_hour * 60 * 60 * 1000,
     };
     localStorage.setItem(key, JSON.stringify(item));
 }
@@ -139,7 +139,8 @@ function getCachedData(key) {
     }
     const item = JSON.parse(itemStr);
     const now = new Date().getTime();
-    if (now > item.expiry) {
+    if (item.expiry > 0 && now > item.expiry) {
+        console.log("remove");
         localStorage.removeItem(key);
         return null;
     }
@@ -213,7 +214,7 @@ async function updateTOC(container, output) {
         renderWrapperT2(elementDOM, toc)
 };
 
-function registerLikeButton() {
+function registerLikeButton(postId) {
     const likeButton = document.getElementById('like');
     const likeCountElement = document.getElementById('likeCount');
     const likeCounterElement = document.getElementById('likeCounter');
@@ -221,6 +222,7 @@ function registerLikeButton() {
     const likeText = document.querySelector('.like-button .like-text');
 
     let likeCount = parseInt(likeCountElement.textContent, 10);
+    let incCount = 0;
     let clickEnabled = false;
     let timer;
     let start_timer = false;
@@ -229,6 +231,16 @@ function registerLikeButton() {
 
     if (typeof countdown !== "undefined")
         clearInterval(countdown)
+
+    let likedPosts = getCachedData("liked_article") || [];
+
+    // Disable like button if the post is already liked
+    if (likedPosts.includes(postId)) {
+        likeButton.disabled = true;
+        likeIconInner.style.fill = '#FF5050';
+        likeText.style.color = '#FF5050';
+        return;
+    }
 
     likeButton.addEventListener('click', function () {
 
@@ -245,6 +257,25 @@ function registerLikeButton() {
                 if (counter <= 0) {
                     clearInterval(countdown);
                     likeCounterElement.parentNode.style.display = 'none';
+                    if (incCount === 0) return;
+
+                    fetch(`/api/incLike?postId=${postId}&incCount=${incCount}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.status) {
+                                console.error('Error:', data.content);
+                            } else {
+                                toggleCloud("感谢你的喜欢！ ╰(*°▽°*)╯");
+                                likedPosts.push(postId);
+                                cacheData("liked_article", likedPosts, -1);
+                            }
+                        })
+                        .catch(error => console.error('Request failed:', error));
                 }
             }, 1000);
 
@@ -257,6 +288,7 @@ function registerLikeButton() {
 
         if (clickEnabled) {
             likeCount += 1;
+            incCount += 1;
             likeCountElement.textContent = likeCount;
             confetti({
                 particleCount: 15,

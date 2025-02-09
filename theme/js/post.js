@@ -53,7 +53,7 @@ fetchDataWithCache('/api/post/' + getPostIdFromUri(), `post/${getPostIdFromUri()
     })
     .then(() => {
         Prism.highlightAll();
-        registerLikeButton();
+        registerLikeButton(getPostIdFromUri());
         updateTOC("#article-body", "#toc-body");
 
         document.getElementById("article-body").innerHTML += `
