@@ -1,12 +1,15 @@
 CC=gcc
 
-LDFLAGS= -lsqlite3 
+LDFLAGS= -Lsqlite3 -lsqlite3 -Wl,-rpath,sqlite3
 CFLAGS=-Wall -Iinclude
 
 LIBDIR=./lib
 LIB_SRC=$(wildcard $(LIBDIR)/*.c)
 LIB_OBJ=$(LIB_SRC:.c=.o)
 LIB_OUT=$(LIBDIR)/liblibrary.a
+
+# dependencies library
+SQLITE3_SHARED = sqlite3/libsqlite3.so
 
 SRCDIR=./src
 
@@ -27,7 +30,7 @@ SRC=suika.c $(wildcard $(LIBDIR)/*.c) $(wildcard $(SRCDIR)/*.c)
 OUTDIR=bin
 OUT=$(OUTDIR)/suika
 
-all: $(OUTDIR) $(OUT)
+all: $(OUTDIR) $(OUT) $(SQLITE3_SHARED)
 
 $(LIB_OUT): $(LIB_OBJ)
 	ar rcs $@ $(LIB_OBJ)
@@ -37,6 +40,19 @@ $(OUTDIR):
 
 $(OUT): $(SRC) $(LIB_OUT)
 	$(CC) -export-dynamic $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+
+$(SQLITE3_SHARED):
+	cd sqlite3 && \
+	gcc -shared -fPIC -O2 -o libsqlite3.so sqlite3.c \
+	-DSQLITE_THREADSAFE=0 \
+	-DSQLITE_DEFAULT_MEMSTATUS=0 \
+	-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 \
+	-DSQLITE_LIKE_DOESNT_MATCH_BLOBS \
+	-DSQLITE_MAX_EXPR_DEPTH=0 \
+	-DSQLITE_OMIT_DECLTYPE \
+	-DSQLITE_OMIT_DEPRECATED \
+	-DSQLITE_OMIT_SHARED_CACHE
 
 release:
 	$(MAKE) RELEASE=1
