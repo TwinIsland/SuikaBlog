@@ -22,8 +22,8 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data);
 // standard router reply int function, can be called by
 // ROUTER_reply(c, router_name, int_response)
 #define ROUTER_reply_int(c, router_name, int_response)                              \
-  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{ %m:%d, %m:%d }\n", \
-                MG_ESC("status"), 200,                                              \
+  mg_http_reply(c, 200, "Content-Type: application/json\r\n", "{ %m:%m, %m:%d }\n", \
+                MG_ESC("status"), MG_ESC("true"),                                   \
                 MG_ESC("content"), int_response);
 
 #define ROUTER_reply_(c, router_name, content, content_type, code)                           \

@@ -95,6 +95,12 @@ extern void exit_handler();
 #define debug(msg, ...)
 #endif
 
+#define LOGGING(msg, ...)                             \
+    do                                              \
+    {                                               \
+        printf("(LOGGING) " msg "\n", ##__VA_ARGS__); \
+    } while (0)
+
 #define SHA256_PASS_MATCHED(pass1, pass2) strncmp((char *)pass1, (char *)pass2, SHA256_BLOCK_SIZE) == 0
 
 // get the sha256 encrypt result from string, size equal to SHA256_BLOCK_SIZE

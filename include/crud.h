@@ -44,7 +44,7 @@ Result get_info(const char *key, char **value);
 Result push_info(const char *key, const char *value);
 
 // Views
-Result get_views();
+Result get_views(Views *ret);
 
-// Close database
-void db_close(void);
+// Visitors
+Result add_visitor(Visitor *visitor, int *visitor_id_ret);

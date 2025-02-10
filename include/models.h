@@ -111,6 +111,14 @@ typedef struct
     int32_t UpVoted;
 } Comment;
 
+typedef struct
+{
+    char *name;
+    char *email;
+    char *website;
+    int banned;
+} Visitor;
+
 void ViewsMap_Destroyer(void *cache);
 
 void free_post(Post *post);
@@ -120,6 +128,7 @@ void free_views(Views *views);
 void free_archieves(Archieves *archieves);
 void free_PostInfos(PostInfos *post_infos);
 void free_indexData(IndexData *indexData);
+void free_visitor(Visitor *visitor);
 
 char *notice_to_json(Notice *notice);
 char *tags_to_json(Tags *tags);
@@ -129,3 +138,4 @@ char *postInfo_to_json(PostInfo *post_info);
 char *archieves_to_json(Archieves *archieves);
 char *postInfos_to_json(PostInfos *post_infos);
 char *indexData_to_json(IndexData *index_data);
+char *visitor_to_json(Visitor *visitor);

@@ -48,7 +48,7 @@ Welcome to Suika Blog System!
         <header class="flex three header">
             <div class="none third-800" style="padding-bottom: 0;">
                 <span>Hi: </span>
-                <span style="font-style: italic;"><a href="#">Visitor</a></span>
+                <label style="font-style: italic; color: #B98A82;" for="login_modal"><u>Visitor</u></label>
             </div>
             <div style="text-align: center; padding-bottom: 0;" class="logo brand one-third third-800">
                 <a href="/" onclick="route()">
@@ -93,6 +93,64 @@ Welcome to Suika Blog System!
                 </footer>
             </article>
         </div>
+
+        <!-- Login function modal -->
+        <div class="modal">
+            <input id="login_modal" type="checkbox" />
+            <label for="login_modal" class="overlay"></label>
+            <article style="width: 30rem;">
+                <header>
+                    <h3>快捷登录</h3>
+                    <label for="login_modal" class="close">&times;</label>
+                </header>
+                <section class="content" style="padding-top: 20px;">
+                    <b>用户名：</b>
+                    <input type="text" style="height: 45px;margin-bottom: 12px;margin-top: 5px;" placeholder="(*/ω＼*)">
+                    <b>电子邮箱：</b>
+                    <input type="email" style="height: 45px;;margin-top: 5px" placeholder="(*/ω＼*)">
+                </section>
+                <footer style="display: flex;align-items: center">
+                    <label class="button" style="font-size: 1.2em;">登录</label>
+                    <label for="register_modal" style="color: #B98A82;margin-left: 10px;"><u>注册账号</u></label>
+                    <p style="color: rgba(33, 37, 41, 0.75); font-size: 2rem; user-select: none; margin-left: auto;">
+                        ExpressAccount</p>
+                </footer>
+            </article>
+        </div>
+
+        <!-- Registor modal -->
+        <div class="modal">
+            <input id="register_modal" type="checkbox" />
+            <label for="register_modal" class="overlay"></label>
+            <article style="width: 30rem;">
+                <header>
+                    <h3>注册账号</h3>
+                    <label for="register_modal" class="close">&times;</label>
+                </header>
+                <section class="content" style="padding-top: 20px;">
+                    <b>用户名：</b>
+                    <p id="username_error" style="color: red; font-size: 0.9em; display: none;">用户名不能为空！</p>
+                    <input id="username" type="text" style="height: 45px; margin-bottom: 12px; margin-top: 5px;"
+                        placeholder="(*/ω＼*)">
+
+                    <b>电子邮箱：</b>
+                    <p id="email_error" style="color: red; font-size: 0.9em; display: none;">请输入有效的电子邮件地址！</p>
+                    <input id="email" type="email" style="height: 45px; margin-bottom: 12px; margin-top: 5px"
+                        placeholder="(*/ω＼*)">
+
+                    <b>网站（可选）：</b>
+                    <input id="website" type="url" style="height: 45px; margin-top: 5px" placeholder="(*/ω＼*)">
+                    <p id="response_message" style="margin-left: auto; color: rgba(33, 37, 41, 0.75); font-size: 1rem;">
+                    </p>
+                </section>
+                <footer style="display: flex; align-items: center">
+                    <label class="button" style="font-size: 1.2em; cursor: pointer;"
+                        onclick="registerAccount()">注册</label>
+                    <label for="login_modal" style="color: #B98A82; margin-left: 10px;"><u>返回登陆</u></label>
+                </footer>
+            </article>
+        </div>
+
 
         <hr style="color: rgb(248, 249, 250);">
 
@@ -171,6 +229,64 @@ Welcome to Suika Blog System!
                 backToTopButton.style.display = 'none';
             }
         });        
+    </script>
+
+    <script>
+        function registerAccount() {
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const website = document.getElementById("website").value.trim();
+            const usernameError = document.getElementById("username_error");
+            const emailError = document.getElementById("email_error");
+            const responseMessage = document.getElementById("response_message");
+
+            // Reset error messages
+            usernameError.style.display = "none";
+            emailError.style.display = "none";
+            responseMessage.innerText = "";
+
+            // Validate input fields
+            let isValid = true;
+
+            if (username === "") {
+                usernameError.style.display = "block";
+                isValid = false;
+            }
+
+            if (email === "" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                emailError.style.display = "block";
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            let requestData = { name: username, email: email };
+            if (website !== "") {
+                requestData.website = website;
+            }
+
+            fetch("/api/visitor/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        responseMessage.style.color = "green";
+                        responseMessage.innerText = `注册成功！你的ID： ${data.content}`;
+                    } else {
+                        responseMessage.style.color = "red";
+                        responseMessage.innerText = `注册失败： ${data.content}`;
+                    }
+                })
+                .catch(error => {
+                    responseMessage.style.color = "red";
+                    responseMessage.innerText = "服务器错误，请稍后再试。";
+                });
+        }
     </script>
 </body>
 

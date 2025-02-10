@@ -522,6 +522,49 @@ ROUTER(auth)
     ROUTER_reply(c, "auth", UNAUTH_ERR);
 }
 
+ROUTER(visitor_register)
+{
+  struct mg_str data = hm->body;
+
+  Visitor visitor = {0};
+  size_t ofs = 0;
+  struct mg_str key, val;
+
+  int field_n = 0;
+
+  while ((ofs = mg_json_next(data, ofs, &key, &val)) > 0)
+  {
+    if (mg_strcmp(key, mg_str("\"name\"")) == 0)
+    {
+      visitor.name = mg_str_without_paren(val);
+      field_n++;
+    }
+    else if (mg_strcmp(key, mg_str("\"email\"")) == 0)
+    {
+      visitor.email = mg_str_without_paren(val);
+      field_n++;
+    }
+  }
+
+  if (field_n == 2)
+  {
+    int ret_vid = -1;
+    Result ret = add_visitor(&visitor, &ret_vid);
+    if (ret.status == FAILED)
+    {
+      free_visitor(&visitor);
+      ROUTER_reply(c, "visitor_register", ret.msg, STRING_type, SERVERSIDE_ERR_CODE);
+      return;
+    }
+    LOGGING("user registor. name: %s\tid: %d", visitor.name, ret_vid);
+    ROUTER_reply_int(c, "visitor_register", ret_vid);
+  }
+  else
+    ROUTER_reply(c, "visitor_register", BADREQ_ERR);
+
+  free_visitor(&visitor);
+}
+
 // Connection event handler function
 void server_fn(struct mg_connection *c, int ev, void *ev_data)
 {
@@ -564,6 +607,9 @@ void server_fn(struct mg_connection *c, int ev, void *ev_data)
         USE_ROUTER(views);
       else if (mg_match(hm->uri, mg_str("/api/incLike#"), NULL))
         USE_ROUTER(incLike);
+      else if (mg_match(hm->uri, mg_str("/api/visitor/register#"), NULL))
+        USE_ROUTER(visitor_register);
+
       else
         goto default_router;
     }

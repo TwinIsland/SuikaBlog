@@ -107,6 +107,13 @@ void free_indexData(IndexData *indexData)
     free_archieves(&indexData->Archieves);
 }
 
+void free_visitor(Visitor *visitor)
+{
+    free(visitor->email);
+    free(visitor->name);
+    free(visitor->website);
+}
+
 char *format_time(time_t t, char *timestamp_buf)
 {
     printf("Raw time_t value: %ld\n", t);
@@ -373,6 +380,17 @@ char *indexData_to_json(IndexData *index_data)
     free(archieves_str);
     free(notice_str);
     free(normalArticleInfos_str);
+
+    return json;
+}
+
+char *visitor_to_json(Visitor *visitor)
+{
+    char *json = mg_mprintf("{%m: %m, %m: %m, %m: %m, %m: %d",
+                            MG_ESC("name"), MG_ESC(visitor->name),
+                            MG_ESC("email"), MG_ESC(visitor->email),
+                            MG_ESC("website"), MG_ESC(visitor->website),
+                            MG_ESC("banned"), MG_ESC(visitor->banned));
 
     return json;
 }

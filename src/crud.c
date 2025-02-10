@@ -491,3 +491,47 @@ Result get_PostInfos_from_n(int n, PostInfos *ret)
 
     return (Result){.status = OK, .ptr = ret};
 }
+
+Result add_visitor(Visitor *visitor, int *visitor_id_ret)
+{
+    if (db == NULL)
+        return UNINITIALIZE_ERR;
+
+    const char *sql = "INSERT INTO Visitors (Name, Email, Website) VALUES (?, ?, ?)";
+
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+        return PREPARATION_ERR;
+
+    sqlite3_bind_text(stmt, 1, visitor->name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, visitor->email, -1, SQLITE_STATIC);
+
+    if (visitor->website) 
+        sqlite3_bind_text(stmt, 3, visitor->website, -1, SQLITE_STATIC);
+    else
+        sqlite3_bind_null(stmt, 3);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        static char err_msg[256];
+        if (sqlite3_errcode(db) ==  19) {
+            // unique constrain
+            snprintf(err_msg, sizeof(err_msg), "The username is already in use.");
+        }
+        else
+            snprintf(err_msg, sizeof(err_msg), "%s", sqlite3_errmsg(db));
+
+        sqlite3_finalize(stmt);
+        return (Result) {
+            .status = FAILED,
+            .msg = err_msg,
+        };
+    }
+
+    long long int visitor_id = sqlite3_last_insert_rowid(db);
+    *visitor_id_ret = visitor_id;
+    sqlite3_finalize(stmt);
+
+    return (Result){.status = OK};
+}
