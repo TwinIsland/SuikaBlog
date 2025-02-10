@@ -4,7 +4,7 @@
 
 sqlite3 *db = NULL;
 
-Result init_db()
+Result db_init()
 {
     int rc = sqlite3_open(config.db_name, &db);
     if (rc != SQLITE_OK)

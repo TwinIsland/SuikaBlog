@@ -4,6 +4,8 @@
 #include "install.h"
 #include "utils.h"
 #include "config.h"
+#include "crud.h"
+#include "db.h"
 
 static Result initialize_pass(const char *key_file, const char *keypass)
 {
@@ -30,26 +32,21 @@ static Result initialize_pass(const char *key_file, const char *keypass)
 
 static Result initialize_db(const char *db_path)
 {
-    sqlite3 *db;
+    Result ret;
     char *errMsg = NULL;
-    int rc;
 
     // Open the SQLite database
-    rc = sqlite3_open(db_path, &db);
-    if (rc != SQLITE_OK)
+    ret = db_init();
+    if (ret.status == FAILED)
     {
-        sqlite3_close(db);
-        return (Result){
-            .status = FAILED,
-            .msg = sqlite3_errmsg(db),
-        };
+        return ret;
     }
 
     // Read SQL commands from db_ini.sql file
     FILE *sqlFile = fopen(DB_INI_SCRIPT_PATH, "r");
     if (sqlFile == NULL)
     {
-        sqlite3_close(db);
+        db_close();
         return (Result){
             .status = FAILED,
             .msg = "Cannot open sql_ini file",
@@ -67,7 +64,7 @@ static Result initialize_db(const char *db_path)
     sql[fsize] = 0;
 
     // Execute SQL commands
-    rc = sqlite3_exec(db, sql, 0, 0, &errMsg);
+    int rc = sqlite3_exec(db, sql, 0, 0, &errMsg);
     if (rc != SQLITE_OK)
     {
         debug("SQL error: %s\n", errMsg);
@@ -80,9 +77,27 @@ static Result initialize_db(const char *db_path)
         };
     }
 
-    // Clean up
-    sqlite3_close(db);
-    free(sql);
+    // Insert hello world Post
+    int _;
+    char content_buf[2048] = {0};
+    FILE *fptr = fopen("assets/init_post.md", "r");
+    if (fptr)
+    {
+        fread(content_buf, 1, sizeof(content_buf) - 1, fptr);
+        fclose(fptr);
+        printf("%s\n", content_buf);
+
+        ret = create_post(
+            "Hello World!",
+            "Thanks for choosing SuikaBlog System",
+            "",
+            content_buf,
+            0,
+            &_);
+    }
+
+    // Close DB
+    db_close();
 
     return (Result){
         .status = OK,

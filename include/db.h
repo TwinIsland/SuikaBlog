@@ -4,7 +4,7 @@
 
 #include "result.h"
 
-Result init_db();
+Result db_init();
 void db_close();
 
 extern sqlite3 *db;

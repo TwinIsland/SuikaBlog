@@ -15,9 +15,9 @@ CREATE TABLE Posts (
 
 CREATE TABLE Visitors (
     Name VARCHAR(64) PRIMARY KEY,
-    Email TEXT,
+    Email TEXT NOT NULL,
     Website TEXT,
-    Banned INTEGER
+    Banned INTEGER DEFAULT 0
 );
 
 CREATE TABLE Comment (

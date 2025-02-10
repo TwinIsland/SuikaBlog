@@ -38,7 +38,7 @@ function renderCoverArticle(coverArticleJSON, normalArticlesJSON) {
 function renderNormalArticle(normalArticlesJSON) {
   return normalArticlesJSON.map(normalArticleJSON => `
   <a href="/post/${normalArticleJSON.PostID}" onclick="route()" style="text-decoration: none; color: inherit;">
-    <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${normalArticleJSON.Banner === "" ? '/img/banner.webp' : '/img/banner.webp'}')";>
+    <div class="card normal-article" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${normalArticleJSON.Banner === "" ? '/img/banner.webp' : normalArticleJSON.Banner}')";>
         <h2 class="inline-text" style="padding: 10px 0 10px 0;">${normalArticleJSON.Title}</h2>
         <div style="margin-bottom: 45px;">
             <span>${normalArticleJSON.CreateDate}</span>

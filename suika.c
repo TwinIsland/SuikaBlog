@@ -109,7 +109,7 @@ int main()
     PRINT_LOG("init: upload pattern", ret, ERR_IS_CRITICAL);
 
     // initialize the database
-    ret = init_db();
+    ret = db_init();
     PRINT_LOG("init: %s", ret, ERR_IS_CRITICAL, config.db_name);
 
     // initialize the plugins
